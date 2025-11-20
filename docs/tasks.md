@@ -1,129 +1,168 @@
-# Technical Task List — Strava Activity Analyzer
+# Technical Task List
 
-Status: Draft v1 (2025-11-20)
+This document tracks the step-by-step technical tasks required to build the Strava Activity Analyzer. Each task is linked to the high-level plan and specific requirements.
 
-Purpose
-- This document enumerates concrete technical tasks derived from the implementation plan and requirements.
-- Every task is a checkbox `[ ]`, grouped into development phases. Each item references the corresponding Plan section(s) in `docs/plan.md` and related Requirement IDs in `docs/requirements.md`.
+## Phase 1: Infrastructure & Authentication
 
-Link Legend
-- Plan links: `plan.md#...` refer to section headings (e.g., Plan 1.1, 2.1, etc.).
-- Requirements links: `requirements.md#group-...` point to the relevant requirement group; the exact R# is listed alongside.
+- [ ] **1.1 Initialize Project Repository**
+  - _Plan Item:_ Project Initialization
+  - _Req ID:_ N/A
+  - **Details:** Initialize git repo, create solution/project structure (e.g., ASP.NET Core Web API + React/Vue/Blazor or MVC), configure .gitignore.
 
----
+- [ ] **1.2 Configure Environment Variables & Secrets**
+  - _Plan Item:_ Project Initialization
+  - _Req ID:_ [Req 1]
+  - **Details:** specific configuration for `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, and `SESSION_SECRET` (or equivalent). Ensure secrets are excluded from source control.
 
-## Phase 1 — Foundation & Auth (M1)
+- [ ] **1.3 Create OAuth2 Controller/Handler**
+  - _Plan Item:_ OAuth2 Client Implementation
+  - _Req ID:_ [Req 1]
+  - **Details:** Implement `/auth/login` endpoint to redirect user to Strava Authorization URL with scopes `read,activity:read_all`.
 
-[ ] Initialize solution skeleton (.NET 8 minimal API + server-rendered UI), repo layout, CI stub, and README bootstrap. Ref: [Plan 9.1](plan.md#91-technology-stack-decision-implementation-agnostic-requirement), [Plan 5.2](plan.md#52-module-layout); Reqs: [R18](requirements.md#group-e--api-and-architecture-optional-when-spa--api), All (supporting).
+- [ ] **1.4 Implement Token Exchange Logic**
+  - _Plan Item:_ Token Exchange & Storage
+  - _Req ID:_ [Req 1]
+  - **Details:** Implement `/auth/callback` to receive the `code` and exchange it for `access_token` and `refresh_token` using Strava's `/oauth/token` endpoint.
 
-[ ] Establish module layout/namespaces: `auth`, `strava_client`, `analytics`, `presentation/ui`, `config`, `cache`, `logging`. Ref: [Plan 5.2](plan.md#52-module-layout), [Plan 9.1](plan.md#91-technology-stack-decision-implementation-agnostic-requirement); Reqs: [R18](requirements.md#group-e--api-and-architecture-optional-when-spa--api).
+- [ ] **1.5 Implement Secure Token Storage**
+  - _Plan Item:_ Token Exchange & Storage
+  - _Req ID:_ [Req 2]
+  - **Details:** Create a service to store tokens securely (e.g., HTTP-only encrypted cookies, server-side session store, or database). Ensure client browser never sees the raw access token.
 
-[ ] Implement configuration & secrets management: env binder, `appsettings` overrides, `.env.example`, and config health-check. Ref: [Plan 1.4](plan.md#14-multi-environment-configuration), [Plan 9.3](plan.md#93-configuration--secrets-management); Reqs: [R4](requirements.md#group-a--authentication-and-security).
+- [ ] **1.6 Implement Token Refresh Service**
+  - _Plan Item:_ Session Management
+  - _Req ID:_ [Req 2]
+  - **Details:** Create middleware or a service wrapper that checks token expiration before API calls and uses the `refresh_token` to get a new `access_token` if needed.
 
-[ ] Add structured logging and error handling middleware; scrub PII/tokens; correlation IDs. Ref: [Plan 9.5](plan.md#95-logging--error-handling), [Plan 1.3](plan.md#13-privacy--secure-handling); Reqs: [R22](requirements.md#group-f--non-functional-requirements), [R3](requirements.md#group-a--authentication-and-security).
+- [ ] **1.7 Create Logout Endpoint**
+  - _Plan Item:_ Sign Out Flow
+  - _Req ID:_ [Req 2]
+  - **Details:** Implement `/auth/logout` to clear session cookies and invalidate server-side session state.
 
-[ ] Build OAuth2 Authorization Code flow: `/auth/login`, `/auth/callback` (server-side secret), state parameter CSRF protection, secure session cookie, redirect to dashboard. Ref: [Plan 1.1](plan.md#11-oauth2-authorization-code-with-pkce-or-server-secret); Reqs: [R1](requirements.md#group-a--authentication-and-security), [R3](requirements.md#group-a--authentication-and-security), [R4](requirements.md#group-a--authentication-and-security).
+## Phase 2: Data Ingestion & Core Logic
 
-[ ] Document Strava scopes used (`read`, `activity:read_all`) and compliance notes. Ref: [Plan 1.3](plan.md#13-privacy--secure-handling); Reqs: [R3](requirements.md#group-a--authentication-and-security), [R27](requirements.md#group-h--edge-cases-and-rules).
+- [ ] **2.1 Define Activity Data Models**
+  - _Plan Item:_ Strava API Client
+  - _Req ID:_ [Req 3]
+  - **Details:** Create DTOs/Classes for Strava Activity (ID, type, distance, moving_time, start_date, timezone, etc.).
 
----
+- [ ] **2.2 Build Strava API Client Wrapper**
+  - _Plan Item:_ Strava API Client
+  - _Req ID:_ [Req 3]
+  - **Details:** Implement a typed HTTP client for fetching activities (`GET /athlete/activities`). Include Authorization header injection.
 
-## Phase 2 — Data Client & Basics (M2)
+- [ ] **2.3 Implement Pagination Logic**
+  - _Plan Item:_ Pagination & Rate Limiting
+  - _Req ID:_ [Req 3]
+  - **Details:** Write a loop/recursive function to fetch activities page-by-page until an empty page is returned or a specific date limit is reached.
 
-[ ] Implement Strava API client with pagination; respect rate limits using response headers; exponential backoff and retry policy. Ref: [Plan 2.1](plan.md#21-strava-api-client-with-pagination-backoff-caching); Reqs: [R5](requirements.md#group-b--data-acquisition-and-handling), [R28](requirements.md#group-h--edge-cases-and-rules).
+- [ ] **2.4 Add Rate Limiting & Backoff**
+  - _Plan Item:_ Pagination & Rate Limiting
+  - _Req ID:_ [Req 3]
+  - **Details:** Inspect Strava response headers (`X-RateLimit-Limit`, `X-RateLimit-Usage`). Implement a delay/pause mechanism if limits are approaching or if `429 Too Many Requests` is received.
 
-[ ] Add centralized token refresh handling; auto-retry a single failed request after refresh. Ref: [Plan 1.2](plan.md#12-token-refresh--retry), [Plan 2.1](plan.md#21-strava-api-client-with-pagination-backoff-caching); Reqs: [R2](requirements.md#group-a--authentication-and-security).
+- [ ] **2.5 Implement Activity Normalizer**
+  - _Plan Item:_ Data Normalization
+  - _Req ID:_ [Req 3]
+  - **Details:** Convert API timestamps to local datetime objects based on the activity's timezone. Ensure numeric precision for distance (meters) and time (seconds).
 
-[ ] Normalize timestamps to user timezone using Strava `start_date_local`/`timezone`; apply cross-midnight assignment rule; document behavior. Ref: [Plan 2.2](plan.md#22-timezone-normalization--cross-midnight-rule); Reqs: [R6](requirements.md#group-b--data-acquisition-and-handling).
+- [ ] **2.6 Create In-Memory Cache Service**
+  - _Plan Item:_ In-Memory Data Store/Cache
+  - _Req ID:_ [Req 3], [Req 11]
+  - **Details:** Implement a caching layer (e.g., IMemoryCache or a Dictionary-based singleton scoped to session) to store fetched activities and prevent re-fetching on every page reload.
 
-[ ] Standardize API error envelope and typed error codes; surface actionable UI messages; handle revoked/expired tokens with re-auth prompt. Ref: [Plan 2.3](plan.md#23-graceful-handling-no-data-api-failures-rate-limits-reauth-prompts); Reqs: [R7](requirements.md#group-b--data-acquisition-and-handling).
+- [ ] **2.7 Build Unit Conversion Utility**
+  - _Plan Item:_ Unit Conversion Service
+  - _Req ID:_ [Req 9]
+  - **Details:** Create functions to convert Meters -> Miles/Km, Meters/Sec -> Min/Mile or Min/Km pace.
 
-[ ] Define domain models (`Activity`, `Split`, `AggregateDay`, `TrendPoint`) and implement core analytics service functions for counts, time, distance, pace, streaks. Ref: [Plan 9.2](plan.md#92-domain-models--analytics-service); Reqs: [R8](requirements.md#group-c--dashboard-and-widgets)–[R14](requirements.md#group-c--dashboard-and-widgets), [R26](requirements.md#group-h--edge-cases-and-rules).
+## Phase 3: Dashboard Framework & Basic Widgets
 
-[ ] Implement caching layer (in-memory initially) for activity lists and summary responses; keys include user, date range, and units; TTL + invalidation on unit/range change; delete-by-user. Ref: [Plan 9.4](plan.md#94-caching-layer), [Plan 2.1](plan.md#21-strava-api-client-with-pagination-backoff-caching); Reqs: [R5](requirements.md#group-b--data-acquisition-and-handling), [R19](requirements.md#group-f--non-functional-requirements), [R21](requirements.md#group-f--non-functional-requirements), [R28](requirements.md#group-h--edge-cases-and-rules).
+- [ ] **3.1 Setup Frontend Project Structure**
+  - _Plan Item:_ Dashboard Layout
+  - _Req ID:_ N/A
+  - **Details:** Scaffold the UI application (HTML/CSS/JS or SPA framework). Configure build pipeline if needed.
 
----
+- [ ] **3.2 Implement Main Dashboard Grid**
+  - _Plan Item:_ Dashboard Layout
+  - _Req ID:_ N/A
+  - **Details:** Create the responsive container and grid layout for widgets.
 
-## Phase 3 — API Surfaces (M3)
+- [ ] **3.3 Create State Management Store**
+  - _Plan Item:_ Global State Management
+  - _Req ID:_ [Req 8], [Req 9]
+  - **Details:** Set up a store (Context API, Redux, Pinia, or simple state) to hold `allActivities`, `filteredActivities`, `dateRange`, and `unitSystem`.
 
-[ ] Implement `/api/me/summary?from=YYYY-MM-DD&to=YYYY-MM-DD&units=metric|imperial` returning all widget data; define DTOs and schema. Ref: [Plan 5.1](plan.md#51-summary-endpoint-andor-per-widget-endpoints); Reqs: [R17](requirements.md#group-e--api-and-architecture-optional-when-spa--api).
+- [ ] **3.4 Build Date Range Picker Component**
+  - _Plan Item:_ Date Filter Controls
+  - _Req ID:_ [Req 8]
+  - **Details:** Create UI for "Last 30 Days", "YTD", "All Time", and Custom Start/End inputs. Wire up logic to filter the `allActivities` list into `filteredActivities`.
 
-[ ] Optionally expose per-widget endpoints; document response contracts and versioning. Ref: [Plan 5.1](plan.md#51-summary-endpoint-andor-per-widget-endpoints); Reqs: [R17](requirements.md#group-e--api-and-architecture-optional-when-spa--api).
+- [ ] **3.5 Implement Running Stats Widget**
+  - _Plan Item:_ Running Statistics Component
+  - _Req ID:_ [Req 6]
+  - **Details:** Create component to compute and display: Total Runs, 10K+ Runs, Total Distance, Avg Pace. Calculate PRs (Fastest 10k, Longest Run) from the filtered list.
 
-[ ] Verify module boundaries and references; ensure `presentation/ui` consumes only API contracts. Ref: [Plan 5.2](plan.md#52-module-layout); Reqs: [R18](requirements.md#group-e--api-and-architecture-optional-when-spa--api).
+- [ ] **3.6 Implement Activity Distribution Charts**
+  - _Plan Item:_ Activity Distribution Charts
+  - _Req ID:_ [Req 4]
+  - **Details:** Integrate a chart library (e.g., Chart.js, Recharts). Create Pie/Donut charts for "Count by Type" and "Time by Type".
 
----
+- [ ] **3.7 Implement Distance Histogram**
+  - _Plan Item:_ Distance Histogram
+  - _Req ID:_ [Req 6]
+  - **Details:** Create logic to bin runs by distance (0-1mi, 1-2mi, etc.). Render a bar chart using these bins.
 
-## Phase 4 — Dashboard MVP (M4)
+## Phase 4: Advanced Visualization & Trends
 
-[ ] Build unauthenticated index/login page with “Connect with Strava” button and privacy note; wire to OAuth. Ref: [Plan 7.1](plan.md#71-indexlogin-page-unauthenticated); Reqs: [R23](requirements.md#group-g--ui-pages-and-navigation).
+- [ ] **4.1 Implement Heatmap Data Transformation**
+  - _Plan Item:_ Heatmap Component Logic
+  - _Req ID:_ [Req 5]
+  - **Details:** Write a function to transform a list of activities into a map of `{ "YYYY-MM-DD": value }`.
 
-[ ] Build authenticated dashboard shell with layout, date controls, units toggle, sign-out. Ref: [Plan 7.2](plan.md#72-dashboard-authenticated); Reqs: [R24](requirements.md#group-g--ui-pages-and-navigation).
+- [ ] **4.2 Build Calendar Heatmap Component**
+  - _Plan Item:_ Workout & Running Heatmaps
+  - _Req ID:_ [Req 5]
+  - **Details:** Render a GitHub-style calendar grid. Support two modes: "All Activities" (intensity = frequency) and "Running" (intensity = distance).
 
-[ ] Implement Activity Count Distribution widget (counts per activity type with percentages). Ref: [Plan 3.1](plan.md#31-activity-count-distribution-piedonut); Reqs: [R8](requirements.md#group-c--dashboard-and-widgets), [R15](requirements.md#group-d--filters-units-and-internationalization).
+- [ ] **4.3 Calculate Streak Metrics**
+  - _Plan Item:_ Workout & Running Heatmaps
+  - _Req ID:_ [Req 5]
+  - **Details:** Implement algorithm to find "Current Streak" and "Longest Streak" based on consecutive days in the filtered dataset.
 
-[ ] Implement Time Distribution by Activity Type widget (total moving time per type, HH:MM). Ref: [Plan 3.2](plan.md#32-time-distribution-by-activity-type-piedonut); Reqs: [R9](requirements.md#group-c--dashboard-and-widgets), [R15](requirements.md#group-d--filters-units-and-internationalization).
+- [ ] **4.4 Implement Trend Aggregation Logic**
+  - _Plan Item:_ Trend Calculation Engine
+  - _Req ID:_ [Req 7]
+  - **Details:** Create service to group filtered data by Day, Week, or Month.
 
-[ ] Implement Workout Heatmap with streaks (calendar grid; count or time per day; ISO week alignment noted). Ref: [Plan 3.3](plan.md#33-workout-heatmap-calendar-grid--streaks); Reqs: [R10](requirements.md#group-c--dashboard-and-widgets), [R26](requirements.md#group-h--edge-cases-and-rules).
+- [ ] **4.5 Build Trend Line Charts**
+  - _Plan Item:_ Mileage & Pace Trend Charts
+  - _Req ID:_ [Req 7]
+  - **Details:** Render line charts for "Mileage over time" and "Avg Pace over time". Implement moving average smoothing (e.g., 7-day rolling avg).
 
-[ ] Implement Date Range filters with presets and persistence (URL or session); ensure all widgets recompute. Ref: [Plan 4.1](plan.md#41-date-range-filters-with-presets--persistence); Reqs: [R15](requirements.md#group-d--filters-units-and-internationalization).
+## Phase 5: User Experience & Quality Assurance
 
-[ ] Implement Units toggle (metric/imperial) affecting all widgets, labels, tooltips, and axis formats. Ref: [Plan 4.2](plan.md#42-units-toggle-metricimperial--locale-formatting); Reqs: [R16](requirements.md#group-d--filters-units-and-internationalization).
+- [ ] **5.1 Add Loading Skeletons/Spinners**
+  - _Plan Item:_ Performance Optimization
+  - _Req ID:_ [Req 11]
+  - **Details:** Show visual feedback while data is being fetched or re-calculated.
 
----
+- [ ] **5.2 Handle "No Data" States**
+  - _Plan Item:_ Empty States
+  - _Req ID:_ [Req 10]
+  - **Details:** Ensure widgets display a friendly message if the date filter results in zero activities.
 
-## Phase 5 — Runner Features (M5)
+- [ ] **5.3 Implement Global Error Boundary/Toast**
+  - _Plan Item:_ Error Handling UI
+  - _Req ID:_ [Req 10]
+  - **Details:** Catch API errors (401, 500) and display a user-friendly notification or error page.
 
-[ ] Implement Running Heatmap (daily distance intensity) with running-specific streaks. Ref: [Plan 3.4](plan.md#34-running-heatmap-distance-intensity--streaks); Reqs: [R11](requirements.md#group-c--dashboard-and-widgets), [R26](requirements.md#group-h--edge-cases-and-rules).
+- [ ] **5.4 Persist User Preferences**
+  - _Plan Item:_ Persist User Settings
+  - _Req ID:_ [Req 8], [Req 9]
+  - **Details:** Save the selected Unit System and Date Range to `localStorage` or URL query parameters so they persist on reload.
 
-[ ] Implement Running Stats & PRs (totals, 10K count, total distance, avg pace; distance histogram; PRs: mile, 10K, longest run, most elevation). Ref: [Plan 3.5](plan.md#35-running-stats--prs); Reqs: [R12](requirements.md#group-c--dashboard-and-widgets).
-
-[ ] Implement Mileage Trend (daily/weekly/monthly with 7-day moving average for daily). Ref: [Plan 3.6](plan.md#36-mileage-trend); Reqs: [R13](requirements.md#group-c--dashboard-and-widgets), [R26](requirements.md#group-h--edge-cases-and-rules).
-
-[ ] Implement Pace Trend (average pace with correct speed inversion; MM:SS; tooltips). Ref: [Plan 3.7](plan.md#37-pace-trend); Reqs: [R14](requirements.md#group-c--dashboard-and-widgets), [R26](requirements.md#group-h--edge-cases-and-rules).
-
----
-
-## Phase 6 — NFRs & Polish (M6)
-
-[ ] Performance tuning and budgets: ensure initial render < 2s on typical dataset; lazy-load charts; observe cache hit ratio. Ref: [Plan 6.1](plan.md#61-performance-targets-and-caching-strategy), [Plan 9.4](plan.md#94-caching-layer); Reqs: [R19](requirements.md#group-f--non-functional-requirements), [R5](requirements.md#group-b--data-acquisition-and-handling).
-
-[ ] Accessibility improvements: keyboard navigation for all controls; contrast-compliant palettes; legends/tooltips; ARIA where appropriate. Ref: [Plan 6.2](plan.md#62-accessibility-a11y); Reqs: [R20](requirements.md#group-f--non-functional-requirements).
-
-[ ] Data retention controls: endpoint/UI for user-triggered cache purge; avoid retaining raw activity data longer than necessary. Ref: [Plan 6.3](plan.md#63-data-retention-controls), [Plan 9.4](plan.md#94-caching-layer); Reqs: [R21](requirements.md#group-f--non-functional-requirements).
-
-[ ] Observability & error tracking: structured logs with levels and error IDs; optional basic error tracking integration; confirm PII/tokens excluded. Ref: [Plan 6.4](plan.md#64-observability--error-tracking), [Plan 1.3](plan.md#13-privacy--secure-handling); Reqs: [R22](requirements.md#group-f--non-functional-requirements), [R3](requirements.md#group-a--authentication-and-security).
-
-[ ] Error views: friendly error page mapping API/auth failures to actionable guidance. Ref: [Plan 7.3](plan.md#73-error-views); Reqs: [R25](requirements.md#group-g--ui-pages-and-navigation), [R7](requirements.md#group-b--data-acquisition-and-handling).
-
-[ ] Weekly/monthly rules: enforce ISO week (Mon–Sun) and calendar months; document rules in UI/README. Ref: [Plan 8.1](plan.md#81-weeklymonthly-rules-iso-week); Reqs: [R26](requirements.md#group-h--edge-cases-and-rules).
-
-[ ] Private activities handling: include only when `activity:read_all` is granted; otherwise exclude and label accordingly. Ref: [Plan 8.2](plan.md#82-private-activities-scope-handling), [Plan 1.3](plan.md#13-privacy--secure-handling); Reqs: [R27](requirements.md#group-h--edge-cases-and-rules), [R3](requirements.md#group-a--authentication-and-security).
-
-[ ] Large dataset stability & UX: batch/paginate, streaming where viable, loading states, and timeout avoidance. Ref: [Plan 8.3](plan.md#83-large-datasets-stability--ux); Reqs: [R28](requirements.md#group-h--edge-cases-and-rules), [R19](requirements.md#group-f--non-functional-requirements).
-
----
-
-## Phase 7 — Testing & QA (cross-cutting)
-
-[ ] Unit tests for analytics functions: counts, time, distance, pace, streaks; include DST and ISO week cases. Ref: [Plan 9.2](plan.md#92-domain-models--analytics-service), [Plan 8.1](plan.md#81-weeklymonthly-rules-iso-week); Reqs: [R8](requirements.md#group-c--dashboard-and-widgets)–[R14](requirements.md#group-c--dashboard-and-widgets), [R26](requirements.md#group-h--edge-cases-and-rules).
-
-[ ] Integration tests for OAuth flow and token refresh, including CSRF/state and cookie security flags. Ref: [Plan 1.1](plan.md#11-oauth2-authorization-code-with-pkce-or-server-secret), [Plan 1.2](plan.md#12-token-refresh--retry); Reqs: [R1](requirements.md#group-a--authentication-and-security), [R2](requirements.md#group-a--authentication-and-security), [R3](requirements.md#group-a--authentication-and-security).
-
-[ ] API contract tests for `/api/me/summary` and per-widget endpoints; schema validation. Ref: [Plan 5.1](plan.md#51-summary-endpoint-andor-per-widget-endpoints); Reqs: [R17](requirements.md#group-e--api-and-architecture-optional-when-spa--api).
-
-[ ] Performance verification with seeded dataset (<5,000 activities): initial render < 2s; cache effectiveness. Ref: [Plan 6.1](plan.md#61-performance-targets-and-caching-strategy); Reqs: [R19](requirements.md#group-f--non-functional-requirements).
-
-[ ] Accessibility checks (keyboard nav, contrast, legends/tooltips) and fixes. Ref: [Plan 6.2](plan.md#62-accessibility-a11y); Reqs: [R20](requirements.md#group-f--non-functional-requirements).
-
-[ ] Data retention and purge tests: verify delete-by-user clears cache/state. Ref: [Plan 6.3](plan.md#63-data-retention-controls), [Plan 9.4](plan.md#94-caching-layer); Reqs: [R21](requirements.md#group-f--non-functional-requirements).
-
-[ ] Observability checks: ensure sensitive fields absent from logs; error IDs present; log levels adjustable. Ref: [Plan 6.4](plan.md#64-observability--error-tracking), [Plan 1.3](plan.md#13-privacy--secure-handling); Reqs: [R22](requirements.md#group-f--non-functional-requirements), [R3](requirements.md#group-a--authentication-and-security).
-
-[ ] UI/UX validation for error views and recovery flows. Ref: [Plan 7.3](plan.md#73-error-views); Reqs: [R25](requirements.md#group-g--ui-pages-and-navigation), [R7](requirements.md#group-b--data-acquisition-and-handling).
-
----
-
-Notes
-- Phases align with Plan Milestones (M1–M6). Phase 7 aggregates testing tasks across features and should be executed continuously with each phase.
-- Use the acceptance outlines in Plan Section 11 as the baseline for test scenarios.
+- [ ] **5.5 Conduct Security Audit**
+  - _Plan Item:_ Security Review
+  - _Req ID:_ [Req 1], [Req 2]
+  - **Details:** Verify no secrets are committed. Test that logging out invalidates the token. Verify tokens are not accessible via client-side JS (if using HttpOnly cookies).
