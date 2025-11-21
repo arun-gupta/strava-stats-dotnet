@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-OPEN_PAGE=""
+OPEN_PAGE="auth"
 for arg in "$@"; do
   case "$arg" in
     --open=swagger)
