@@ -4,17 +4,18 @@ An ASP.NET Core 8 Web API for analyzing Strava activities. This repo will later 
 
 ## Quickstart
 
-This project requires the .NET 8 SDK.
+This project requires the .NET 8 SDK (LTS).
 
-### 1) Install .NET SDK (macOS)
+### 1) Install .NET 8 SDK (macOS)
 - Using Homebrew (recommended):
   ```bash
   brew update
-  brew install --cask dotnet-sdk
-  # verify
-  dotnet --info
+  brew install --cask dotnet-sdk@8
+  # verify runtime/SDK versions
+  dotnet --list-runtimes | grep Microsoft.NETCore.App | grep 8.
+  dotnet --list-sdks | grep 8.
   ```
-- Or download the official installer (PKG) for your architecture (Apple Silicon = Arm64, Intel = x64):
+- Or download the official .NET 8 installer (PKG) for your architecture (Apple Silicon = Arm64, Intel = x64):
   https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 
 If `dotnet` isn’t found after install, ensure it’s on your PATH. Common locations:
@@ -45,6 +46,8 @@ On macOS/Linux (or Git Bash on Windows), `start.sh` will:
 - Load variables from `.env` if present.
 - Default `ASPNETCORE_ENVIRONMENT=Development` if not set.
 - Run `dotnet restore`, `dotnet build`, and start the API.
+
+Note: If you see a message about a missing framework like "Microsoft.NETCore.App 8.0.0", ensure the .NET 8 runtime is installed as shown above.
 
 ## Secrets & configuration (Task 1.2)
 
