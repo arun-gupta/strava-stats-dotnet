@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -235,15 +236,15 @@ app.Run();
 // DTOs (minimal) — with top-level statements, types must come after all statements
 internal sealed class TokenResponse
 {
-    public string? AccessToken { get; set; }
-    public string? RefreshToken { get; set; }
-    public long? ExpiresAt { get; set; }
-    public AthleteResponse? Athlete { get; set; }
+    [JsonPropertyName("access_token")] public string? AccessToken { get; set; }
+    [JsonPropertyName("refresh_token")] public string? RefreshToken { get; set; }
+    [JsonPropertyName("expires_at")] public long? ExpiresAt { get; set; }
+    [JsonPropertyName("athlete")] public AthleteResponse? Athlete { get; set; }
 }
 
 internal sealed class AthleteResponse
 {
-    public string? Username { get; set; }
-    public string? Firstname { get; set; }
-    public string? Lastname { get; set; }
+    [JsonPropertyName("username")] public string? Username { get; set; }
+    [JsonPropertyName("firstname")] public string? Firstname { get; set; }
+    [JsonPropertyName("lastname")] public string? Lastname { get; set; }
 }
