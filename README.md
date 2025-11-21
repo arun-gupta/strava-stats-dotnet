@@ -1,2 +1,77 @@
-# Strava Activity Analyzer - DotNet
+# Strava Activity Analyzer (DotNet)
+
+An ASP.NET Core 8 Web API for analyzing Strava activities. This repo will later include a frontend dashboard, but Phase 1 focuses on backend auth and data ingestion.
+
+## Quick start
+
+1. Restore, build, and run the API:
+   ```bash
+   dotnet restore
+   dotnet build
+   dotnet run --project src/StravaStats.Api
+   ```
+2. Open Swagger UI:
+   - Development: https://localhost:7185/swagger
+   - Health check: GET http://localhost:5185/health → `{ "status": "ok" }`
+
+## Secrets & configuration (Task 1.2)
+
+Never commit secrets. This repo ignores `.env` and common secret files.
+
+Supported configuration keys:
+- `Strava:ClientId` / `Strava:ClientSecret` — Strava OAuth application credentials
+- `Security:SessionSecret` — secret for session/cookie/HMAC usage
+
+You can provide them using either nested keys or flat env vars:
+- Nested (ASP.NET style): `Strava__ClientId`, `Strava__ClientSecret`, `Security__SessionSecret`
+- Flat (legacy/simple): `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `SESSION_SECRET`
+
+Both styles are supported. At startup we map the flat variables into the nested section so options binding works consistently.
+
+### Option A: .env (local only)
+1. Copy the example file and fill real values:
+   ```bash
+   cp .env.example .env
+   # edit .env and set values
+   ```
+2. Run the API as usual. Your shell will need to export the variables from `.env` (e.g., using `direnv`, `dotenvx`, or `export $(grep -v '^#' .env | xargs)`), or configure your IDE run profile to load them.
+
+### Option B: dotnet user-secrets (recommended for local dev)
+User Secrets stores values outside the repo, per machine.
+
+```bash
+dotnet user-secrets init --project src/StravaStats.Api
+dotnet user-secrets set "Strava:ClientId" "<your_client_id>" --project src/StravaStats.Api
+dotnet user-secrets set "Strava:ClientSecret" "<your_client_secret>" --project src/StravaStats.Api
+dotnet user-secrets set "Security:SessionSecret" "<a-long-random-string>" --project src/StravaStats.Api
+```
+
+### Option C: Environment variables (CI/container/prod)
+Set either nested or flat variables in your deployment environment. Examples (Bash):
+
+```bash
+export Strava__ClientId=123
+export Strava__ClientSecret=abc
+export Security__SessionSecret=$(openssl rand -hex 32)
+```
+or
+```bash
+export STRAVA_CLIENT_ID=123
+export STRAVA_CLIENT_SECRET=abc
+export SESSION_SECRET=$(openssl rand -hex 32)
+```
+
+## Repo structure
+
+```
+src/
+  StravaStats.Api/
+    Program.cs
+    appsettings.json
+    Properties/launchSettings.json
+docs/
+```
+
+## Roadmap
+See `docs/tasks.md` and `docs/plan.md`.
 

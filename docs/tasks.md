@@ -10,10 +10,11 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Initialize git repo, create solution/project structure (e.g., ASP.NET Core Web API + React/Vue/Blazor or MVC), configure .gitignore.
   - Completed on 2025-11-21: Added `.gitignore` (Dotnet/Node/IDE), created `.sln` and initial ASP.NET Core Web API project at `src/StravaStats.Api` with a `/health` endpoint and Swagger in Development.
 
-- [ ] **1.2 Configure Environment Variables & Secrets**
+- [x] **1.2 Configure Environment Variables & Secrets**
   - _Plan Item:_ Project Initialization
   - _Req ID:_ [Req 1]
   - **Details:** specific configuration for `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, and `SESSION_SECRET` (or equivalent). Ensure secrets are excluded from source control.
+  - Completed on 2025-11-21: Added strongly-typed options (`StravaOptions`, `SecurityOptions`), bound to config. Mapped flat env vars to section keys, added `.env.example`, and documented `dotnet user-secrets` usage in README. `.env` already gitignored.
 
 - [ ] **1.3 Create OAuth2 Controller/Handler**
   - _Plan Item:_ OAuth2 Client Implementation
