@@ -47,6 +47,9 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromHours(8);
 });
 
+// Typed HttpClient for Strava API
+builder.Services.AddHttpClient("strava");
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -227,6 +230,94 @@ app.MapGet("/welcome", (HttpContext http) =>
         "  </body>\n" +
         "</html>\n";
     return Results.Content(content, "text/html");
+});
+
+// Task 1.6: Token refresh helper endpoint and service logic
+// Internal helper to ensure a valid access token is present in session; refresh if expired/near-expiry
+static async Task<(bool ok, string? accessToken, string? error)> EnsureAccessTokenAsync(HttpContext http, IHttpClientFactory httpClientFactory, IOptions<StravaOptions> strava)
+{
+    var access = http.Session.GetString("strava_access_token");
+    var refresh = http.Session.GetString("strava_refresh_token");
+    var expiresAtStr = http.Session.GetString("strava_expires_at");
+    long expiresAt = 0;
+    _ = long.TryParse(expiresAtStr, out expiresAt);
+
+    // Consider token stale if it expires in < 2 minutes
+    var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+    var stale = expiresAt == 0 || (expiresAt - now) <= 120;
+
+    if (!stale && !string.IsNullOrWhiteSpace(access))
+    {
+        return (true, access, null);
+    }
+
+    if (string.IsNullOrWhiteSpace(refresh))
+    {
+        return (false, null, "missing_refresh_token");
+    }
+
+    var clientId = strava.Value.ClientId;
+    var clientSecret = strava.Value.ClientSecret;
+    if (string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(clientSecret))
+    {
+        return (false, null, "server_config_missing");
+    }
+
+    var httpClient = httpClientFactory.CreateClient("strava");
+    var payload = new Dictionary<string, string>
+    {
+        ["client_id"] = clientId!,
+        ["client_secret"] = clientSecret!,
+        ["grant_type"] = "refresh_token",
+        ["refresh_token"] = refresh!
+    };
+    HttpResponseMessage resp;
+    try
+    {
+        resp = await httpClient.PostAsync("https://www.strava.com/oauth/token", new FormUrlEncodedContent(payload));
+    }
+    catch (Exception ex)
+    {
+        return (false, null, $"refresh_failed:{ex.Message}");
+    }
+    var body = await resp.Content.ReadAsStringAsync();
+    if (!resp.IsSuccessStatusCode)
+    {
+        return (false, null, $"refresh_http_{(int)resp.StatusCode}:{body}");
+    }
+
+    var refreshed = JsonSerializer.Deserialize<TokenResponse>(body, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+    if (refreshed is null || string.IsNullOrWhiteSpace(refreshed.AccessToken))
+    {
+        return (false, null, "refresh_parse_error");
+    }
+
+    http.Session.SetString("strava_access_token", refreshed.AccessToken);
+    if (!string.IsNullOrWhiteSpace(refreshed.RefreshToken))
+        http.Session.SetString("strava_refresh_token", refreshed.RefreshToken);
+    if (refreshed.ExpiresAt.HasValue)
+        http.Session.SetString("strava_expires_at", refreshed.ExpiresAt.Value.ToString());
+
+    return (true, refreshed.AccessToken, null);
+}
+
+// Example secured proxy endpoint that uses EnsureAccessTokenAsync and calls Strava athlete profile
+app.MapGet("/me", async (HttpContext http, IHttpClientFactory httpClientFactory, IOptions<StravaOptions> strava) =>
+{
+    var ok = await EnsureAccessTokenAsync(http, httpClientFactory, strava);
+    if (!ok.ok)
+    {
+        return Results.Unauthorized();
+    }
+    var client = httpClientFactory.CreateClient("strava");
+    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", ok.accessToken);
+    var resp = await client.GetAsync("https://www.strava.com/api/v3/athlete");
+    var body = await resp.Content.ReadAsStringAsync();
+    if (!resp.IsSuccessStatusCode)
+    {
+        return Results.Problem(title: "Strava API call failed", detail: body, statusCode: (int)resp.StatusCode);
+    }
+    return Results.Content(body, "application/json");
 });
 
 // (types moved above to satisfy top-level statements rule)
