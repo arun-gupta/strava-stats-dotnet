@@ -14,6 +14,20 @@ An ASP.NET Core 8 Web API for analyzing Strava activities. This repo will later 
    - Development: https://localhost:7185/swagger
    - Health check: GET http://localhost:5185/health → `{ "status": "ok" }`
 
+### Single-command start
+On macOS/Linux (or Git Bash on Windows), you can use the helper script:
+
+```bash
+./start.sh        # may need: chmod +x start.sh
+# or
+bash start.sh
+```
+
+The script will:
+- Load variables from `.env` if present.
+- Default `ASPNETCORE_ENVIRONMENT=Development` if not set.
+- Run `dotnet restore`, `dotnet build`, and start the API.
+
 ## Secrets & configuration (Task 1.2)
 
 Never commit secrets. This repo ignores `.env` and common secret files.
