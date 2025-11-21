@@ -1,0 +1,38 @@
+# General
+.DS_Store
+*.swp
+*.swo
+*.tmp
+*.log
+
+# Node / Frontend (future phases)
+node_modules/
+dist/
+build/
+.parcel-cache/
+.next/
+.nuxt/
+coverage/
+
+# .NET / Visual Studio
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userprefs
+*.csproj.user
+*.vcxproj.user
+
+# Logs
+logs/
+*.log
+
+# Environment / Secrets (do not commit)
+*.env
+.env*
+secrets.json
+
+# IDE
+.idea/
+.vscode/

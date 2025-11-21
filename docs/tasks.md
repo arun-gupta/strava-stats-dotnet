@@ -4,10 +4,11 @@ This document tracks the step-by-step technical tasks required to build the Stra
 
 ## Phase 1: Infrastructure & Authentication
 
-- [ ] **1.1 Initialize Project Repository**
+- [x] **1.1 Initialize Project Repository**
   - _Plan Item:_ Project Initialization
   - _Req ID:_ N/A
   - **Details:** Initialize git repo, create solution/project structure (e.g., ASP.NET Core Web API + React/Vue/Blazor or MVC), configure .gitignore.
+  - Completed on 2025-11-21: Added `.gitignore` (Dotnet/Node/IDE), created `.sln` and initial ASP.NET Core Web API project at `src/StravaStats.Api` with a `/health` endpoint and Swagger in Development.
 
 - [ ] **1.2 Configure Environment Variables & Secrets**
   - _Plan Item:_ Project Initialization

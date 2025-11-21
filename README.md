@@ -1,1 +1,2 @@
-# strava-stats-dotnet
+# Strava Activity Analyzer - DotNet
+
