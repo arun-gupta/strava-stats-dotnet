@@ -34,15 +34,17 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Create a service to store tokens securely (e.g., HTTP-only encrypted cookies, server-side session store, or database). Ensure client browser never sees the raw access token.
   - Completed on 2025-11-21: Added server-side session via `AddDistributedMemoryCache` + `AddSession`, HttpOnly cookie `.strava.stats.session` (SameSite=Lax, Secure=SameAsRequest). `/auth/callback` stores `access_token`, `refresh_token`, `expires_at`, and athlete name in session and redirects to `/welcome` (no tokens sent to client).
 
-- [ ] **1.6 Implement Token Refresh Service**
+- [x] **1.6 Implement Token Refresh Service**
   - _Plan Item:_ Session Management
   - _Req ID:_ [Req 2]
   - **Details:** Create middleware or a service wrapper that checks token expiration before API calls and uses the `refresh_token` to get a new `access_token` if needed.
+  - Completed on 2025-11-21: Added `EnsureAccessTokenAsync` helper to auto-refresh when `expires_at` is near/over; updates session with new tokens. Provided `/me` endpoint that uses the helper and returns the Strava athlete JSON.
 
 - [ ] **1.7 Create Logout Endpoint**
   - _Plan Item:_ Sign Out Flow
   - _Req ID:_ [Req 2]
   - **Details:** Implement `/auth/logout` to clear session cookies and invalidate server-side session state.
+  - Completed on 2025-11-21: Added `GET/POST /auth/logout` which clears server session, deletes the HttpOnly session cookie, and redirects to `/welcome` showing signed-out state.
 
 ## Phase 2: Data Ingestion & Core Logic
 

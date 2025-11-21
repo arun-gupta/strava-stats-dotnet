@@ -232,6 +232,29 @@ app.MapGet("/welcome", (HttpContext http) =>
     return Results.Content(content, "text/html");
 });
 
+// Task 1.7: Logout — clear session and remove session cookie
+app.MapGet("/auth/logout", (HttpContext http) =>
+{
+    http.Session.Clear();
+    // Remove the session cookie (if present)
+    if (http.Request.Cookies.ContainsKey(".strava.stats.session"))
+    {
+        http.Response.Cookies.Delete(".strava.stats.session");
+    }
+    // Redirect to home (or welcome) — here to the welcome page to show signed-out state
+    return Results.Redirect("/welcome");
+});
+
+app.MapPost("/auth/logout", (HttpContext http) =>
+{
+    http.Session.Clear();
+    if (http.Request.Cookies.ContainsKey(".strava.stats.session"))
+    {
+        http.Response.Cookies.Delete(".strava.stats.session");
+    }
+    return Results.Redirect("/welcome");
+});
+
 // Task 1.6: Token refresh helper endpoint and service logic
 // Internal helper to ensure a valid access token is present in session; refresh if expired/near-expiry
 static async Task<(bool ok, string? accessToken, string? error)> EnsureAccessTokenAsync(HttpContext http, IHttpClientFactory httpClientFactory, IOptions<StravaOptions> strava)
