@@ -40,3 +40,6 @@ secrets.json
 
 # JetBrains IDE project folder (ensure ignored even if variant path)
 .idea
+
+# Ensure any committed .idea files are removed
+*.iml
