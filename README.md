@@ -2,28 +2,46 @@
 
 An ASP.NET Core 8 Web API for analyzing Strava activities. This repo will later include a frontend dashboard, but Phase 1 focuses on backend auth and data ingestion.
 
-## Quick start
+## Quickstart
 
-1. Restore, build, and run the API:
-   ```bash
-   dotnet restore
-   dotnet build
-   dotnet run --project src/StravaStats.Api
-   ```
-2. Open Swagger UI:
-   - Development: https://localhost:7185/swagger
-   - Health check: GET http://localhost:5185/health → `{ "status": "ok" }`
+This project requires the .NET 8 SDK.
 
-### Single-command start
-On macOS/Linux (or Git Bash on Windows), you can use the helper script:
+### 1) Install .NET SDK (macOS)
+- Using Homebrew (recommended):
+  ```bash
+  brew update
+  brew install --cask dotnet-sdk
+  # verify
+  dotnet --info
+  ```
+- Or download the official installer (PKG) for your architecture (Apple Silicon = Arm64, Intel = x64):
+  https://dotnet.microsoft.com/en-us/download/dotnet/8.0
 
+If `dotnet` isn’t found after install, ensure it’s on your PATH. Common locations:
+`/opt/homebrew/share/dotnet` (Apple Silicon), `/usr/local/share/dotnet` (Intel). You can add both:
 ```bash
-./start.sh        # may need: chmod +x start.sh
-# or
-bash start.sh
+echo 'export PATH="$PATH:/opt/homebrew/share/dotnet:/usr/local/share/dotnet"' >> ~/.zshrc
+source ~/.zshrc
 ```
 
-The script will:
+### 2) Start the API
+- Single-command start (recommended):
+  ```bash
+  ./start.sh        # first time you may need: chmod +x start.sh
+  ```
+- Or run manually:
+  ```bash
+  dotnet restore
+  dotnet build
+  dotnet run --project src/StravaStats.Api
+  ```
+
+Then open:
+- Swagger UI (Development): https://localhost:7185/swagger
+- Health check: `GET http://localhost:5185/health` → `{ "status": "ok" }`
+
+### About the start.sh helper
+On macOS/Linux (or Git Bash on Windows), `start.sh` will:
 - Load variables from `.env` if present.
 - Default `ASPNETCORE_ENVIRONMENT=Development` if not set.
 - Run `dotnet restore`, `dotnet build`, and start the API.
