@@ -16,10 +16,11 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** specific configuration for `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, and `SESSION_SECRET` (or equivalent). Ensure secrets are excluded from source control.
   - Completed on 2025-11-21: Added strongly-typed options (`StravaOptions`, `SecurityOptions`), bound to config. Mapped flat env vars to section keys, added `.env.example`, and documented `dotnet user-secrets` usage in README. `.env` already gitignored.
 
-- [ ] **1.3 Create OAuth2 Controller/Handler**
+- [x] **1.3 Create OAuth2 Controller/Handler**
   - _Plan Item:_ OAuth2 Client Implementation
   - _Req ID:_ [Req 1]
   - **Details:** Implement `/auth/login` endpoint to redirect user to Strava Authorization URL with scopes `read,activity:read_all`.
+  - Completed on 2025-11-21: Added `GET /auth/login` which validates `Strava:ClientId`, computes `redirect_uri` (default to `{scheme}://{host}/auth/callback` unless overridden by query), and redirects to `https://www.strava.com/oauth/authorize` with `response_type=code` and required scopes.
 
 - [ ] **1.4 Implement Token Exchange Logic**
   - _Plan Item:_ Token Exchange & Storage
