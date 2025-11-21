@@ -66,8 +66,16 @@ if [[ -n "$OPEN_PAGE" ]]; then
   # Run the app in background to allow opening the browser shortly after startup
   dotnet run --project src/StravaStats.Api &
   APP_PID=$!
-  # Give the server a moment to start
-  sleep 1.5
+  # Wait for the server to become healthy (poll health endpoint up to ~20s)
+  HEALTH_URL="http://localhost:5185/health"
+  echo "Waiting for API to become available at $HEALTH_URL ..."
+  for i in {1..40}; do
+    if curl -fsS "$HEALTH_URL" >/dev/null 2>&1; then
+      echo "API is up."
+      break
+    fi
+    sleep 0.5
+  done
   case "$OPEN_PAGE" in
     swagger)
       echo "Opening Swagger UI..."
@@ -75,6 +83,7 @@ if [[ -n "$OPEN_PAGE" ]]; then
       ;;
     auth)
       echo "Opening Strava auth login page..."
+      echo "URL: $HTTP_URL/auth/login"
       open_url "$HTTP_URL/auth/login"
       ;;
   esac
