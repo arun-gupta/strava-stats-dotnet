@@ -67,12 +67,21 @@ You can provide them using either nested keys or flat env vars:
 Both styles are supported. At startup we map the flat variables into the nested section so options binding works consistently.
 
 ### Option A: .env (local only)
+Use the provided example file to set your Strava credentials locally. The app’s `start.sh` script auto-loads `.env` at startup.
+
 1. Copy the example file and fill real values:
    ```bash
    cp .env.example .env
    # edit .env and set values
+   # STRAVA_CLIENT_ID=... 
+   # STRAVA_CLIENT_SECRET=...
+   # SESSION_SECRET=...
    ```
-2. Run the API as usual. Your shell will need to export the variables from `.env` (e.g., using `direnv`, `dotenvx`, or `export $(grep -v '^#' .env | xargs)`), or configure your IDE run profile to load them.
+2. Start the app (the script reads `.env` automatically):
+   ```bash
+   ./start.sh
+   ```
+   No extra exports or tools are required. If you prefer not to use `start.sh`, make sure your shell loads the variables from `.env` before running `dotnet run`.
 
 ### Option B: dotnet user-secrets (recommended for local dev)
 User Secrets stores values outside the repo, per machine.
