@@ -148,24 +148,35 @@ app.MapGet("/auth/callback", async (
     });
     if (json is null || string.IsNullOrWhiteSpace(json.AccessToken))
     {
-        return Results.Problem("Unexpected token response from Strava.", detail: body, statusCode: 502);
+        return Results.Problem(title: "Unexpected token response from Strava.", detail: body, statusCode: 502);
     }
 
     // Optionally fetch athlete profile for welcome page
     var athleteName = "";
     try
     {
-        using var authed = new HttpClient();
-        authed.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", json.AccessToken);
-        var athleteResp = await authed.GetAsync("https://www.strava.com/api/v3/athlete");
-        if (athleteResp.IsSuccessStatusCode)
+        // Prefer the embedded athlete info from token response, fall back to API call if missing
+        if (json.Athlete is not null)
         {
-            var athleteRaw = await athleteResp.Content.ReadAsStringAsync();
-            var athlete = JsonSerializer.Deserialize<AthleteResponse>(athleteRaw, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-            athleteName = new[] { athlete?.Firstname, athlete?.Lastname }
+            athleteName = new[] { json.Athlete.Firstname, json.Athlete.Lastname }
                 .Where(s => !string.IsNullOrWhiteSpace(s))
-                .DefaultIfEmpty(athlete?.Username ?? "")
+                .DefaultIfEmpty(json.Athlete.Username ?? "")
                 .Aggregate("", (acc, s) => string.IsNullOrWhiteSpace(acc) ? s! : acc + " " + s);
+        }
+        else
+        {
+            using var authed = new HttpClient();
+            authed.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", json.AccessToken);
+            var athleteResp = await authed.GetAsync("https://www.strava.com/api/v3/athlete");
+            if (athleteResp.IsSuccessStatusCode)
+            {
+                var athleteRaw = await athleteResp.Content.ReadAsStringAsync();
+                var athlete = JsonSerializer.Deserialize<AthleteResponse>(athleteRaw, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                athleteName = new[] { athlete?.Firstname, athlete?.Lastname }
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .DefaultIfEmpty(athlete?.Username ?? "")
+                    .Aggregate("", (acc, s) => string.IsNullOrWhiteSpace(acc) ? s! : acc + " " + s);
+            }
         }
     }
     catch
@@ -190,45 +201,49 @@ app.MapGet("/welcome", (HttpContext http) =>
 {
     var name = http.Session.GetString("strava_athlete_name");
     var isSignedIn = !string.IsNullOrWhiteSpace(http.Session.GetString("strava_access_token"));
-    var content = $"""
-<!DOCTYPE html>
-<html lang=\"en\">
-  <head>
-    <meta charset=\"utf-8\" />
-    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
-    <title>Strava Stats — Welcome</title>
-    <style>
-      body { font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 2rem; }
-      .card { max-width: 640px; padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-      .muted { color: #6b7280; }
-      a.button { display: inline-block; padding: 0.6rem 1rem; background: #f96332; color: white; border-radius: 8px; text-decoration: none; }
-    </style>
-  </head>
-  <body>
-    <div class=\"card\">
-      <h1>Welcome{(string.IsNullOrWhiteSpace(name) ? "" : ", " + System.Net.WebUtility.HtmlEncode(name))}!</h1>
-      <p class=\"muted\">{(isSignedIn ? "You are signed in with Strava." : "You are not signed in.")}</p>
-      <p><a class=\"button\" href=\"/auth/login\">Sign in again</a></p>
-    </div>
-  </body>
-</html>
-""";
+    var nameHtml = string.IsNullOrWhiteSpace(name) ? "" : ", " + System.Net.WebUtility.HtmlEncode(name);
+    var statusText = isSignedIn ? "You are signed in with Strava." : "You are not signed in.";
+    var content =
+        "<!DOCTYPE html>\n" +
+        "<html lang=\"en\">\n" +
+        "  <head>\n" +
+        "    <meta charset=\"utf-8\" />\n" +
+        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n" +
+        "    <title>Strava Stats — Welcome</title>\n" +
+        "    <style>\n" +
+        "      body { font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 2rem; }\n" +
+        "      .card { max-width: 640px; padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }\n" +
+        "      .muted { color: #6b7280; }\n" +
+        "      a.button { display: inline-block; padding: 0.6rem 1rem; background: #f96332; color: white; border-radius: 8px; text-decoration: none; }\n" +
+        "    </style>\n" +
+        "  </head>\n" +
+        "  <body>\n" +
+        "    <div class=\"card\">\n" +
+        "      <h1>Welcome" + nameHtml + "!</h1>\n" +
+        "      <p class=\"muted\">" + System.Net.WebUtility.HtmlEncode(statusText) + "</p>\n" +
+        "      <p><a class=\"button\" href=\"/auth/login\">Sign in again</a></p>\n" +
+        "    </div>\n" +
+        "  </body>\n" +
+        "</html>\n";
     return Results.Content(content, "text/html");
 });
 
-// DTOs (minimal)
-file sealed class TokenResponse
+// (types moved above to satisfy top-level statements rule)
+
+app.Run();
+
+// DTOs (minimal) — with top-level statements, types must come after all statements
+internal sealed class TokenResponse
 {
     public string? AccessToken { get; set; }
     public string? RefreshToken { get; set; }
     public long? ExpiresAt { get; set; }
+    public AthleteResponse? Athlete { get; set; }
 }
 
-file sealed class AthleteResponse
+internal sealed class AthleteResponse
 {
     public string? Username { get; set; }
     public string? Firstname { get; set; }
     public string? Lastname { get; set; }
 }
-
-app.Run();
