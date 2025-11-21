@@ -44,6 +44,10 @@ Then open:
 - Swagger UI (Development): https://localhost:7185/swagger
 - Health check: `GET http://localhost:5185/health` → `{ "status": "ok" }`
 
+After signing in with Strava, you’ll see a simple welcome page:
+
+![Welcome page](docs/images/welcome.png)
+
 ### About the start.sh helper
 On macOS/Linux (or Git Bash on Windows), `start.sh` will:
 - Load variables from `.env` if present.
