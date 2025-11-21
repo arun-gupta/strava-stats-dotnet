@@ -22,10 +22,11 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Implement `/auth/login` endpoint to redirect user to Strava Authorization URL with scopes `read,activity:read_all`.
   - Completed on 2025-11-21: Added `GET /auth/login` which validates `Strava:ClientId`, computes `redirect_uri` (default to `{scheme}://{host}/auth/callback` unless overridden by query), and redirects to `https://www.strava.com/oauth/authorize` with `response_type=code` and required scopes.
 
-- [ ] **1.4 Implement Token Exchange Logic**
+- [x] **1.4 Implement Token Exchange Logic**
   - _Plan Item:_ Token Exchange & Storage
   - _Req ID:_ [Req 1]
   - **Details:** Implement `/auth/callback` to receive the `code` and exchange it for `access_token` and `refresh_token` using Strava's `/oauth/token` endpoint.
+  - Completed on 2025-11-21: Added `GET /auth/callback` which validates `code`, posts to `https://www.strava.com/oauth/token` with `client_id`, `client_secret`, `grant_type=authorization_code`, and returns the raw JSON response for verification (temporary until Task 1.5 stores tokens securely).
 
 - [ ] **1.5 Implement Secure Token Storage**
   - _Plan Item:_ Token Exchange & Storage

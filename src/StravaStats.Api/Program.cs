@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +68,67 @@ app.MapGet("/auth/login", (IOptions<StravaOptions> strava, HttpContext http, str
               $"&scope={Uri.EscapeDataString(scope)}";
 
     return Results.Redirect(url);
+});
+
+// Task 1.4: OAuth callback to exchange authorization code for tokens
+// GET /auth/callback?code=...&state=...
+// Minimal implementation: exchanges code for token and returns raw JSON (temporary for verification)
+app.MapGet("/auth/callback", async (
+    IOptions<StravaOptions> strava,
+    HttpContext http,
+    string? code,
+    string? state) =>
+{
+    if (string.IsNullOrWhiteSpace(code))
+    {
+        return Results.BadRequest(new { error = "missing_code", message = "Missing 'code' query parameter." });
+    }
+
+    var clientId = strava.Value.ClientId;
+    var clientSecret = strava.Value.ClientSecret;
+    if (string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(clientSecret))
+    {
+        return Results.Problem("Strava ClientId/ClientSecret are not configured.", statusCode: 500);
+    }
+
+    // Compute redirect_uri identical to what was used in /auth/login by default
+    var redirectUri = $"{http.Request.Scheme}://{http.Request.Host}/auth/callback";
+
+    using var httpClient = new HttpClient();
+    var request = new HttpRequestMessage(HttpMethod.Post, "https://www.strava.com/oauth/token")
+    {
+        Content = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["client_id"] = clientId!,
+            ["client_secret"] = clientSecret!,
+            ["code"] = code!,
+            ["grant_type"] = "authorization_code",
+            // Strava does not require redirect_uri for code exchange, but some providers do; keeping local for completeness
+            // ["redirect_uri"] = redirectUri,
+        })
+    };
+
+    HttpResponseMessage resp;
+    try
+    {
+        resp = await httpClient.SendAsync(request);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Failed to contact Strava token endpoint: {ex.Message}", statusCode: 502);
+    }
+
+    var body = await resp.Content.ReadAsStringAsync();
+    if (!resp.IsSuccessStatusCode)
+    {
+        return Results.Problem(
+            title: "Strava token exchange failed",
+            detail: body,
+            statusCode: (int)resp.StatusCode);
+    }
+
+    // For Task 1.4 we return the raw JSON payload. In Task 1.5 we'll store tokens securely and avoid sending them to the client.
+    return Results.Content(body, "application/json");
 });
 
 app.Run();
