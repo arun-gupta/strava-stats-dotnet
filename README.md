@@ -1,5 +1,8 @@
 # Strava Activity Analyzer (DotNet)
 
+![Built with JetBrains Rider](https://img.shields.io/badge/Built%20with-JetBrains%20Rider-000000?logo=rider&logoColor=white)
+![Co‑authored by Junie](https://img.shields.io/badge/Co%E2%80%91authored%20by-Junie-4C9BF0)
+
 An ASP.NET Core 8 Web API for analyzing Strava activities. This repo will later include a frontend dashboard, but Phase 1 focuses on backend auth and data ingestion.
 
 ## Quickstart
