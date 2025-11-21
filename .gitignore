@@ -36,3 +36,6 @@ secrets.json
 # IDE
 .idea/
 .vscode/
+
+# JetBrains IDE project folder (ensure ignored even if variant path)
+.idea
