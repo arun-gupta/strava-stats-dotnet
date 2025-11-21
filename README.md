@@ -101,10 +101,14 @@ export SESSION_SECRET=$(openssl rand -hex 32)
 ```
 src/
   StravaStats.Api/
+    Options/
+      StravaOptions.cs
+      SecurityOptions.cs
     Program.cs
     appsettings.json
     Properties/launchSettings.json
 docs/
+start.sh
 ```
 
 ## Roadmap
