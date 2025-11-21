@@ -28,10 +28,11 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Implement `/auth/callback` to receive the `code` and exchange it for `access_token` and `refresh_token` using Strava's `/oauth/token` endpoint.
   - Completed on 2025-11-21: Added `GET /auth/callback` which validates `code`, posts to `https://www.strava.com/oauth/token` with `client_id`, `client_secret`, `grant_type=authorization_code`, and returns the raw JSON response for verification (temporary until Task 1.5 stores tokens securely).
 
-- [ ] **1.5 Implement Secure Token Storage**
+- [x] **1.5 Implement Secure Token Storage**
   - _Plan Item:_ Token Exchange & Storage
   - _Req ID:_ [Req 2]
   - **Details:** Create a service to store tokens securely (e.g., HTTP-only encrypted cookies, server-side session store, or database). Ensure client browser never sees the raw access token.
+  - Completed on 2025-11-21: Added server-side session via `AddDistributedMemoryCache` + `AddSession`, HttpOnly cookie `.strava.stats.session` (SameSite=Lax, Secure=SameAsRequest). `/auth/callback` stores `access_token`, `refresh_token`, `expires_at`, and athlete name in session and redirects to `/welcome` (no tokens sent to client).
 
 - [ ] **1.6 Implement Token Refresh Service**
   - _Plan Item:_ Session Management
