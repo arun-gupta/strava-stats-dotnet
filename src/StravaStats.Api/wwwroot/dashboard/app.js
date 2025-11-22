@@ -648,6 +648,41 @@ function renderRunningStats(activities) {
   }
 }
 
+// Transform activities to heatmap data structure
+// Returns { "YYYY-MM-DD": value } for easy lookup by date
+function transformToHeatmapData(activities, mode = 'all') {
+  const heatmapData = {};
+
+  // Filter activities based on mode
+  let filteredActivities = activities;
+  if (mode === 'running') {
+    const runningTypes = ['Run', 'TrailRun', 'VirtualRun'];
+    filteredActivities = activities.filter(a => runningTypes.includes(a.sport_type));
+  }
+
+  filteredActivities.forEach(activity => {
+    // Extract date from start_local (YYYY-MM-DD)
+    const date = activity.start_local ? activity.start_local.split('T')[0] : null;
+    if (!date) return;
+
+    // Initialize date entry if it doesn't exist
+    if (!heatmapData[date]) {
+      heatmapData[date] = {
+        count: 0,
+        time: 0,
+        distance: 0
+      };
+    }
+
+    // Accumulate metrics for the day
+    heatmapData[date].count += 1;
+    heatmapData[date].time += activity.moving_time_s || 0;
+    heatmapData[date].distance += activity.distance_m || 0;
+  });
+
+  return heatmapData;
+}
+
 // Update UI when active tab changes
 function updateActiveTab() {
   const { activeTab } = getState();

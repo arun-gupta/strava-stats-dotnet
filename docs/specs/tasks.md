@@ -157,10 +157,11 @@ This document tracks the step-by-step technical tasks required to build the Stra
 
 ## Phase 4: Advanced Visualization & Trends
 
-- [ ] **4.1 Implement Heatmap Data Transformation**
+- [x] **4.1 Implement Heatmap Data Transformation**
   - _Plan Item:_ Heatmap Component Logic
   - _Req ID:_ [Req 5]
   - **Details:** Write a function to transform a list of activities into a map of `{ "YYYY-MM-DD": value }` for both "All Activities" (intensity by count or time) and "Running Only" (intensity by distance) modes.
+  - Completed on 2025-11-22: Added `transformToHeatmapData(activities, mode)` function in app.js. Function accepts activities array and mode ('all' or 'running') and returns a map where each date key (YYYY-MM-DD) contains aggregated metrics: count (number of activities), time (total moving time in seconds), and distance (total distance in meters). Supports filtering to running types (Run, TrailRun, VirtualRun) when mode is 'running'. Extracts dates from start_local timestamps for proper timezone handling.
 
 - [ ] **4.2 Build Calendar Heatmap Component**
   - _Plan Item:_ Heatmap Tab with Mode Toggle
