@@ -384,6 +384,42 @@ app.MapGet("/activities", async (
     }
 });
 
+// Task 2.3: pagination verification endpoint — fetch all pages
+// GET /activities/all?per_page=100&before={unix}&after={unix}&max_pages=50
+app.MapGet("/activities/all", async (
+    HttpContext http,
+    IHttpClientFactory httpClientFactory,
+    IOptions<StravaOptions> strava,
+    StravaStats.Api.Services.IStravaApiClient api,
+    int? per_page,
+    long? before,
+    long? after,
+    int? max_pages,
+    CancellationToken ct) =>
+{
+    var ok = await EnsureAccessTokenAsync(http, httpClientFactory, strava);
+    if (!ok.ok)
+    {
+        return Results.Unauthorized();
+    }
+
+    try
+    {
+        var (all, _) = await api.GetAllActivitiesAsync(
+            ok.accessToken!,
+            perPage: per_page ?? 100,
+            before: before,
+            after: after,
+            maxPages: Math.Clamp(max_pages ?? 100, 1, 1000),
+            ct: ct);
+        return Results.Ok(all);
+    }
+    catch (HttpRequestException ex) when (ex.StatusCode.HasValue)
+    {
+        return Results.Problem(title: "Strava API call failed", detail: ex.Message, statusCode: (int)ex.StatusCode!.Value);
+    }
+});
+
 // (types moved above to satisfy top-level statements rule)
 
 app.Run();

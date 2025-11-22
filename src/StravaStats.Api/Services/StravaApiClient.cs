@@ -14,6 +14,15 @@ public interface IStravaApiClient
         long? before = null,
         long? after = null,
         CancellationToken ct = default);
+
+    // Task 2.3: pagination helper — fetch all pages until an empty page or cutoff
+    Task<(ActivitySummaryDto[] Activities, HttpResponseMessage? LastResponse)> GetAllActivitiesAsync(
+        string accessToken,
+        int perPage = 100,
+        long? before = null,
+        long? after = null,
+        int maxPages = 100,
+        CancellationToken ct = default);
 }
 
 public sealed class StravaApiClient : IStravaApiClient
@@ -59,5 +68,38 @@ public sealed class StravaApiClient : IStravaApiClient
 
         var activities = JsonSerializer.Deserialize<ActivitySummaryDto[]>(body, JsonOpts) ?? Array.Empty<ActivitySummaryDto>();
         return (activities, resp);
+    }
+
+    public async Task<(ActivitySummaryDto[] Activities, HttpResponseMessage? LastResponse)> GetAllActivitiesAsync(
+        string accessToken,
+        int perPage = 100,
+        long? before = null,
+        long? after = null,
+        int maxPages = 100,
+        CancellationToken ct = default)
+    {
+        var all = new List<ActivitySummaryDto>(capacity: perPage * Math.Min(maxPages, 10));
+        HttpResponseMessage? last = null;
+
+        for (var page = 1; page <= maxPages; page++)
+        {
+            ct.ThrowIfCancellationRequested();
+            var (items, resp) = await GetActivitiesAsync(accessToken, page, perPage, before, after, ct);
+            last = resp;
+            if (items.Length == 0)
+            {
+                break;
+            }
+
+            all.AddRange(items);
+
+            // Strava returns at most `per_page` items; if fewer were returned, we reached the last page.
+            if (items.Length < perPage)
+            {
+                break;
+            }
+        }
+
+        return (all.ToArray(), last);
     }
 }

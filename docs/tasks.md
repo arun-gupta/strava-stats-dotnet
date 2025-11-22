@@ -54,16 +54,17 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Create DTOs/Classes for Strava Activity (ID, type, distance, moving_time, start_date, timezone, etc.).
   - Completed on 2025-11-22: Added `ActivitySummaryDto` in `src/StravaStats.Api/Models/ActivityDtos.cs` with key fields: `id`, `name`, `type`, `sport_type`, `distance` (m), `moving_time` (s), `elapsed_time` (s), `total_elevation_gain` (m), `start_date` (UTC), `start_date_local`, `timezone`, location arrays, and basic flags/counters. These map Strava's `GET /athlete/activities` summary payload.
 
-- [ ] **2.2 Build Strava API Client Wrapper**
+- [x] **2.2 Build Strava API Client Wrapper**
   - _Plan Item:_ Strava API Client
   - _Req ID:_ [Req 3]
   - **Details:** Implement a typed HTTP client for fetching activities (`GET /athlete/activities`). Include Authorization header injection.
   - Completed on 2025-11-22: Added `IStravaApiClient` and `StravaApiClient` in `src/StravaStats.Api/Services/StravaApiClient.cs` using named `HttpClient("strava")` (BaseAddress `https://www.strava.com/api/v3/`). Injects `Bearer` token per request and deserializes to `ActivitySummaryDto[]`. Exposed verification endpoint `GET /activities` supporting `page`, `per_page`, `before`, `after`.
 
-- [ ] **2.3 Implement Pagination Logic**
+- [x] **2.3 Implement Pagination Logic**
   - _Plan Item:_ Pagination & Rate Limiting
   - _Req ID:_ [Req 3]
   - **Details:** Write a loop/recursive function to fetch activities page-by-page until an empty page is returned or a specific date limit is reached.
+  - Completed on 2025-11-22 03:02: Added `GetAllActivitiesAsync` to `IStravaApiClient`/`StravaApiClient` that iterates pages (default `perPage=100`) until an empty/short page or `maxPages` reached. Added verification endpoint `GET /activities/all` with query params `per_page`, `before`, `after`, `max_pages`. Uses existing OAuth session and token refresh.
 
 - [ ] **2.4 Add Rate Limiting & Backoff**
   - _Plan Item:_ Pagination & Rate Limiting
