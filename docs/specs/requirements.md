@@ -42,8 +42,9 @@ The Strava Activity Analyzer is a web application designed to authenticate with 
 5. **Training Heatmaps**
    - **User Story**: As a user, I want to visualize my training consistency on a calendar grid so that I can spot streaks and gaps.
    - **Acceptance Criteria**:
-     - WHEN the "Workout Heatmap" renders, THEN the system SHALL colorize days based on the intensity (count or time) of all activities.
-     - WHEN the "Running Heatmap" renders, THEN the system SHALL only display running data and colorize days based on distance covered.
+     - WHEN the "Heatmap" tab loads, THEN the system SHALL provide a mode toggle to switch between "All Activities" and "Running Only" views.
+     - WHEN "All Activities" mode is selected, THEN the system SHALL colorize days based on the intensity (count or time) of all activities.
+     - WHEN "Running Only" mode is selected, THEN the system SHALL only display running data and colorize days based on distance covered.
      - WHEN viewing heatmaps, THEN the system SHALL calculate and display the current and longest streak of active days.
 
 6. **Running Statistics**
@@ -56,8 +57,9 @@ The Strava Activity Analyzer is a web application designed to authenticate with 
 7. **Trend Analysis**
    - **User Story**: As a user, I want to see how my mileage and pace have changed over time so that I can identify training trends.
    - **Acceptance Criteria**:
-     - WHEN rendering the "Mileage Trend", THEN the system SHALL display a chart of distance aggregated by day, week, or month.
-     - WHEN rendering the "Pace Trend", THEN the system SHALL display the average running pace over time, handling pace inversions (speed vs. time/distance) correctly.
+     - WHEN the "Trends" tab loads, THEN the system SHALL provide a mode toggle to switch between "All Activities" and "Running Only" views.
+     - WHEN rendering trends, THEN the system SHALL display line charts of distance and pace over time aggregated by day, week, or month.
+     - WHEN "Running Only" mode is selected, THEN the system SHALL filter to running activities and display average running pace over time, handling pace inversions (speed vs. time/distance) correctly.
      - WHEN displaying trend lines, THEN the system SHALL apply smoothing (e.g., moving average) to reduce noise in daily data.
 
 ### User Controls & Configuration

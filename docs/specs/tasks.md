@@ -160,27 +160,22 @@ This document tracks the step-by-step technical tasks required to build the Stra
 - [ ] **4.1 Implement Heatmap Data Transformation**
   - _Plan Item:_ Heatmap Component Logic
   - _Req ID:_ [Req 5]
-  - **Details:** Write a function to transform a list of activities into a map of `{ "YYYY-MM-DD": value }`.
+  - **Details:** Write a function to transform a list of activities into a map of `{ "YYYY-MM-DD": value }` for both "All Activities" (intensity by count or time) and "Running Only" (intensity by distance) modes.
 
 - [ ] **4.2 Build Calendar Heatmap Component**
-  - _Plan Item:_ Workout & Running Heatmaps
+  - _Plan Item:_ Heatmap Tab with Mode Toggle
   - _Req ID:_ [Req 5]
-  - **Details:** Render a GitHub-style calendar grid. Support two modes: "All Activities" (intensity = frequency) and "Running" (intensity = distance). Add single "Heatmap" tab to dashboard with toggle/buttons to switch between the two modes.
+  - **Details:** Render a GitHub-style calendar grid. Add single "🔥 Heatmap" tab to dashboard with mode toggle/buttons to switch between "All Activities" and "Running Only" views. Calculate and display "Current Streak" and "Longest Streak" metrics based on consecutive days in the filtered dataset.
 
-- [ ] **4.3 Calculate Streak Metrics**
-  - _Plan Item:_ Workout & Running Heatmaps
-  - _Req ID:_ [Req 5]
-  - **Details:** Implement algorithm to find "Current Streak" and "Longest Streak" based on consecutive days in the filtered dataset. Display these metrics in the heatmap tabs.
-
-- [ ] **4.4 Implement Trend Aggregation Logic**
+- [ ] **4.3 Implement Trend Aggregation Logic**
   - _Plan Item:_ Trend Calculation Engine
   - _Req ID:_ [Req 7]
-  - **Details:** Create service to group filtered data by Day, Week, or Month.
+  - **Details:** Create function to group filtered data by Day, Week, or Month for both "All Activities" and "Running Only" modes. Calculate distance totals and average pace for each time bucket.
 
-- [ ] **4.5 Build Trend Line Charts**
-  - _Plan Item:_ Mileage & Pace Trend Charts
+- [ ] **4.4 Build Trend Line Charts**
+  - _Plan Item:_ Trends Tab with Mode Toggle
   - _Req ID:_ [Req 7]
-  - **Details:** Render line charts for "Mileage over time" and "Avg Pace over time". Implement moving average smoothing (e.g., 7-day rolling avg). Add "Mileage Trend" and "Pace Trend" tabs to dashboard.
+  - **Details:** Render line charts for distance and pace over time. Add single "📈 Trends" tab to dashboard with mode toggle between "All Activities" and "Running Only". Implement aggregation selector (Day/Week/Month) and moving average smoothing (e.g., 7-day rolling avg) to reduce noise.
 
 ## Phase 5: User Experience & Quality Assurance
 
