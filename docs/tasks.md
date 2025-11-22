@@ -66,7 +66,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Write a loop/recursive function to fetch activities page-by-page until an empty page is returned or a specific date limit is reached.
   - Completed on 2025-11-22 03:02: Added `GetAllActivitiesAsync` to `IStravaApiClient`/`StravaApiClient` that iterates pages (default `perPage=100`) until an empty/short page or `maxPages` reached. Added verification endpoint `GET /activities/all` with query params `per_page`, `before`, `after`, `max_pages`. Uses existing OAuth session and token refresh.
 
-- [ ] **2.4 Add Rate Limiting & Backoff**
+- [x] **2.4 Add Rate Limiting & Backoff**
   - _Plan Item:_ Pagination & Rate Limiting
   - _Req ID:_ [Req 3]
   - **Details:** Inspect Strava response headers (`X-RateLimit-Limit`, `X-RateLimit-Usage`). Implement a delay/pause mechanism if limits are approaching or if `429 Too Many Requests` is received.
@@ -76,6 +76,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - _Plan Item:_ Data Normalization
   - _Req ID:_ [Req 3]
   - **Details:** Convert API timestamps to local datetime objects based on the activity's timezone. Ensure numeric precision for distance (meters) and time (seconds).
+  - Started on 2025-11-22 03:13: Add `ActivityNormalizer` service to convert `start_date` (UTC) to local `DateTime` using the activity timezone; project normalized DTO with double precision for distance and integer seconds for time. Verification endpoints to follow.
 
 - [ ] **2.6 Create In-Memory Cache Service**
   - _Plan Item:_ In-Memory Data Store/Cache
