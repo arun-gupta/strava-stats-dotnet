@@ -74,8 +74,9 @@ The Strava Activity Analyzer is a web application designed to authenticate with 
 9. **Unit Preferences**
    - **User Story**: As a user, I want to toggle between metric and imperial units so that the data is presented in a format I understand.
    - **Acceptance Criteria**:
+     - WHEN the dashboard loads, THEN the system SHALL default to imperial units (miles, min/mile).
      - WHEN the user toggles the unit switch, THEN the system SHALL convert all distance (miles/km) and pace (min/mile vs min/km) metrics immediately.
-     - WHEN the dashboard loads, THEN the system SHALL default to units inferred from the user's locale or a saved preference.
+     - WHEN a unit preference is set, THEN the system SHALL persist the selection in the URL or session so that a page refresh maintains the preference.
 
 ### System Quality & User Experience
 

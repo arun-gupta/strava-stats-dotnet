@@ -22,7 +22,7 @@ This document outlines the development phases for the Strava Activity Analyzer, 
 | **High** | **Pagination & Rate Limiting**: Implement logic to handle pagination (fetching all history) and respect API rate limits (backoff/retry). | [Req 3] |
 | **High** | **Data Normalization**: Normalize activity data (timestamps to local timezone, units to internal standard) for consistent aggregation. | [Req 3] |
 | **High** | **In-Memory Data Store/Cache**: Implement a temporary storage mechanism to hold fetched activities during the user's session to avoid re-fetching. | [Req 3], [Req 11] |
-| **High** | **Unit Conversion Service**: Create a utility service to handle conversions between Metric (km, m/s) and Imperial (mi, min/mi) on the fly. | [Req 9] |
+| **High** | **Unit Conversion Service**: Create a utility service to handle conversions between Metric (km, m/s) and Imperial (mi, min/mi). Default to imperial units with toggle to switch. | [Req 9] |
 
 ## Phase 3: Dashboard Framework & Basic Widgets
 **Goal:** Create the UI skeleton and implement the fundamental descriptive statistics.

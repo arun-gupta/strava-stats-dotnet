@@ -92,7 +92,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
 - [ ] **2.7 Build Unit Conversion Utility**
   - _Plan Item:_ Unit Conversion Service
   - _Req ID:_ [Req 9]
-  - **Details:** Create functions to convert Meters -> Miles/Km, Meters/Sec -> Min/Mile or Min/Km pace.
+  - **Details:** Create functions to convert Meters -> Miles/Km, Meters/Sec -> Min/Mile or Min/Km pace. Default to imperial units (miles, min/mile) with toggle to switch to metric.
 
 ## Phase 3: Dashboard Framework & Basic Widgets
 

@@ -122,8 +122,8 @@ export function setHeatmapMode(mode) {
   }
 }
 
-// Initialize unit system from browser locale
+// Initialize unit system (defaults to imperial)
 export function initializeUnitSystem() {
-  const useMiles = navigator.language?.startsWith('en-US');
-  state.unitSystem = useMiles ? 'imperial' : 'metric';
+  // Default to imperial units (miles, min/mile)
+  state.unitSystem = 'imperial';
 }
