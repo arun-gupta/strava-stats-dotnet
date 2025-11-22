@@ -48,7 +48,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
 
 ## Phase 2: Data Ingestion & Core Logic
 
-- [ ] **2.1 Define Activity Data Models**
+- [x] **2.1 Define Activity Data Models**
   - _Plan Item:_ Strava API Client
   - _Req ID:_ [Req 3]
   - **Details:** Create DTOs/Classes for Strava Activity (ID, type, distance, moving_time, start_date, timezone, etc.).
