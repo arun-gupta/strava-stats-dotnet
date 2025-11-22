@@ -1,6 +1,6 @@
 # Implementation Plan
 
-This document outlines the development phases for the Strava Activity Analyzer, mapping technical tasks to the requirements defined in `docs/requirements.md`.
+This document outlines the development phases for the Strava Activity Analyzer, mapping technical tasks to the requirements defined in `docs/specs/requirements.md`.
 
 ## Phase 1: Infrastructure & Authentication
 **Goal:** Establish the project structure and enable users to securely connect their Strava accounts.

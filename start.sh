@@ -3,11 +3,11 @@
 # - Loads .env if present
 # - Sets a sensible default environment
 # - Restores, builds, and runs the API project
-# - Optional: opens a browser page after start (--open=swagger|auth)
+# - Optional: opens a browser page after start (--open=swagger|auth|dashboard)
 
 set -euo pipefail
 
-OPEN_PAGE="auth"
+OPEN_PAGE="dashboard"
 for arg in "$@"; do
   case "$arg" in
     --open=swagger)
@@ -16,6 +16,10 @@ for arg in "$@"; do
       ;;
     --open=auth)
       OPEN_PAGE="auth"
+      shift
+      ;;
+    --open=dashboard)
+      OPEN_PAGE="dashboard"
       shift
       ;;
     *)
@@ -127,6 +131,11 @@ if [[ -n "$OPEN_PAGE" ]]; then
       echo "Opening Strava auth login page..."
       echo "URL: $HTTP_URL/auth/login"
       open_url "$HTTP_URL/auth/login"
+      ;;
+    dashboard)
+      echo "Opening Dashboard..."
+      echo "URL: $HTTP_URL/dashboard"
+      open_url "$HTTP_URL/dashboard"
       ;;
   esac
   # Wait on the app process to keep logs in this terminal

@@ -204,8 +204,15 @@ app.MapGet("/auth/callback", async (
     if (json.ExpiresAt.HasValue)
         http.Session.SetString("strava_expires_at", json.ExpiresAt.Value.ToString());
 
-    // Redirect to a simple welcome page
-    return Results.Redirect("/welcome");
+    // Redirect to dashboard for immediate value after login
+    return Results.Redirect("/dashboard");
+});
+
+// Smart root redirect: if signed in → /dashboard; else → /welcome
+app.MapGet("/", (HttpContext http) =>
+{
+    var isSignedIn = !string.IsNullOrWhiteSpace(http.Session.GetString("strava_access_token"));
+    return Results.Redirect(isSignedIn ? "/dashboard" : "/welcome");
 });
 
 // Simple welcome page that shows signed-in state (no token exposure)
@@ -226,7 +233,7 @@ app.MapGet("/welcome", (HttpContext http) =>
         "      body { font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 2rem; }\n" +
         "      .card { max-width: 640px; padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }\n" +
         "      .muted { color: #6b7280; }\n" +
-        "      a.button { display: inline-block; padding: 0.6rem 1rem; background: #f96332; color: white; border-radius: 8px; text-decoration: none; }\n" +
+        "      a.button { display: inline-block; padding: 0.6rem 1rem; background: #f96332; color: white; border-radius: 8px; text-decoration: none; margin-right: .5rem;}\n" +
         "      a.button.secondary { background: #111827; }\n" +
         "    </style>\n" +
         "  </head>\n" +
@@ -235,16 +242,24 @@ app.MapGet("/welcome", (HttpContext http) =>
         "      <h1>Welcome" + nameHtml + "!</h1>\n" +
         "      <p class=\"muted\">" + System.Net.WebUtility.HtmlEncode(statusText) + "</p>\n" +
         (isSignedIn
-            ? "      <p><a class=\"button secondary\" href=\"/auth/logout\">Logout</a></p>\n"
-            : "      <p><a class=\"button\" href=\"/auth/login\">Sign in again</a></p>\n") +
+            ? "      <p><a class=\"button\" href=\"/dashboard\">Open Dashboard</a><a class=\"button secondary\" href=\"/auth/logout\">Logout</a></p>\n"
+            : "      <p><a class=\"button\" href=\"/auth/login\">Sign in with Strava</a></p>\n") +
         "    </div>\n" +
         "  </body>\n" +
         "</html>\n";
     return Results.Content(content, "text/html");
 });
 
-// Simple route to the static dashboard UI
-app.MapGet("/dashboard", () => Results.Redirect("/dashboard/index.html"));
+// Route to dashboard with signed-in check: redirect to login if not authenticated
+app.MapGet("/dashboard", (HttpContext http) =>
+{
+    var isSignedIn = !string.IsNullOrWhiteSpace(http.Session.GetString("strava_access_token"));
+    if (!isSignedIn)
+    {
+        return Results.Redirect("/auth/login");
+    }
+    return Results.Redirect("/dashboard/index.html");
+});
 
 // Task 1.7: Logout — clear session and remove session cookie
 app.MapGet("/auth/logout", (HttpContext http) =>

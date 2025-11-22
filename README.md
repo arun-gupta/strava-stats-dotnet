@@ -29,9 +29,9 @@ cp .env.example .env
 ./start.sh        # first time you may need: chmod +x start.sh
 ```
 
-After signing in with Strava, you’ll see a simple welcome page:
+After signing in with Strava, you’ll be redirected to your dashboard:
 
-![Welcome page](docs/images/welcome.png)
+![Dashboard](docs/images/dashboard.png)
 
 ### About the start.sh helper
 On macOS/Linux (or Git Bash on Windows), `start.sh` will:
@@ -117,7 +117,7 @@ start.sh
 ```
 
 ## Roadmap
-See `docs/tasks.md` and `docs/plan.md`.
+See `docs/specs/tasks.md` and `docs/specs/plan.md`.
 
 
 ### Git hooks (auto add Co‑authored‑by: Junie)
