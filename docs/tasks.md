@@ -2,6 +2,11 @@
 
 This document tracks the step-by-step technical tasks required to build the Strava Activity Analyzer. Each task is linked to the high-level plan and specific requirements.
 
+> Checklist legend
+> - [x] = task fully completed (meets acceptance criteria)
+> - [ ] = task not completed
+> - “Started” notes indicate work is in progress but the task remains unchecked until finished
+
 ## Phase 1: Infrastructure & Authentication
 
 - [x] **1.1 Initialize Project Repository**
@@ -72,11 +77,12 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Inspect Strava response headers (`X-RateLimit-Limit`, `X-RateLimit-Usage`). Implement a delay/pause mechanism if limits are approaching or if `429 Too Many Requests` is received.
   - Completed on 2025-11-22 03:10: In `StravaApiClient`, added header parsing and backoff: on 429, wait until next quarter‑hour window then retry once; during pagination, apply gentle delays when minute usage ≥80% (15s) and ≥90% (60s). No API surface changes; `/activities` and `/activities/all` benefit automatically.
 
-- [ ] **2.5 Implement Activity Normalizer**
+- [x] **2.5 Implement Activity Normalizer**
   - _Plan Item:_ Data Normalization
   - _Req ID:_ [Req 3]
   - **Details:** Convert API timestamps to local datetime objects based on the activity's timezone. Ensure numeric precision for distance (meters) and time (seconds).
-  - Started on 2025-11-22 03:13: Add `ActivityNormalizer` service to convert `start_date` (UTC) to local `DateTime` using the activity timezone; project normalized DTO with double precision for distance and integer seconds for time. Verification endpoints to follow.
+  - Completed on 2025-11-22 03:22: Added `ActivityNormalizer` with timezone extraction (IANA), UTC→local conversion with DST support, rounding/precision, and normalized DTO. Added endpoints `GET /activities/normalized` and `GET /activities/all/normalized`.
+  - Tests: Added xUnit tests in `tests/StravaStats.Api.Tests` covering (a) Strava timezone string parsing like "(GMT-08:00) America/Los_Angeles"; (b) DST summer conversion for `America/Los_Angeles`; (c) fallback behavior when timezone is missing or malformed; (d) rounding for distance/elevation. Run with `dotnet test`.
 
 - [ ] **2.6 Create In-Memory Cache Service**
   - _Plan Item:_ In-Memory Data Store/Cache
