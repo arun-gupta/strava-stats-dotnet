@@ -1,5 +1,8 @@
 import { getState, setUser, setAllActivities, setDateRange, setActiveTab, initializeUnitSystem, subscribe, setHeatmapMode } from './js/state.js';
 
+// Register Chart.js datalabels plugin globally
+Chart.register(ChartDataLabels);
+
 const authArea = document.getElementById('authArea');
 
 const totalsLoading = document.getElementById('totalsLoading');
