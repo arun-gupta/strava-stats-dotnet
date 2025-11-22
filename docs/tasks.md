@@ -58,6 +58,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - _Plan Item:_ Strava API Client
   - _Req ID:_ [Req 3]
   - **Details:** Implement a typed HTTP client for fetching activities (`GET /athlete/activities`). Include Authorization header injection.
+  - Completed on 2025-11-22: Added `IStravaApiClient` and `StravaApiClient` in `src/StravaStats.Api/Services/StravaApiClient.cs` using named `HttpClient("strava")` (BaseAddress `https://www.strava.com/api/v3/`). Injects `Bearer` token per request and deserializes to `ActivitySummaryDto[]`. Exposed verification endpoint `GET /activities` supporting `page`, `per_page`, `before`, `after`.
 
 - [ ] **2.3 Implement Pagination Logic**
   - _Plan Item:_ Pagination & Rate Limiting

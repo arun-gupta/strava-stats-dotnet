@@ -48,7 +48,11 @@ builder.Services.AddSession(options =>
 });
 
 // Typed HttpClient for Strava API
-builder.Services.AddHttpClient("strava");
+builder.Services.AddHttpClient("strava", c =>
+{
+    c.BaseAddress = new Uri("https://www.strava.com/api/v3/");
+});
+builder.Services.AddTransient<StravaStats.Api.Services.IStravaApiClient, StravaStats.Api.Services.StravaApiClient>();
 
 var app = builder.Build();
 
@@ -344,6 +348,40 @@ app.MapGet("/me", async (HttpContext http, IHttpClientFactory httpClientFactory,
         return Results.Problem(title: "Strava API call failed", detail: body, statusCode: (int)resp.StatusCode);
     }
     return Results.Content(body, "application/json");
+});
+
+// Task 2.2: Strava API client wrapper verification endpoint
+// GET /activities?page=1&per_page=30&before={unix}&after={unix}
+app.MapGet("/activities", async (
+    HttpContext http,
+    IHttpClientFactory httpClientFactory,
+    IOptions<StravaOptions> strava,
+    StravaStats.Api.Services.IStravaApiClient api,
+    int? page,
+    int? per_page,
+    long? before,
+    long? after) =>
+{
+    var ok = await EnsureAccessTokenAsync(http, httpClientFactory, strava);
+    if (!ok.ok)
+    {
+        return Results.Unauthorized();
+    }
+
+    try
+    {
+        var (activities, _) = await api.GetActivitiesAsync(
+            ok.accessToken!,
+            page ?? 1,
+            per_page ?? 30,
+            before,
+            after);
+        return Results.Ok(activities);
+    }
+    catch (HttpRequestException ex) when (ex.StatusCode.HasValue)
+    {
+        return Results.Problem(title: "Strava API call failed", detail: ex.Message, statusCode: (int)ex.StatusCode!.Value);
+    }
 });
 
 // (types moved above to satisfy top-level statements rule)
