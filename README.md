@@ -58,19 +58,6 @@ Current highlights:
 ## Roadmap
 See [docs/specs/tasks.md](docs/specs/tasks.md) and [docs/specs/plan.md](docs/specs/plan.md).
 
-
-### Git hooks (auto add Co‑authored‑by: Junie)
-This repository is configured to append a co‑author trailer to every commit message via a local Git hook.
-
-Setup (one time per clone):
-```bash
-git config core.hooksPath .githooks
-chmod +x .githooks/prepare-commit-msg
-```
-
-After this, your commits will automatically include:
-```
-Co-authored-by: Junie <junie@jetbrains.com>
-```
-The hook skips merge commits and won’t duplicate the trailer if it already exists.
+## Contributing
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, Git hooks configuration, and contribution guidelines.
 
