@@ -58,28 +58,32 @@
       <div class="tab-content">
         <!-- Overview Tab -->
         <div id="tab-overview" class="tab-panel active">
-          <section id="totalsCard" class="card">
-            <h4 id="totalsTitle">Last 30 Days</h4>
-            <div id="totalsLoading">Loading totals…</div>
-            <div id="totals" class="hidden">
-              <div class="grid">
-                <article>
-                  <header>Total Activities</header>
-                  <strong id="totCount">—</strong>
-                </article>
-                <article>
-                  <header>Total Moving Time</header>
-                  <strong id="totTime">—</strong>
-                </article>
-              </div>
-            </div>
-            <div id="totalsEmpty" class="hidden">No activities in the last 30 days.</div>
-          </section>
-
           <section class="card">
-            <h4>Activity Count Distribution</h4>
-            <div class="chart-container">
-              <canvas id="activityCountChart"></canvas>
+            <div id="totalsLoading">Loading activities…</div>
+            <div id="totalsEmpty" class="hidden">No activities in the last 30 days.</div>
+            <div id="totals" class="hidden">
+              <div class="overview-layout">
+                <div class="overview-stats">
+                  <div class="stat-card">
+                    <div class="stat-label">Date Range</div>
+                    <div class="stat-value" id="totalsTitle">Last 30 Days</div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-label">Total Activities</div>
+                    <div class="stat-value" id="totCount">—</div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-label">Total Moving Time</div>
+                    <div class="stat-value" id="totTime">—</div>
+                  </div>
+                </div>
+                <div class="overview-chart">
+                  <h4>Activity Count Distribution</h4>
+                  <div class="chart-container">
+                    <canvas id="activityCountChart"></canvas>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         </div>

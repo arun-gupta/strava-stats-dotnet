@@ -160,6 +160,67 @@
   }
 }
 
+/* Overview Layout */
+.overview-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .overview-layout {
+    grid-template-columns: auto 1fr;
+    gap: 2rem;
+  }
+}
+
+.overview-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stat-card {
+  padding: 1rem;
+  background: var(--pico-secondary-background);
+  border-radius: var(--pico-border-radius);
+  border: 1px solid var(--pico-muted-border-color);
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--pico-muted-color);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--pico-color);
+}
+
+.overview-chart {
+  min-width: 0;
+}
+
+.overview-chart h4 {
+  margin-bottom: 0.5rem;
+}
+
+.overview-chart .chart-container {
+  height: 300px;
+  padding: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .overview-chart .chart-container {
+    height: 350px;
+  }
+}
+
 /* Heatmap */
 .flex-between { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .segmented { display: inline-flex; border: 1px solid var(--pico-muted-border-color); border-radius: 8px; overflow: hidden; }
