@@ -70,6 +70,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - _Plan Item:_ Pagination & Rate Limiting
   - _Req ID:_ [Req 3]
   - **Details:** Inspect Strava response headers (`X-RateLimit-Limit`, `X-RateLimit-Usage`). Implement a delay/pause mechanism if limits are approaching or if `429 Too Many Requests` is received.
+  - Completed on 2025-11-22 03:10: In `StravaApiClient`, added header parsing and backoff: on 429, wait until next quarter‑hour window then retry once; during pagination, apply gentle delays when minute usage ≥80% (15s) and ≥90% (60s). No API surface changes; `/activities` and `/activities/all` benefit automatically.
 
 - [ ] **2.5 Implement Activity Normalizer**
   - _Plan Item:_ Data Normalization
