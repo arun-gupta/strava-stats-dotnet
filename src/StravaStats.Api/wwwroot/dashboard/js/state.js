@@ -6,6 +6,7 @@ const state = {
   filteredActivities: [],
   dateRange: { type: 'last30', customStart: null, customEnd: null }, // type: 'all' | 'ytd' | 'last30' | 'custom'
   unitSystem: 'imperial', // 'metric' | 'imperial'
+  activeTab: 'overview', // 'overview' | 'activity-count' | 'time-dist' | etc.
 };
 
 const subscribers = [];
@@ -95,6 +96,12 @@ function applyFilter() {
     });
   }
 
+  notify();
+}
+
+// Set active tab
+export function setActiveTab(tabName) {
+  state.activeTab = tabName;
   notify();
 }
 

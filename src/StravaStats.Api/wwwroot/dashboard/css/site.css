@@ -96,3 +96,52 @@
 #dateRangeCard {
   margin-bottom: 1.5rem;
 }
+
+/* Tab Navigation */
+.tab-nav {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--pico-muted-border-color);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--pico-muted-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  margin: 0;
+  margin-bottom: -2px;
+}
+
+.tab-btn:hover {
+  color: var(--pico-color);
+  background: var(--pico-secondary-background);
+}
+
+.tab-btn.active {
+  color: var(--pico-primary);
+  border-bottom-color: var(--pico-primary);
+  background: transparent;
+}
+
+/* Tab Content */
+.tab-content {
+  position: relative;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}

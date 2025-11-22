@@ -125,20 +125,26 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Create UI for "Last 30 Days", "YTD", "All Time", and Custom Start/End inputs. Wire up logic to filter the `allActivities` list into `filteredActivities`.
   - Completed on 2025-11-22: Added date range picker UI in `index.html` with dropdown (Last 30 Days, Year to Date, All Time, Custom Range) and custom date inputs. Styled in `site.css` with flexbox layout. Implemented event handlers in `app.js` that call `setDateRange()` from state store. Custom date inputs show/hide based on selection. Totals title updates dynamically to reflect current date range. Filtering logic in `state.js` automatically applies to `filteredActivities` and triggers re-render via subscriber pattern.
 
-- [ ] **3.5 Implement Running Stats Widget**
-  - _Plan Item:_ Running Statistics Component
-  - _Req ID:_ [Req 6]
-  - **Details:** Create component to compute and display: Total Runs, 10K+ Runs, Total Distance, Avg Pace. Calculate PRs (Fastest 10k, Longest Run) from the filtered list.
+- [x] **3.4.5 Implement Tabbed Dashboard Layout (Foundation)**
+  - _Plan Item:_ Dashboard Layout Enhancement
+  - _Req ID:_ [Req 4], [Req 5], [Req 6], [Req 7]
+  - **Details:** Convert dashboard from grid layout to tabbed interface. Create tab infrastructure with initial "Overview" tab (containing current Totals and Recent Activities sections). Implement tab switching logic, state management for active tab, and styling with active state. Ensure tabs are responsive on mobile. The date range filter should remain global and apply to all tabs.
+  - Completed on 2025-11-22: Created tabbed interface foundation with "Overview" tab containing existing Totals and Recent Activities. Added tab navigation bar in `index.html` with emoji icon. Styled tabs in `site.css` with active state (bottom border highlight), hover effects, and mobile-responsive horizontal scroll. Added `activeTab` to state.js with `setActiveTab()` function. Implemented tab switching logic in `app.js` that updates button states and panel visibility via subscriber pattern. Date range filter remains global and applies to all tabs.
 
-- [ ] **3.6 Implement Activity Distribution Charts**
+- [ ] **3.5 Implement Activity Distribution Charts**
   - _Plan Item:_ Activity Distribution Charts
   - _Req ID:_ [Req 4]
-  - **Details:** Integrate a chart library (e.g., Chart.js, Recharts). Create Pie/Donut charts for "Count by Type" and "Time by Type".
+  - **Details:** Integrate a chart library (e.g., Chart.js, Recharts). Create Pie/Donut charts for "Count by Type" and "Time by Type". Add "Activity Count" and "Time Distribution" tabs to dashboard.
+
+- [ ] **3.6 Implement Running Stats Widget**
+  - _Plan Item:_ Running Statistics Component
+  - _Req ID:_ [Req 6]
+  - **Details:** Create component to compute and display: Total Runs, 10K+ Runs, Total Distance, Avg Pace. Calculate PRs (Fastest 10k, Longest Run) from the filtered list. Add "Running Stats" tab to dashboard.
 
 - [ ] **3.7 Implement Distance Histogram**
   - _Plan Item:_ Distance Histogram
   - _Req ID:_ [Req 6]
-  - **Details:** Create logic to bin runs by distance (0-1mi, 1-2mi, etc.). Render a bar chart using these bins.
+  - **Details:** Create logic to bin runs by distance (0-1mi, 1-2mi, etc.). Render a bar chart using these bins. This can be added to the "Running Stats" tab.
 
 ## Phase 4: Advanced Visualization & Trends
 
@@ -150,12 +156,12 @@ This document tracks the step-by-step technical tasks required to build the Stra
 - [ ] **4.2 Build Calendar Heatmap Component**
   - _Plan Item:_ Workout & Running Heatmaps
   - _Req ID:_ [Req 5]
-  - **Details:** Render a GitHub-style calendar grid. Support two modes: "All Activities" (intensity = frequency) and "Running" (intensity = distance).
+  - **Details:** Render a GitHub-style calendar grid. Support two modes: "All Activities" (intensity = frequency) and "Running" (intensity = distance). Add "Workout Heatmap" and "Running Heatmap" tabs to dashboard.
 
 - [ ] **4.3 Calculate Streak Metrics**
   - _Plan Item:_ Workout & Running Heatmaps
   - _Req ID:_ [Req 5]
-  - **Details:** Implement algorithm to find "Current Streak" and "Longest Streak" based on consecutive days in the filtered dataset.
+  - **Details:** Implement algorithm to find "Current Streak" and "Longest Streak" based on consecutive days in the filtered dataset. Display these metrics in the heatmap tabs.
 
 - [ ] **4.4 Implement Trend Aggregation Logic**
   - _Plan Item:_ Trend Calculation Engine
@@ -165,7 +171,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
 - [ ] **4.5 Build Trend Line Charts**
   - _Plan Item:_ Mileage & Pace Trend Charts
   - _Req ID:_ [Req 7]
-  - **Details:** Render line charts for "Mileage over time" and "Avg Pace over time". Implement moving average smoothing (e.g., 7-day rolling avg).
+  - **Details:** Render line charts for "Mileage over time" and "Avg Pace over time". Implement moving average smoothing (e.g., 7-day rolling avg). Add "Mileage Trend" and "Pace Trend" tabs to dashboard.
 
 ## Phase 5: User Experience & Quality Assurance
 

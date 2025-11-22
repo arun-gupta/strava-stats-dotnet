@@ -1,4 +1,4 @@
-import { getState, setUser, setAllActivities, setDateRange, initializeUnitSystem, subscribe } from './js/state.js';
+import { getState, setUser, setAllActivities, setDateRange, setActiveTab, initializeUnitSystem, subscribe } from './js/state.js';
 
 const authArea = document.getElementById('authArea');
 const recentLoading = document.getElementById('recentLoading');
@@ -19,6 +19,9 @@ const dateRangeBtns = document.querySelectorAll('.date-range-btn');
 const customDateInputs = document.getElementById('customDateInputs');
 const customStart = document.getElementById('customStart');
 const customEnd = document.getElementById('customEnd');
+
+const tabBtns = document.querySelectorAll('.tab-btn');
+const tabPanels = document.querySelectorAll('.tab-panel');
 
 // Simple helpers
 const fmtDate = (iso) => new Date(iso).toLocaleDateString();
@@ -287,10 +290,43 @@ customEnd.addEventListener('change', () => {
   }
 });
 
-// Subscribe to state changes to re-render when filter/units change
+// Tab switching handlers
+tabBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tabName = btn.dataset.tab;
+    setActiveTab(tabName);
+  });
+});
+
+// Update UI when active tab changes
+function updateActiveTab() {
+  const { activeTab } = getState();
+
+  // Update button states
+  tabBtns.forEach(btn => {
+    if (btn.dataset.tab === activeTab) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  // Update panel visibility
+  tabPanels.forEach(panel => {
+    if (panel.id === `tab-${activeTab}`) {
+      panel.classList.add('active');
+    } else {
+      panel.classList.remove('active');
+    }
+  });
+}
+
+// Subscribe to state changes to re-render when filter/units/tabs change
 // (but skip rendering if we haven't loaded data yet)
 let dataLoaded = false;
 subscribe((state) => {
+  updateActiveTab();
+
   if (dataLoaded) {
     renderRecent(state.filteredActivities.slice(0, 20));
     renderTotals(state.filteredActivities);

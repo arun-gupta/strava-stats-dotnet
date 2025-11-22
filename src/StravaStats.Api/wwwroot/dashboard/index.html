@@ -44,7 +44,16 @@
         </div>
       </section>
 
-      <div class="dashboard-grid">
+      <!-- Tab Navigation -->
+      <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="overview">📊 Overview</button>
+      </nav>
+
+      <!-- Tab Panels -->
+      <div class="tab-content">
+        <!-- Overview Tab -->
+        <div id="tab-overview" class="tab-panel active">
+          <div class="dashboard-grid">
       <section id="totalsCard" class="card">
         <h4 id="totalsTitle">Last 30 Days</h4>
         <div id="totalsLoading">Loading totals…</div>
@@ -90,7 +99,12 @@
         </div>
         <div id="recentEmpty" class="hidden">No recent activities.</div>
       </section>
+          </div>
+        </div>
+        <!-- End Overview Tab -->
       </div>
+      <!-- End Tab Content -->
+
       <footer class="muted" style="margin-top:2rem">Built quickly with vanilla JS. Data from your Strava account.</footer>
     </main>
 
