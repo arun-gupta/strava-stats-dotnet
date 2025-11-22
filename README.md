@@ -3,7 +3,23 @@
 ![Built with JetBrains Rider](https://img.shields.io/badge/Built%20with-JetBrains%20Rider-000000?logo=rider&logoColor=white)
 ![Co-authored by Junie & Claude Agent](https://img.shields.io/badge/Co%E2%80%91authored%20by-Junie%20%26%20Claude%20Agent-6B46C1)
 
-An ASP.NET Core 8 Web API for analyzing Strava activities. This repo will later include a frontend dashboard, but Phase 1 focuses on backend auth and data ingestion.
+An ASP.NET Core 8 Web API for analyzing Strava activities with an interactive dashboard for tracking your fitness progress.
+
+## Features
+
+Current highlights:
+- **Secure Authentication**: OAuth login with Strava, secure server-side session (no tokens exposed to browser), automatic token refresh
+- **Smart Data Fetching**: Typed Strava API client with pagination and respectful rate-limit backoff
+- **Activity Normalization**: DST-aware local time conversion, consistent unit handling
+- **Interactive Dashboard** at `/dashboard`:
+  - Tabbed interface (Overview and more coming soon)
+  - Flexible date range filtering (Last 7/30/90 days, 6 months, YTD, All Time, Custom)
+  - Activity summaries with totals, distance, moving time, and averages
+  - Recent activities table with sortable data
+  - Imperial/Metric unit system support
+  - Responsive design for mobile and desktop
+
+![Dashboard](docs/images/dashboard.png)
 
 ## Quickstart
 
@@ -29,29 +45,11 @@ cp .env.example .env
 ./start.sh        # first time you may need: chmod +x start.sh
 ```
 
-After signing in with Strava, you’ll be redirected to your dashboard:
-
-![Dashboard](docs/images/dashboard.png)
-
+After signing in with Strava, you'll be redirected to your dashboard.
 
 ### Advanced setup and alternatives
 - Windows/Linux install instructions, PATH notes, and using dotnet user-secrets are documented here:
   - [docs/setup.md](docs/setup.md)
-
-<!-- Configuration (secrets) section removed for a leaner README. See docs/setup.md#configure-secrets for full details. -->
-
-## Features
-
-Current highlights:
-- OAuth login with Strava and secure server-side session (no tokens exposed to the browser)
-- Automatic token refresh and a clean Logout flow
-- Typed Strava API client with pagination and respectful rate‑limit backoff
-- Activity normalization (DST‑aware local time, consistent units)
-- Minimal dashboard at `/dashboard`:
-  - Login status with Sign in/Logout
-  - Recent Activities table (first page)
-  - Last 30 days totals (count, distance, time)
-  - Graceful empty/unauthorized states
 
 ## Roadmap
 See [docs/specs/tasks.md](docs/specs/tasks.md) and [docs/specs/plan.md](docs/specs/plan.md).
