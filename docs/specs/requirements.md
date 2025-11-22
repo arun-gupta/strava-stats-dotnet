@@ -46,6 +46,7 @@ The Strava Activity Analyzer is a web application designed to authenticate with 
      - WHEN "All Activities" mode is selected, THEN the system SHALL colorize days based on the total time spent on all activities per day.
      - WHEN "Running Only" mode is selected, THEN the system SHALL only display running data and colorize days based on distance covered.
      - WHEN viewing the heatmap, THEN the system SHALL display a legend within the Heatmap tab showing time-based intensity levels: "No Activity", "< 1h", "1-2h", "2h+" for All Activities mode, and distance-based levels for Running Only mode.
+     - WHEN viewing the heatmap, THEN the system SHALL display the calendar in a horizontal layout (days as rows, weeks as columns) that utilizes available screen width for better visual presentation.
      - WHEN viewing the heatmap, THEN the system SHALL display workout statistics including: Workout Days (total days with activity), Missed Days (days without activity), Current Streak (consecutive active days ending today), Days Since Last (days since most recent activity), Longest Gap (longest period without activity), and Total Gap Days (sum of all gap days).
      - WHEN the user clicks "Show Gap Details", THEN the system SHALL display a list of all gap periods (consecutive days without activity) in the selected date range, showing the start date, end date, and duration of each gap.
 
@@ -69,7 +70,8 @@ The Strava Activity Analyzer is a web application designed to authenticate with 
 8. **Date Filtering**
    - **User Story**: As a user, I want to filter my dashboard by specific dates so that I can analyze a specific training block or year.
    - **Acceptance Criteria**:
-     - WHEN the user selects a preset (e.g., 30 days, YTD, All Time), THEN the system SHALL recompute all dashboard widgets to reflect only activities within that range.
+     - WHEN the dashboard loads, THEN the system SHALL default to showing the last 7 days of activity data.
+     - WHEN the user selects a preset (e.g., 7 days, 30 days, YTD, All Time), THEN the system SHALL recompute all dashboard widgets to reflect only activities within that range.
      - WHEN the user selects a custom range, THEN the system SHALL allow picking specific start and end dates.
      - WHEN a filter is applied, THEN the system SHALL persist the selection in the URL or session so that a page refresh maintains the context.
 

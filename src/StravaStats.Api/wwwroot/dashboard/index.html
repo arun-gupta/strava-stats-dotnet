@@ -29,8 +29,8 @@
       <!-- Date Range Picker -->
       <section class="card" id="dateRangeCard">
         <div class="date-range-picker">
-          <button class="date-range-btn" data-range="last7">Last 7 Days</button>
-          <button class="date-range-btn active" data-range="last30">Last 30 Days</button>
+          <button class="date-range-btn active" data-range="last7">Last 7 Days</button>
+          <button class="date-range-btn" data-range="last30">Last 30 Days</button>
           <button class="date-range-btn" data-range="last90">Last 90 Days</button>
           <button class="date-range-btn" data-range="last6months">Last 6 Months</button>
           <button class="date-range-btn" data-range="ytd">Year to Date</button>
@@ -49,9 +49,10 @@
       <!-- Tab Navigation -->
       <nav class="tab-nav">
         <button class="tab-btn active" data-tab="overview">📊 Overview</button>
-        <button class="tab-btn" data-tab="time-dist">⏱️ Time Distribution</button>
+        <button class="tab-btn" data-tab="time-dist">⏱️ Duration</button>
         <button class="tab-btn" data-tab="heatmap">🔥 Heatmap</button>
         <button class="tab-btn" data-tab="running-stats">🏃 Running Stats</button>
+        <button class="tab-btn" data-tab="trends">📈 Trends</button>
       </nav>
 
       <!-- Tab Panels -->
@@ -66,7 +67,7 @@
                 <div class="overview-stats">
                   <div class="stat-card">
                     <div class="stat-label">Date Range</div>
-                    <div class="stat-value" id="totalsTitle">Last 30 Days</div>
+                    <div class="stat-value" id="totalsTitle">Last 7 Days</div>
                   </div>
                   <div class="stat-card">
                     <div class="stat-label">Total Activities</div>
@@ -89,16 +90,16 @@
         </div>
         <!-- End Overview Tab -->
 
-        <!-- Time Distribution Tab -->
+        <!-- Duration Tab -->
         <div id="tab-time-dist" class="tab-panel">
           <section class="card">
-            <h4>Time Distribution by Type</h4>
+            <h4>Duration by Type</h4>
             <div class="chart-container">
               <canvas id="timeDistChart"></canvas>
             </div>
           </section>
         </div>
-        <!-- End Time Distribution Tab -->
+        <!-- End Duration Tab -->
 
         <!-- Heatmap Tab -->
         <div id="tab-heatmap" class="tab-panel">
@@ -173,13 +174,6 @@
         <!-- Running Stats Tab -->
         <div id="tab-running-stats" class="tab-panel">
           <section class="card">
-            <h4>Distance Distribution</h4>
-            <div class="chart-container">
-              <canvas id="distanceHistogramChart"></canvas>
-            </div>
-          </section>
-
-          <section class="card">
             <h4>Running Summary</h4>
             <div id="runningStatsLoading">Loading running stats…</div>
             <div id="runningStats" class="hidden">
@@ -212,8 +206,52 @@
             </div>
             <div id="runningStatsEmpty" class="hidden">No running activities in the selected date range.</div>
           </section>
+
+          <section class="card">
+            <h4>Distance Distribution</h4>
+            <div class="chart-container">
+              <canvas id="distanceHistogramChart"></canvas>
+            </div>
+          </section>
         </div>
         <!-- End Running Stats Tab -->
+
+        <!-- Trends Tab -->
+        <div id="tab-trends" class="tab-panel">
+          <section class="card">
+            <div class="flex-between">
+              <h4 style="margin:0">Trends</h4>
+              <div class="trend-controls">
+                <div class="segmented">
+                  <button id="trendAllBtn" class="seg-btn active" data-mode="all">All Activities</button>
+                  <button id="trendRunBtn" class="seg-btn" data-mode="running">Running Only</button>
+                </div>
+                <div class="segmented">
+                  <button class="seg-btn" data-granularity="day">Daily</button>
+                  <button class="seg-btn active" data-granularity="week">Weekly</button>
+                  <button class="seg-btn" data-granularity="month">Monthly</button>
+                  <button class="seg-btn" data-granularity="year">Yearly</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <h4>Distance Over Time</h4>
+            <div class="chart-container">
+              <canvas id="distanceTrendChart"></canvas>
+            </div>
+          </section>
+
+          <section class="card">
+            <h4>Pace Over Time</h4>
+            <div id="paceTrendEmpty" class="hidden">Pace data only available for running activities.</div>
+            <div class="chart-container">
+              <canvas id="paceTrendChart"></canvas>
+            </div>
+          </section>
+        </div>
+        <!-- End Trends Tab -->
       </div>
       <!-- End Tab Content -->
 

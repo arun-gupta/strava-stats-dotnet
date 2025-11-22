@@ -277,6 +277,47 @@ if (hmAllBtn && hmRunBtn) {
   });
 }
 
+// Trend mode toggle
+const trendAllBtn = document.getElementById('trendAllBtn');
+const trendRunBtn = document.getElementById('trendRunBtn');
+if (trendAllBtn && trendRunBtn) {
+  [trendAllBtn, trendRunBtn].forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.mode;
+      [trendAllBtn, trendRunBtn].forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      trendMode = mode;
+
+      // Re-render trend charts with new mode
+      if (dataLoaded) {
+        const { filteredActivities } = getState();
+        renderDistanceTrendChart(filteredActivities);
+        renderPaceTrendChart(filteredActivities);
+      }
+    });
+  });
+}
+
+// Trend granularity buttons
+const trendGranularityBtns = document.querySelectorAll('[data-granularity]');
+if (trendGranularityBtns.length > 0) {
+  trendGranularityBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const granularity = btn.dataset.granularity;
+      trendGranularityBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      trendGranularity = granularity;
+
+      // Re-render trend charts with new granularity
+      if (dataLoaded) {
+        const { filteredActivities } = getState();
+        renderDistanceTrendChart(filteredActivities);
+        renderPaceTrendChart(filteredActivities);
+      }
+    });
+  });
+}
+
 // Show Gap Details button
 if (showGapDetailsBtn) {
   showGapDetailsBtn.addEventListener('click', () => {
@@ -692,6 +733,177 @@ function transformToHeatmapData(activities, mode = 'all') {
   return heatmapData;
 }
 
+// ---- Trends Aggregation (4.3.1) ----
+// Utilities for bucketing by Day / ISO Week (Mon-Sun) / Month
+function startOfDayLocal(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function getISOWeek(date) {
+  // Copy date so don't modify original
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  // ISO week date weeks start on Monday, so correct the day number
+  const dayNum = d.getUTCDay() || 7; // 1..7, Monday=1, Sunday=7
+  // Set the target to the Thursday of this week so the week number is correct
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return { year: d.getUTCFullYear(), week: weekNo };
+}
+
+function startOfISOWeek(date) {
+  const d = startOfDayLocal(date);
+  const day = (d.getDay() + 6) % 7; // Mon=0..Sun=6
+  const monday = new Date(d);
+  monday.setDate(d.getDate() - day);
+  monday.setHours(0, 0, 0, 0);
+  return monday;
+}
+
+function startOfMonth(date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function startOfYear(date) {
+  return new Date(date.getFullYear(), 0, 1);
+}
+
+function formatKey(date, granularity) {
+  if (granularity === 'day') {
+    return formatDateKey(startOfDayLocal(date)); // YYYY-MM-DD
+  }
+  if (granularity === 'week') {
+    const { year, week } = getISOWeek(date);
+    return `${year}-W${String(week).padStart(2, '0')}`;
+  }
+  if (granularity === 'month') {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    return `${y}-${m}`;
+  }
+  if (granularity === 'year') {
+    return String(date.getFullYear());
+  }
+  return '';
+}
+
+function labelForKey(date, granularity) {
+  if (granularity === 'day') return formatKey(date, 'day');
+  if (granularity === 'week') {
+    const start = startOfISOWeek(date);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    return `${formatDateKey(start)} → ${formatDateKey(end)}`;
+  }
+  if (granularity === 'month') {
+    return date.toLocaleString(undefined, { year: 'numeric', month: 'short' });
+  }
+  if (granularity === 'year') {
+    return String(date.getFullYear());
+  }
+  return '';
+}
+
+// Returns an array of buckets sorted by date with metrics per bucket.
+// Each bucket: { key, label, date: Date(start), count, distance_m_total, moving_time_s_total, avg_pace_s_per_km | null }
+// mode: 'all' | 'running'
+// granularity: 'day' | 'week' | 'month' | 'year'
+function groupActivitiesForTrends(activities, { mode = 'all', granularity = 'day' } = {}) {
+  if (!Array.isArray(activities) || activities.length === 0) return [];
+
+  const runningTypes = ['Run', 'TrailRun', 'VirtualRun'];
+  const isRunning = (a) => runningTypes.includes(a.sport_type);
+
+  // In 'running' mode, we only include running activities in totals.
+  // In 'all' mode, distance/time totals include all; pace uses only running activities (null if none).
+  const buckets = new Map();
+
+  for (const a of activities) {
+    if (!a.start_local) continue;
+    const dt = new Date(a.start_local);
+    let bucketStart;
+    if (granularity === 'day') bucketStart = startOfDayLocal(dt);
+    else if (granularity === 'week') bucketStart = startOfISOWeek(dt);
+    else if (granularity === 'month') bucketStart = startOfMonth(dt);
+    else bucketStart = startOfYear(dt);
+
+    const key = formatKey(bucketStart, granularity);
+    if (!buckets.has(key)) {
+      buckets.set(key, {
+        key,
+        label: labelForKey(bucketStart, granularity),
+        date: bucketStart,
+        count: 0,
+        distance_m_total: 0,
+        moving_time_s_total: 0,
+        // For pace, track running-only sums to compute avg pace
+        _run_distance_m: 0,
+        _run_time_s: 0,
+      });
+    }
+
+    const b = buckets.get(key);
+    const addToTotals = mode === 'all' || (mode === 'running' && isRunning(a));
+    if (addToTotals) {
+      b.count += 1;
+      b.distance_m_total += a.distance_m || 0;
+      b.moving_time_s_total += a.moving_time_s || 0;
+    }
+    // Always track running sub-totals for pace calculation in both modes
+    if (isRunning(a)) {
+      b._run_distance_m += a.distance_m || 0;
+      b._run_time_s += a.moving_time_s || 0;
+    }
+  }
+
+  // Finalize buckets and compute avg pace (sec/km) over running-only distance
+  const out = Array.from(buckets.values())
+    .sort((a, b) => a.date - b.date)
+    .map(b => {
+      const avgPace = b._run_distance_m > 0 ? (b._run_time_s / (b._run_distance_m / 1000)) : null; // sec per km
+      return {
+        key: b.key,
+        label: b.label,
+        date: b.date,
+        count: b.count,
+        distance_m_total: b.distance_m_total,
+        moving_time_s_total: b.moving_time_s_total,
+        avg_pace_s_per_km: avgPace,
+      };
+    });
+
+  return out;
+}
+
+// Simple trailing moving average smoothing over numeric field.
+// Returns new array with an added field `${field}_ma{window}` and a helper to get smoothed values.
+function movingAverage(series, field, window = 7) {
+  if (!Array.isArray(series) || series.length === 0) return [];
+  const values = series.map(p => (p[field] ?? null));
+  const out = [];
+  let sum = 0;
+  let count = 0;
+  const queue = [];
+  for (let i = 0; i < values.length; i++) {
+    const v = values[i];
+    queue.push(v);
+    if (v != null) { sum += v; count += 1; }
+    if (queue.length > window) {
+      const removed = queue.shift();
+      if (removed != null) { sum -= removed; count -= 1; }
+    }
+    const smoothed = count > 0 ? (sum / count) : null;
+    out.push({ ...series[i], [`${field}_ma${window}`]: smoothed });
+  }
+  return out;
+}
+
+// Expose for console testing and for 4.3.2 charts
+window.Trends = {
+  groupActivitiesForTrends,
+  movingAverage,
+};
+
 // Build date range domain for heatmap grid
 function getDateDomain() {
   const { dateRange, filteredActivities } = getState();
@@ -880,27 +1092,40 @@ function renderHeatmap(activities) {
     days.push({ date: new Date(d), value, metrics });
   }
 
-  // Create week columns (7 rows)
-  const weeks = [];
-  for (let i = 0; i < days.length; i += 7) {
-    weeks.push(days.slice(i, i+7));
-  }
-
   // Update legend labels based on mode
   updateLegendLabels(heatmapMode);
 
-  weeks.forEach(week => {
-    const col = document.createElement('div');
-    col.className = 'week';
-    week.forEach(({ date, value, metrics }) => {
+  // Create chronological layout: rows flow left to right, top to bottom
+  // Determine how many days to show per row (e.g., 7 for a week-based view)
+  const daysPerRow = 7;
+
+  // Split days into rows
+  const rows = [];
+  for (let i = 0; i < days.length; i += daysPerRow) {
+    rows.push(days.slice(i, i + daysPerRow));
+  }
+
+  // Render each row chronologically
+  rows.forEach(rowDays => {
+    const row = document.createElement('div');
+    row.className = 'heatmap-row';
+
+    // Add day label (hidden but kept for structure)
+    const label = document.createElement('div');
+    label.className = 'day-label';
+    row.appendChild(label);
+
+    // Add cells for each day in the row
+    rowDays.forEach(({ date, value, metrics }) => {
       const cell = document.createElement('div');
       const level = quantizeLevel(value, heatmapMode);
       cell.className = `day level-${level}`;
       cell.title = formatDayTitle(date, metrics, heatmapMode);
       cell.setAttribute('aria-label', cell.title);
-      col.appendChild(cell);
+      row.appendChild(cell);
     });
-    heatmapEl.appendChild(col);
+
+    heatmapEl.appendChild(row);
   });
 
   // Calculate and display workout statistics
@@ -940,6 +1165,252 @@ function renderHeatmap(activities) {
   showGapDetailsBtn.textContent = 'Show Gap Details';
 }
 
+// Trend chart instances
+let distanceTrendChart = null;
+let paceTrendChart = null;
+
+// Trend state (mode and granularity)
+let trendMode = 'all';
+let trendGranularity = 'week';
+
+// Render distance trend line chart
+function renderDistanceTrendChart(activities) {
+  const ctx = document.getElementById('distanceTrendChart');
+  if (!ctx) return;
+
+  const { unitSystem } = getState();
+
+  // Group activities by granularity
+  const buckets = groupActivitiesForTrends(activities, { mode: trendMode, granularity: trendGranularity });
+
+  if (buckets.length === 0) {
+    if (distanceTrendChart) {
+      distanceTrendChart.destroy();
+      distanceTrendChart = null;
+    }
+    return;
+  }
+
+  // Extract distance in user's preferred units
+  const labels = buckets.map(b => b.label);
+  const distanceData = buckets.map(b => {
+    const m = b.distance_m_total || 0;
+    return unitSystem === 'imperial' ? metersToMiles(m) : metersToKm(m);
+  });
+
+  // Apply moving average smoothing for daily data
+  let smoothedData = distanceData;
+  if (trendGranularity === 'day' && buckets.length > 7) {
+    const smoothed = movingAverage(buckets.map((b, i) => ({ ...b, dist: distanceData[i] })), 'dist', 7);
+    smoothedData = smoothed.map(s => s.dist_ma7);
+  }
+
+  const distanceUnit = unitSystem === 'imperial' ? 'mi' : 'km';
+
+  // Destroy existing chart
+  if (distanceTrendChart) {
+    distanceTrendChart.destroy();
+  }
+
+  distanceTrendChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: `Distance (${distanceUnit})`,
+        data: trendGranularity === 'day' && smoothedData !== distanceData ? smoothedData : distanceData,
+        borderColor: '#f96332',
+        backgroundColor: 'rgba(249, 99, 50, 0.1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointRadius: trendGranularity === 'day' ? 2 : 4,
+        pointHoverRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            color: '#cbd5e1',
+            font: { size: 12 }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const value = context.parsed.y.toFixed(2);
+              return `${context.dataset.label}: ${value}`;
+            }
+          }
+        },
+        datalabels: {
+          display: false // No data labels on line charts
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#94a3b8',
+            maxRotation: 45,
+            minRotation: 0
+          },
+          grid: {
+            color: 'rgba(148, 163, 184, 0.1)'
+          }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: '#94a3b8',
+            callback: function(value) {
+              return value.toFixed(1);
+            }
+          },
+          grid: {
+            color: 'rgba(148, 163, 184, 0.1)'
+          },
+          title: {
+            display: true,
+            text: `Distance (${distanceUnit})`,
+            color: '#cbd5e1'
+          }
+        }
+      }
+    }
+  });
+}
+
+// Render pace trend line chart
+function renderPaceTrendChart(activities) {
+  const ctx = document.getElementById('paceTrendChart');
+  const emptyEl = document.getElementById('paceTrendEmpty');
+  if (!ctx || !emptyEl) return;
+
+  const { unitSystem } = getState();
+
+  // Group activities by granularity
+  const buckets = groupActivitiesForTrends(activities, { mode: trendMode, granularity: trendGranularity });
+
+  // Filter buckets that have pace data (avg_pace_s_per_km not null)
+  const paceData = buckets.filter(b => b.avg_pace_s_per_km != null && b.avg_pace_s_per_km > 0);
+
+  if (paceData.length === 0) {
+    if (paceTrendChart) {
+      paceTrendChart.destroy();
+      paceTrendChart = null;
+    }
+    emptyEl.classList.remove('hidden');
+    ctx.style.display = 'none';
+    return;
+  }
+
+  emptyEl.classList.add('hidden');
+  ctx.style.display = 'block';
+
+  const labels = paceData.map(b => b.label);
+
+  // Convert pace from s/km to s/mi if imperial, else keep as s/km
+  const paceValues = paceData.map(b => {
+    const secPerKm = b.avg_pace_s_per_km;
+    return unitSystem === 'imperial' ? secPerKm * 1.609344 : secPerKm;
+  });
+
+  // Apply moving average smoothing for daily data
+  let smoothedPace = paceValues;
+  if (trendGranularity === 'day' && paceData.length > 7) {
+    const smoothed = movingAverage(paceData.map((b, i) => ({ ...b, pace: paceValues[i] })), 'pace', 7);
+    smoothedPace = smoothed.map(s => s.pace_ma7);
+  }
+
+  const paceUnit = unitSystem === 'imperial' ? 'min/mi' : 'min/km';
+
+  // Destroy existing chart
+  if (paceTrendChart) {
+    paceTrendChart.destroy();
+  }
+
+  paceTrendChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: `Avg Pace (${paceUnit})`,
+        data: trendGranularity === 'day' && smoothedPace !== paceValues ? smoothedPace : paceValues,
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointRadius: trendGranularity === 'day' ? 2 : 4,
+        pointHoverRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            color: '#cbd5e1',
+            font: { size: 12 }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const secPerUnit = context.parsed.y;
+              const mins = Math.floor(secPerUnit / 60);
+              const secs = Math.floor(secPerUnit % 60);
+              return `Avg Pace: ${mins}:${secs.toString().padStart(2, '0')} ${paceUnit}`;
+            }
+          }
+        },
+        datalabels: {
+          display: false // No data labels on line charts
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#94a3b8',
+            maxRotation: 45,
+            minRotation: 0
+          },
+          grid: {
+            color: 'rgba(148, 163, 184, 0.1)'
+          }
+        },
+        y: {
+          reverse: true, // Lower pace (faster) is better, so invert the axis
+          ticks: {
+            color: '#94a3b8',
+            callback: function(value) {
+              const mins = Math.floor(value / 60);
+              const secs = Math.floor(value % 60);
+              return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+          },
+          grid: {
+            color: 'rgba(148, 163, 184, 0.1)'
+          },
+          title: {
+            display: true,
+            text: `Pace (${paceUnit})`,
+            color: '#cbd5e1'
+          }
+        }
+      }
+    }
+  });
+}
+
 // Update UI when active tab changes
 function updateActiveTab() {
   const { activeTab } = getState();
@@ -977,6 +1448,8 @@ subscribe((state) => {
     renderDistanceHistogram(state.filteredActivities);
     renderRunningStats(state.filteredActivities);
     renderHeatmap(state.filteredActivities);
+    renderDistanceTrendChart(state.filteredActivities);
+    renderPaceTrendChart(state.filteredActivities);
   }
 });
 
@@ -989,4 +1462,6 @@ loadData().then(() => {
   renderDistanceHistogram(filteredActivities);
   renderRunningStats(filteredActivities);
   renderHeatmap(filteredActivities);
+  renderDistanceTrendChart(filteredActivities);
+  renderPaceTrendChart(filteredActivities);
 });

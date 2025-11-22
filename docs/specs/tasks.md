@@ -122,8 +122,8 @@ This document tracks the step-by-step technical tasks required to build the Stra
 - [x] **3.4 Build Date Range Picker Component**
   - _Plan Item:_ Date Filter Controls
   - _Req ID:_ [Req 8]
-  - **Details:** Create UI for "Last 30 Days", "YTD", "All Time", and Custom Start/End inputs. Wire up logic to filter the `allActivities` list into `filteredActivities`.
-  - Completed on 2025-11-22: Added date range picker UI in `index.html` with dropdown (Last 30 Days, Year to Date, All Time, Custom Range) and custom date inputs. Styled in `site.css` with flexbox layout. Implemented event handlers in `app.js` that call `setDateRange()` from state store. Custom date inputs show/hide based on selection. Totals title updates dynamically to reflect current date range. Filtering logic in `state.js` automatically applies to `filteredActivities` and triggers re-render via subscriber pattern.
+  - **Details:** Create UI for date range presets (Last 7 Days, Last 30 Days, YTD, All Time) and Custom Start/End inputs. Wire up logic to filter the `allActivities` list into `filteredActivities`. Default to "Last 7 Days" on initial load.
+  - Completed on 2025-11-22: Added date range picker UI in `index.html` with buttons for Last 7 Days, Last 30 Days, Last 90 Days, Last 6 Months, Year to Date, All Time, and Custom Range with custom date inputs. Styled in `site.css` with flexbox layout. Implemented event handlers in `app.js` that call `setDateRange()` from state store. Custom date inputs show/hide based on selection. Totals title updates dynamically to reflect current date range. Filtering logic in `state.js` automatically applies to `filteredActivities` and triggers re-render via subscriber pattern. Defaults to "Last 7 Days" on initial load.
 
 - [x] **3.4.5 Implement Tabbed Dashboard Layout (Foundation)**
   - _Plan Item:_ Dashboard Layout Enhancement
@@ -182,20 +182,36 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Add comprehensive workout statistics display to Heatmap tab showing: Workout Days (total days with activity), Missed Days (days without activity), Current Streak (consecutive active days ending today), Days Since Last (days since most recent activity), Longest Gap (longest period without activity), and Total Gap Days (sum of all gap days). Display these as a grid of stat cards similar to the overview layout.
   - Completed on 2025-11-22: Replaced "Streaks" section with "Workout Statistics" section containing 6 stat cards in a responsive grid. Added CSS for `.workout-stats-grid` and `.workout-stat` styles. Implemented calculation logic in `renderHeatmap()` for all 6 statistics. Statistics update dynamically when date range or heatmap mode changes.
 
-- [ ] **4.2.3 Update Heatmap Legend with Time-based Labels**
+- [x] **4.2.3 Update Heatmap Legend with Time-based Labels**
   - _Plan Item:_ Heatmap Legend Enhancement
   - _Req ID:_ [Req 5]
   - **Details:** Replace generic "Less/More" legend labels with descriptive time-based labels for All Activities mode ("No Activity", "< 1h", "1-2h", "2h+") and distance-based labels for Running Only mode. Update quantization logic to use fixed time/distance thresholds instead of relative percentages.
+  - Completed on 2025-11-22: Replaced generic "Less/More" legend with descriptive time-based labels. Restructured legend HTML with 4 levels (reduced from 5) using `.legend-item` containers. Implemented `updateLegendLabels()` function to dynamically update labels based on mode (All Activities: "No Activity", "< 1h", "1-2h", "2h+" | Running: "No Activity", "< 5km", "10-15km", "15km+"). Updated `quantizeLevel()` to use fixed thresholds instead of relative percentages. Updated CSS with `.legend-item`, `.legend-label` styles and reduced color levels to 4.
 
-- [ ] **4.3 Implement Trend Aggregation Logic**
-  - _Plan Item:_ Trend Calculation Engine
-  - _Req ID:_ [Req 7]
-  - **Details:** Create function to group filtered data by Day, Week, or Month for both "All Activities" and "Running Only" modes. Calculate distance totals and average pace for each time bucket.
+- [x] **4.2.4 Implement Horizontal Heatmap Layout**
+  - _Plan Item:_ Heatmap Layout Enhancement
+  - _Req ID:_ [Req 5]
+  - **Details:** Change heatmap layout from vertical (weeks as columns, days as rows) to horizontal (days as rows, weeks as columns) to better utilize available screen width. Update rendering logic to build rows for each day of the week (Sunday through Saturday) with week columns flowing horizontally. Add day-of-week labels on the left side. Update CSS to support horizontal scrolling and responsive layout.
+  - Completed on 2025-11-22: Changed heatmap from vertical to horizontal layout. Implemented 7 rows (one per day of week: Sun-Sat) with weeks flowing horizontally as columns. Added day-of-week labels on the left side (32px wide, right-aligned). Updated `renderHeatmap()` to group days by day of week and render as `.heatmap-row` elements. Updated CSS: changed `.heatmap` to column flex direction, added `.heatmap-row` and `.day-label` styles, increased day cell size from 12px to 14px, reduced gaps to 3px, added `flex-shrink: 0` to prevent squishing. Layout now better utilizes available screen width with horizontal scrolling support.
 
-- [ ] **4.4 Build Trend Line Charts**
+- [x] **4.3 Build Trends Tab**
   - _Plan Item:_ Trends Tab with Mode Toggle
   - _Req ID:_ [Req 7]
-  - **Details:** Render line charts for distance and pace over time. Add single "📈 Trends" tab to dashboard with mode toggle between "All Activities" and "Running Only". Implement aggregation selector (Day/Week/Month) and moving average smoothing (e.g., 7-day rolling avg) to reduce noise.
+  - **Details:** Add single "📈 Trends" tab to dashboard with mode toggle between "All Activities" and "Running Only". Display line charts for distance and pace over time with aggregation options and smoothing.
+  - Completed on 2025-11-22: Implemented complete trends functionality with aggregation logic (4.3.1) and visualization (4.3.2).
+
+  - [x] **4.3.1 Implement Trend Aggregation Logic**
+    - **Details:** Create function to group filtered data by Day, Week, or Month for both "All Activities" and "Running Only" modes. Calculate distance totals and average pace for each time bucket. Implement moving average smoothing (e.g., 7-day rolling avg) to reduce noise in daily data.
+    - Completed on 2025-11-22: Added trend aggregation utilities in `app.js`:
+      - `groupActivitiesForTrends(activities, { mode, granularity })` buckets by Day/ISO Week/Month and returns sorted buckets with `distance_m_total`, `moving_time_s_total`, `count`, and `avg_pace_s_per_km` (pace computed from running activities only). Supports `mode: 'all' | 'running'`.
+      - `movingAverage(series, field, window)` computes trailing moving average for any numeric field (default 7). Exposed via `window.Trends` for use by charts in 4.3.2.
+
+  - [x] **4.3.2 Build Trend Line Charts**
+    - **Details:** Render line charts for distance and pace over time using Chart.js. Add mode toggle between "All Activities" and "Running Only". Implement aggregation selector (Day/Week/Month) with dropdown or segmented control. Display dual-axis chart or separate charts for distance and pace trends.
+    - Completed on 2025-11-22: Added "📈 Trends" tab with mode toggle (All Activities/Running Only) and granularity selector (Daily/Weekly/Monthly). Implemented two separate line charts:
+      - **Distance Over Time**: Shows distance trends in user's preferred units (mi/km) with orange styling. Applies 7-day moving average smoothing for daily granularity to reduce noise.
+      - **Pace Over Time**: Shows average pace trends (min/mi or min/km) with blue styling and inverted y-axis (faster pace at top). Only displays when running data is available. Applies 7-day moving average smoothing for daily data.
+      - Both charts are responsive, integrate with global date range filter and unit system, and automatically re-render when mode, granularity, date range, or unit system changes. Charts use existing `groupActivitiesForTrends()` and `movingAverage()` functions from task 4.3.1.
 
 ## Phase 5: User Experience & Quality Assurance
 

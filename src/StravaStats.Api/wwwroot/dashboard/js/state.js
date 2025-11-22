@@ -4,7 +4,7 @@ const state = {
   user: null,
   allActivities: [],
   filteredActivities: [],
-  dateRange: { type: 'last30', customStart: null, customEnd: null }, // type: 'all' | 'ytd' | 'last30' | 'custom'
+  dateRange: { type: 'last7', customStart: null, customEnd: null }, // type: 'all' | 'ytd' | 'last7' | 'last30' | 'custom'
   unitSystem: 'imperial', // 'metric' | 'imperial'
   activeTab: 'overview', // 'overview' | 'activity-count' | 'time-dist' | 'heatmap' | etc.
   heatmapMode: 'all', // 'all' | 'running'

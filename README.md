@@ -46,7 +46,7 @@ cp .env.example .env
 
 3) Start the API
 ```bash
-./start.sh        # first time you may need: chmod +x start.sh
+./quickstart.sh        # first time you may need: chmod +x quickstart.sh
 ```
 
 After signing in with Strava, you'll be redirected to your dashboard.

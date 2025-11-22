@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # Git prepare-commit-msg hook to ensure a co-author trailer is present.
 # Appends "Co-authored-by: Junie <junie@jetbrains.com>" if missing.
-# Skips merge commits and commits with existing trailer.
+# Skips merge commits and commits with any existing Co-Authored-By trailer.
 
 MSG_FILE="$1"
 SOURCE="$2"
@@ -11,12 +11,12 @@ if [ "$SOURCE" = "merge" ]; then
   exit 0
 fi
 
-COAUTHOR_LINE="Co-authored-by: Junie <junie@jetbrains.com>"
-
-# If the message already contains the co-author line, do nothing
-if grep -qi "^Co-authored-by: Junie <junie@jetbrains.com>$" "$MSG_FILE"; then
+# If the message already contains any Co-Authored-By trailer, do nothing
+if grep -qi "^Co-Authored-By:" "$MSG_FILE"; then
   exit 0
 fi
+
+COAUTHOR_LINE="Co-authored-by: Junie <junie@jetbrains.com>"
 
 # Ensure there is a blank line before trailers per git convention
 printf "\n%s\n" "$COAUTHOR_LINE" >> "$MSG_FILE"
