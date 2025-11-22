@@ -36,15 +36,15 @@ Current highlights:
 
 | Activity Overview | Duration by Type | Heatmap - All Activities |
 |:---:|:---:|:---:|
-| [![Overview](docs/images/overview.png)](docs/images/overview.png) | [![Duration](docs/images/duration.png)](docs/images/duration.png) | [![Heatmap All](docs/images/heatmap-activity.png)](docs/images/heatmap-activity.png) |
+| [![Overview](./docs/images/overview.png)](./docs/images/overview.png) | [![Duration](./docs/images/duration.png)](./docs/images/duration.png) | [![Heatmap All](./docs/images/heatmap-activity.png)](./docs/images/heatmap-activity.png) |
 
 | Heatmap - Running Only | Running Distance Trends | Running Pace Trends |
 |:---:|:---:|:---:|
-| [![Heatmap Running](docs/images/heatmap-running.png)](docs/images/heatmap-running.png) | [![Distance Trends](docs/images/trends-distance.png)](docs/images/trends-distance.png) | [![Pace Trends](docs/images/trends-pace.png)](docs/images/trends-pace.png) |
+| [![Heatmap Running](./docs/images/heatmap-running.png)](./docs/images/heatmap-running.png) | [![Distance Trends](./docs/images/trends-distance.png)](./docs/images/trends-distance.png) | [![Pace Trends](./docs/images/trends-pace.png)](./docs/images/trends-pace.png) |
 
 | Running Statistics | | |
 |:---:|:---:|:---:|
-| [![Running Stats](docs/images/running-stats.png)](docs/images/running-stats.png) | | |
+| [![Running Stats](./docs/images/running-stats.png)](./docs/images/running-stats.png) | | |
 
 ## Quickstart
 
