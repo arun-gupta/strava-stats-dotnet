@@ -52,6 +52,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - _Plan Item:_ Strava API Client
   - _Req ID:_ [Req 3]
   - **Details:** Create DTOs/Classes for Strava Activity (ID, type, distance, moving_time, start_date, timezone, etc.).
+  - Completed on 2025-11-22: Added `ActivitySummaryDto` in `src/StravaStats.Api/Models/ActivityDtos.cs` with key fields: `id`, `name`, `type`, `sport_type`, `distance` (m), `moving_time` (s), `elapsed_time` (s), `total_elevation_gain` (m), `start_date` (UTC), `start_date_local`, `timezone`, location arrays, and basic flags/counters. These map Strava's `GET /athlete/activities` summary payload.
 
 - [ ] **2.2 Build Strava API Client Wrapper**
   - _Plan Item:_ Strava API Client
