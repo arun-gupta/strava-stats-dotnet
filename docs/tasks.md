@@ -40,7 +40,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Create middleware or a service wrapper that checks token expiration before API calls and uses the `refresh_token` to get a new `access_token` if needed.
   - Completed on 2025-11-21: Added `EnsureAccessTokenAsync` helper to auto-refresh when `expires_at` is near/over; updates session with new tokens. Provided `/me` endpoint that uses the helper and returns the Strava athlete JSON.
 
-- [ ] **1.7 Create Logout Endpoint**
+- [x] **1.7 Create Logout Endpoint**
   - _Plan Item:_ Sign Out Flow
   - _Req ID:_ [Req 2]
   - **Details:** Implement `/auth/logout` to clear session cookies and invalidate server-side session state.

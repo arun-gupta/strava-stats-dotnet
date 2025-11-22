@@ -219,13 +219,16 @@ app.MapGet("/welcome", (HttpContext http) =>
         "      .card { max-width: 640px; padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }\n" +
         "      .muted { color: #6b7280; }\n" +
         "      a.button { display: inline-block; padding: 0.6rem 1rem; background: #f96332; color: white; border-radius: 8px; text-decoration: none; }\n" +
+        "      a.button.secondary { background: #111827; }\n" +
         "    </style>\n" +
         "  </head>\n" +
         "  <body>\n" +
         "    <div class=\"card\">\n" +
         "      <h1>Welcome" + nameHtml + "!</h1>\n" +
         "      <p class=\"muted\">" + System.Net.WebUtility.HtmlEncode(statusText) + "</p>\n" +
-        "      <p><a class=\"button\" href=\"/auth/login\">Sign in again</a></p>\n" +
+        (isSignedIn
+            ? "      <p><a class=\"button secondary\" href=\"/auth/logout\">Logout</a></p>\n"
+            : "      <p><a class=\"button\" href=\"/auth/login\">Sign in again</a></p>\n") +
         "    </div>\n" +
         "  </body>\n" +
         "</html>\n";
