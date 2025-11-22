@@ -45,61 +45,12 @@ Note: If you see a message about a missing framework like "Microsoft.NETCore.App
 - Windows/Linux install instructions, PATH notes, and using dotnet user-secrets are documented here:
   - docs/setup.md
 
-## Secrets & configuration (Task 1.2)
+## Configuration (secrets)
 
-Never commit secrets. This repo ignores `.env` and common secret files.
+Keep the README simple: use one of the following, and see docs for full instructions.
 
-Supported configuration keys:
-- `Strava:ClientId` / `Strava:ClientSecret` — Strava OAuth application credentials
-- `Security:SessionSecret` — secret for session/cookie/HMAC usage
-
-You can provide them using either nested keys or flat env vars:
-- Nested (ASP.NET style): `Strava__ClientId`, `Strava__ClientSecret`, `Security__SessionSecret`
-- Flat (legacy/simple): `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `SESSION_SECRET`
-
-Both styles are supported. At startup we map the flat variables into the nested section so options binding works consistently.
-
-### Option A: .env (local only)
-Use the provided example file to set your Strava credentials locally. The app’s `start.sh` script auto-loads `.env` at startup.
-
-1. Copy the example file and fill real values:
-   ```bash
-   cp .env.example .env
-   # edit .env and set values
-   # STRAVA_CLIENT_ID=... 
-   # STRAVA_CLIENT_SECRET=...
-   # SESSION_SECRET=...
-   ```
-2. Start the app (the script reads `.env` automatically):
-   ```bash
-   ./start.sh
-   ```
-   No extra exports or tools are required. If you prefer not to use `start.sh`, make sure your shell loads the variables from `.env` before running `dotnet run`.
-
-### Option B: dotnet user-secrets (recommended for local dev)
-User Secrets stores values outside the repo, per machine.
-
-```bash
-dotnet user-secrets init --project src/StravaStats.Api
-dotnet user-secrets set "Strava:ClientId" "<your_client_id>" --project src/StravaStats.Api
-dotnet user-secrets set "Strava:ClientSecret" "<your_client_secret>" --project src/StravaStats.Api
-dotnet user-secrets set "Security:SessionSecret" "<a-long-random-string>" --project src/StravaStats.Api
-```
-
-### Option C: Environment variables (CI/container/prod)
-Set either nested or flat variables in your deployment environment. Examples (Bash):
-
-```bash
-export Strava__ClientId=123
-export Strava__ClientSecret=abc
-export Security__SessionSecret=$(openssl rand -hex 32)
-```
-or
-```bash
-export STRAVA_CLIENT_ID=123
-export STRAVA_CLIENT_SECRET=abc
-export SESSION_SECRET=$(openssl rand -hex 32)
-```
+- Quick local setup: copy `.env.example` to `.env`, fill in your Strava app creds and a session secret, then run `./start.sh` (it auto-loads `.env`).
+- Alternative methods (dotnet user-secrets, environment variables for CI/containers), supported keys, and security notes are documented in `docs/setup.md`.
 
 ## Repo structure
 
