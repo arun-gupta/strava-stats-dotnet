@@ -40,25 +40,20 @@ After signing in with Strava, you’ll be redirected to your dashboard:
 - Windows/Linux install instructions, PATH notes, and using dotnet user-secrets are documented here:
   - docs/setup.md
 
-## Configuration (secrets)
+<!-- Configuration (secrets) section removed for a leaner README. See docs/setup.md#configure-secrets for full details. -->
 
-- Quick local: copy `.env.example` → `.env`, set your Strava client ID/secret and a session secret, then run `./start.sh` (it auto-loads `.env`).
-- Full details (user-secrets, env vars for CI/containers, supported keys, security notes): see `docs/setup.md#configure-secrets`.
+## Features
 
-## Repo structure
-
-```
-src/
-  StravaStats.Api/
-    Options/
-      StravaOptions.cs
-      SecurityOptions.cs
-    Program.cs
-    appsettings.json
-    Properties/launchSettings.json
-docs/
-start.sh
-```
+Current highlights:
+- OAuth login with Strava and secure server-side session (no tokens exposed to the browser)
+- Automatic token refresh and a clean Logout flow
+- Typed Strava API client with pagination and respectful rate‑limit backoff
+- Activity normalization (DST‑aware local time, consistent units)
+- Minimal dashboard at `/dashboard`:
+  - Login status with Sign in/Logout
+  - Recent Activities table (first page)
+  - Last 30 days totals (count, distance, time)
+  - Graceful empty/unauthorized states
 
 ## Roadmap
 See `docs/specs/tasks.md` and `docs/specs/plan.md`.
