@@ -113,15 +113,17 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Create the responsive container and grid layout for widgets.
   - Completed on 2025-11-22: Added `.dashboard-grid` single-column responsive layout with proper card styling (background, border, padding). Fixed stat card text wrapping with `white-space: nowrap` on headers and proper spacing. Cards now display cleanly without text breaking awkwardly.
 
-- [ ] **3.3 Create State Management Store**
+- [x] **3.3 Create State Management Store**
   - _Plan Item:_ Global State Management
   - _Req ID:_ [Req 8], [Req 9]
   - **Details:** Set up a store (Context API, Redux, Pinia, or simple state) to hold `allActivities`, `filteredActivities`, `dateRange`, and `unitSystem`.
+  - Completed on 2025-11-22: Enhanced `js/state.js` with subscriber pattern and centralized state management. Store holds `user`, `allActivities`, `filteredActivities`, `dateRange` (with type and custom dates), and `unitSystem` (imperial/metric). Includes `subscribe()`, `getState()`, `setUser()`, `setAllActivities()`, `setDateRange()`, `setUnitSystem()`, and `initializeUnitSystem()` functions. Automatic filtering logic applies date ranges (last30/ytd/all/custom). Refactored `app.js` to use the store with reactive re-rendering on state changes.
 
-- [ ] **3.4 Build Date Range Picker Component**
+- [x] **3.4 Build Date Range Picker Component**
   - _Plan Item:_ Date Filter Controls
   - _Req ID:_ [Req 8]
   - **Details:** Create UI for "Last 30 Days", "YTD", "All Time", and Custom Start/End inputs. Wire up logic to filter the `allActivities` list into `filteredActivities`.
+  - Completed on 2025-11-22: Added date range picker UI in `index.html` with dropdown (Last 30 Days, Year to Date, All Time, Custom Range) and custom date inputs. Styled in `site.css` with flexbox layout. Implemented event handlers in `app.js` that call `setDateRange()` from state store. Custom date inputs show/hide based on selection. Totals title updates dynamically to reflect current date range. Filtering logic in `state.js` automatically applies to `filteredActivities` and triggers re-render via subscriber pattern.
 
 - [ ] **3.5 Implement Running Stats Widget**
   - _Plan Item:_ Running Statistics Component

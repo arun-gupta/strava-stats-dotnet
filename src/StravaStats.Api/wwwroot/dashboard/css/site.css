@@ -39,3 +39,60 @@
 
 /* Tables overflow safe inside cards */
 .card-scroll { overflow: auto; }
+
+/* Date Range Picker */
+.date-range-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.date-range-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-radius: var(--pico-border-radius);
+  border: 1px solid var(--pico-secondary-border);
+  background: var(--pico-secondary-background);
+  color: var(--pico-secondary-inverse);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0;
+}
+
+.date-range-btn:hover {
+  background: var(--pico-secondary-hover-background);
+  border-color: var(--pico-secondary-hover-border);
+}
+
+.date-range-btn.active {
+  background: var(--pico-primary-background);
+  border-color: var(--pico-primary-border);
+  color: var(--pico-primary-inverse);
+}
+
+.custom-date-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--pico-muted-border-color);
+}
+
+.custom-date-inputs label {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.custom-date-inputs input[type="date"] {
+  margin: 0;
+  width: auto;
+}
+
+#dateRangeCard {
+  margin-bottom: 1.5rem;
+}

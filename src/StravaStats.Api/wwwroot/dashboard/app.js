@@ -1,3 +1,5 @@
+import { getState, setUser, setAllActivities, setDateRange, initializeUnitSystem, subscribe } from './js/state.js';
+
 const authArea = document.getElementById('authArea');
 const recentLoading = document.getElementById('recentLoading');
 const recentTable = document.getElementById('recentTable');
@@ -7,10 +9,16 @@ const recentEmpty = document.getElementById('recentEmpty');
 const totalsLoading = document.getElementById('totalsLoading');
 const totals = document.getElementById('totals');
 const totalsEmpty = document.getElementById('totalsEmpty');
+const totalsTitle = document.getElementById('totalsTitle');
 const totCount = document.getElementById('totCount');
 const totDistance = document.getElementById('totDistance');
 const totTime = document.getElementById('totTime');
 const avgPer = document.getElementById('avgPer');
+
+const dateRangeBtns = document.querySelectorAll('.date-range-btn');
+const customDateInputs = document.getElementById('customDateInputs');
+const customStart = document.getElementById('customStart');
+const customEnd = document.getElementById('customEnd');
 
 // Simple helpers
 const fmtDate = (iso) => new Date(iso).toLocaleDateString();
@@ -22,10 +30,6 @@ const fmtTime = (secs) => {
 };
 const metersToKm = (m) => (m / 1000);
 const metersToMiles = (m) => (m / 1609.344);
-
-// Unit preference (basic): default to miles for US locale
-const useMiles = navigator.language?.startsWith('en-US');
-const distLabel = useMiles ? 'mi' : 'km';
 
 function setAuthUI(isSignedIn, name) {
   if (isSignedIn) {
@@ -50,23 +54,40 @@ async function fetchJson(url) {
 async function loadAuth() {
   try {
     const me = await fetch('/me');
-    if (me.status === 401) { setAuthUI(false); return false; }
+    if (me.status === 401) {
+      setAuthUI(false);
+      setUser(null);
+      return false;
+    }
     if (!me.ok) throw new Error('me_failed');
     const data = await me.json();
     const name = [data.firstname, data.lastname].filter(Boolean).join(' ') || data.username || '';
+    setUser(data);
     setAuthUI(true, name);
     return true;
   } catch (_) {
     setAuthUI(false);
+    setUser(null);
     return false;
   }
 }
 
 function renderRecent(list) {
   recentLoading.classList.add('hidden');
-  if (!list || list.length === 0) { recentEmpty.classList.remove('hidden'); return; }
+  if (!list || list.length === 0) {
+    recentEmpty.classList.remove('hidden');
+    recentTable.classList.add('hidden');
+    return;
+  }
+
+  recentEmpty.classList.add('hidden');
   recentTable.classList.remove('hidden');
   recentTbody.innerHTML = '';
+
+  const { unitSystem } = getState();
+  const useMiles = unitSystem === 'imperial';
+  const distLabel = useMiles ? 'mi' : 'km';
+
   for (const a of list) {
     const tr = document.createElement('tr');
     const date = new Date(a.start_local).toLocaleString([], { dateStyle: 'medium' });
@@ -87,7 +108,30 @@ function renderRecent(list) {
 
 function renderTotals(list) {
   totalsLoading.classList.add('hidden');
-  if (!list || list.length === 0) { totalsEmpty.classList.remove('hidden'); return; }
+  if (!list || list.length === 0) {
+    // Update empty message based on current date range
+    const { dateRange } = getState();
+    const emptyMessages = {
+      last7: 'No activities in the last 7 days.',
+      last30: 'No activities in the last 30 days.',
+      last90: 'No activities in the last 90 days.',
+      last6months: 'No activities in the last 6 months.',
+      ytd: 'No activities this year.',
+      all: 'No activities found.',
+      custom: 'No activities in the selected date range.'
+    };
+    totalsEmpty.textContent = emptyMessages[dateRange.type] || 'No activities found.';
+    totalsEmpty.classList.remove('hidden');
+    totals.classList.add('hidden');
+    return;
+  }
+
+  totalsEmpty.classList.add('hidden');
+
+  const { unitSystem } = getState();
+  const useMiles = unitSystem === 'imperial';
+  const distLabel = useMiles ? 'mi' : 'km';
+
   const count = list.length;
   const totalMeters = list.reduce((s, a) => s + (a.distance_m || 0), 0);
   const totalTime = list.reduce((s, a) => s + (a.moving_time_s || 0), 0);
@@ -101,6 +145,9 @@ function renderTotals(list) {
 }
 
 async function loadData() {
+  // Initialize unit system from browser locale
+  initializeUnitSystem();
+
   const signedIn = await loadAuth();
   if (!signedIn) {
     // Hide loaders and prompt sign-in in empty states
@@ -114,27 +161,143 @@ async function loadData() {
   }
 
   try {
-    // Recent: first page, 20 items
-    const recent = await fetchJson('/activities/normalized?page=1&per_page=20');
-    renderRecent(recent);
-  } catch (e) {
-    recentLoading.classList.add('hidden');
-    recentEmpty.textContent = 'Failed to load recent activities.';
-    recentEmpty.classList.remove('hidden');
-  }
+    // Load all activities (up to 500)
+    const all = await fetchJson('/activities/all/normalized?per_page=100&max_pages=5');
+    console.log('Loaded activities:', all.length);
 
-  try {
-    // Totals: last 30 days using unix seconds
-    const nowSec = Math.floor(Date.now() / 1000);
-    const thirtyDaysSec = 30 * 24 * 3600;
-    const after = nowSec - thirtyDaysSec;
-    const all = await fetchJson(`/activities/all/normalized?per_page=100&max_pages=50&after=${after}`);
-    renderTotals(all);
+    setAllActivities(all);
+
+    // Get filtered activities from state (currently defaults to last 30 days)
+    const { filteredActivities } = getState();
+    console.log('Filtered activities:', filteredActivities.length);
+
+    // Render recent (first 20 from filtered)
+    renderRecent(filteredActivities.slice(0, 20));
+
+    // Render totals (all filtered)
+    renderTotals(filteredActivities);
+
+    // Update title
+    updateTotalsTitle();
   } catch (e) {
+    console.error('Failed to load activities:', e);
+    recentLoading.classList.add('hidden');
     totalsLoading.classList.add('hidden');
+    recentEmpty.textContent = 'Failed to load activities.';
     totalsEmpty.textContent = 'Failed to load totals.';
+    recentEmpty.classList.remove('hidden');
     totalsEmpty.classList.remove('hidden');
   }
 }
 
-loadData();
+// Update totals title based on date range
+function updateTotalsTitle() {
+  const { dateRange } = getState();
+  const titles = {
+    last7: 'Last 7 Days',
+    last30: 'Last 30 Days',
+    last90: 'Last 90 Days',
+    last6months: 'Last 6 Months',
+    ytd: 'Year to Date',
+    all: 'All Time',
+    custom: 'Custom Range'
+  };
+
+  let title = titles[dateRange.type] || 'Activities';
+
+  // Add date range for time-based filters
+  const now = new Date();
+  let startDate, endDate = now;
+
+  if (dateRange.type === 'last7') {
+    startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  } else if (dateRange.type === 'last30') {
+    startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  } else if (dateRange.type === 'last90') {
+    startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+  } else if (dateRange.type === 'last6months') {
+    startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - 6);
+  } else if (dateRange.type === 'ytd') {
+    startDate = new Date(now.getFullYear(), 0, 1);
+  } else if (dateRange.type === 'custom' && dateRange.customStart) {
+    startDate = new Date(dateRange.customStart);
+    if (dateRange.customEnd) {
+      endDate = new Date(dateRange.customEnd);
+    }
+  }
+
+  if (startDate) {
+    const formatDate = (d) => d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+    title += ` (${formatDate(startDate)} - ${formatDate(endDate)})`;
+  }
+
+  totalsTitle.textContent = title;
+}
+
+// Update active button state
+function updateActiveButton(activeRange) {
+  dateRangeBtns.forEach(btn => {
+    if (btn.dataset.range === activeRange) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+}
+
+// Date range button handlers
+dateRangeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const range = btn.dataset.range;
+
+    if (range === 'custom') {
+      customDateInputs.classList.remove('hidden');
+      updateActiveButton(range);
+
+      // Set default dates: last 30 days
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+      customEnd.value = today.toISOString().split('T')[0];
+      customStart.value = thirtyDaysAgo.toISOString().split('T')[0];
+
+      setDateRange('custom', customStart.value, customEnd.value);
+      updateTotalsTitle();
+    } else {
+      customDateInputs.classList.add('hidden');
+      setDateRange(range);
+      updateActiveButton(range);
+      updateTotalsTitle();
+    }
+  });
+});
+
+customStart.addEventListener('change', () => {
+  if (customStart.value) {
+    setDateRange('custom', customStart.value, customEnd.value || null);
+    updateTotalsTitle();
+  }
+});
+
+customEnd.addEventListener('change', () => {
+  if (customStart.value) {
+    setDateRange('custom', customStart.value, customEnd.value || null);
+    updateTotalsTitle();
+  }
+});
+
+// Subscribe to state changes to re-render when filter/units change
+// (but skip rendering if we haven't loaded data yet)
+let dataLoaded = false;
+subscribe((state) => {
+  if (dataLoaded) {
+    renderRecent(state.filteredActivities.slice(0, 20));
+    renderTotals(state.filteredActivities);
+    updateTotalsTitle();
+  }
+});
+
+loadData().then(() => {
+  dataLoaded = true;
+});

@@ -24,9 +24,29 @@
     </header>
 
     <main class="container" role="main">
+      <!-- Date Range Picker -->
+      <section class="card" id="dateRangeCard">
+        <div class="date-range-picker">
+          <button class="date-range-btn" data-range="last7">Last 7 Days</button>
+          <button class="date-range-btn active" data-range="last30">Last 30 Days</button>
+          <button class="date-range-btn" data-range="last90">Last 90 Days</button>
+          <button class="date-range-btn" data-range="last6months">Last 6 Months</button>
+          <button class="date-range-btn" data-range="ytd">Year to Date</button>
+          <button class="date-range-btn" data-range="all">All Time</button>
+          <button class="date-range-btn" data-range="custom">Custom Range</button>
+
+          <div id="customDateInputs" class="custom-date-inputs hidden">
+            <label for="customStart">Start:</label>
+            <input type="date" id="customStart" />
+            <label for="customEnd">End:</label>
+            <input type="date" id="customEnd" />
+          </div>
+        </div>
+      </section>
+
       <div class="dashboard-grid">
       <section id="totalsCard" class="card">
-        <h4>Last 30 Days</h4>
+        <h4 id="totalsTitle">Last 30 Days</h4>
         <div id="totalsLoading">Loading totals…</div>
         <div id="totals" class="hidden">
           <div class="grid">
