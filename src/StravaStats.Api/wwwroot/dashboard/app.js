@@ -693,11 +693,12 @@ function getDateDomain() {
 }
 
 function quantizeLevel(value, maxValue) {
-  if (!maxValue || maxValue <= 0 || !value) return 0;
+  if (!value || value <= 0) return 0;
+  if (!maxValue || maxValue <= 0) return 1;
   const ratio = value / maxValue;
-  if (ratio >= 0.80) return 4;
-  if (ratio >= 0.60) return 3;
-  if (ratio >= 0.35) return 2;
+  if (ratio >= 0.75) return 4;
+  if (ratio >= 0.50) return 3;
+  if (ratio >= 0.25) return 2;
   return 1;
 }
 
