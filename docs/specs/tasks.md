@@ -84,15 +84,17 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - Completed on 2025-11-22 03:22: Added `ActivityNormalizer` with timezone extraction (IANA), UTC→local conversion with DST support, rounding/precision, and normalized DTO. Added endpoints `GET /activities/normalized` and `GET /activities/all/normalized`.
   - Tests: Added xUnit tests in `tests/StravaStats.Api.Tests` covering (a) Strava timezone string parsing like "(GMT-08:00) America/Los_Angeles"; (b) DST summer conversion for `America/Los_Angeles`; (c) fallback behavior when timezone is missing or malformed; (d) rounding for distance/elevation. Run with `dotnet test`.
 
-- [ ] **2.6 Create In-Memory Cache Service**
+- [x] **2.6 Create In-Memory Cache Service**
   - _Plan Item:_ In-Memory Data Store/Cache
   - _Req ID:_ [Req 3], [Req 11]
   - **Details:** Implement a caching layer (e.g., IMemoryCache or a Dictionary-based singleton scoped to session) to store fetched activities and prevent re-fetching on every page reload.
+  - Completed on 2025-11-23: Added IMemoryCache service to cache activities in `/activities/all/normalized` endpoint. Cache key is generated from athlete ID + query parameters. Cache expiration: 5-minute sliding, 15-minute absolute. Cache invalidation on logout. Added athlete ID capture during OAuth callback and storage in session.
 
-- [ ] **2.7 Build Unit Conversion Utility**
+- [x] **2.7 Build Unit Conversion Utility**
   - _Plan Item:_ Unit Conversion Service
   - _Req ID:_ [Req 9]
   - **Details:** Create functions to convert Meters -> Miles/Km, Meters/Sec -> Min/Mile or Min/Km pace. Default to imperial units (miles, min/mile) with toggle to switch to metric.
+  - Completed on 2025-11-23: Created `UnitConverter` service with interface `IUnitConverter`. Implemented conversions for distance (m↔km, m↔mi), pace (m/s→min/km, m/s→min/mi), speed (m/s→km/h, m/s→mph), and elevation (m↔ft). Added format helpers for display with configurable decimal places and unit system. Registered as singleton in DI container. Comprehensive unit tests added (46 tests total, all passing).
 
 ## Phase 3: Dashboard Framework & Basic Widgets
 

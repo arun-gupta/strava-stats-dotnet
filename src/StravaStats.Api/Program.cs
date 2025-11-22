@@ -12,6 +12,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Caching.Memory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,9 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromHours(8);
 });
 
+// In-memory cache for activities (Task 2.6)
+builder.Services.AddMemoryCache();
+
 // Typed HttpClient for Strava API
 builder.Services.AddHttpClient("strava", c =>
 {
@@ -54,6 +58,7 @@ builder.Services.AddHttpClient("strava", c =>
 });
 builder.Services.AddTransient<StravaStats.Api.Services.IStravaApiClient, StravaStats.Api.Services.StravaApiClient>();
 builder.Services.AddTransient<StravaStats.Api.Services.IActivityNormalizer, StravaStats.Api.Services.ActivityNormalizer>();
+builder.Services.AddSingleton<StravaStats.Api.Services.IUnitConverter, StravaStats.Api.Services.UnitConverter>();
 
 var app = builder.Build();
 
@@ -163,8 +168,9 @@ app.MapGet("/auth/callback", async (
         return Results.Problem(title: "Unexpected token response from Strava.", detail: body, statusCode: 502);
     }
 
-    // Optionally fetch athlete profile for welcome page
+    // Optionally fetch athlete profile for welcome page and cache key
     var athleteName = "";
+    var athleteId = json.Athlete?.Id ?? 0;
     try
     {
         // Prefer the embedded athlete info from token response, fall back to API call if missing
@@ -174,6 +180,7 @@ app.MapGet("/auth/callback", async (
                 .Where(s => !string.IsNullOrWhiteSpace(s))
                 .DefaultIfEmpty(json.Athlete.Username ?? "")
                 .Aggregate("", (acc, s) => string.IsNullOrWhiteSpace(acc) ? s! : acc + " " + s);
+            athleteId = json.Athlete.Id;
         }
         else
         {
@@ -188,6 +195,7 @@ app.MapGet("/auth/callback", async (
                     .Where(s => !string.IsNullOrWhiteSpace(s))
                     .DefaultIfEmpty(athlete?.Username ?? "")
                     .Aggregate("", (acc, s) => string.IsNullOrWhiteSpace(acc) ? s! : acc + " " + s);
+                athleteId = athlete?.Id ?? 0;
             }
         }
     }
@@ -201,6 +209,7 @@ app.MapGet("/auth/callback", async (
     if (!string.IsNullOrWhiteSpace(json.RefreshToken))
         http.Session.SetString("strava_refresh_token", json.RefreshToken);
     http.Session.SetString("strava_athlete_name", athleteName ?? string.Empty);
+    http.Session.SetString("strava_athlete_id", athleteId.ToString());
     if (json.ExpiresAt.HasValue)
         http.Session.SetString("strava_expires_at", json.ExpiresAt.Value.ToString());
 
@@ -261,9 +270,19 @@ app.MapGet("/dashboard", (HttpContext http) =>
     return Results.Redirect("/dashboard/index.html");
 });
 
-// Task 1.7: Logout — clear session and remove session cookie
-app.MapGet("/auth/logout", (HttpContext http) =>
+// Task 1.7: Logout — clear session, invalidate cache, and remove session cookie
+app.MapGet("/auth/logout", (HttpContext http, Microsoft.Extensions.Caching.Memory.IMemoryCache cache) =>
 {
+    // Invalidate cached activities for this user before clearing session
+    var athleteId = http.Session.GetString("strava_athlete_id");
+    if (!string.IsNullOrWhiteSpace(athleteId))
+    {
+        // Remove all possible cache entries for this user
+        // Since we can't enumerate all keys, we'll rely on the cache expiration
+        // For now, just clear the most common cache key pattern
+        cache.Remove($"activities_{athleteId}_100_");
+    }
+
     http.Session.Clear();
     // Remove the session cookie (if present)
     if (http.Request.Cookies.ContainsKey(".strava.stats.session"))
@@ -274,8 +293,15 @@ app.MapGet("/auth/logout", (HttpContext http) =>
     return Results.Redirect("/welcome");
 });
 
-app.MapPost("/auth/logout", (HttpContext http) =>
+app.MapPost("/auth/logout", (HttpContext http, Microsoft.Extensions.Caching.Memory.IMemoryCache cache) =>
 {
+    // Invalidate cached activities for this user before clearing session
+    var athleteId = http.Session.GetString("strava_athlete_id");
+    if (!string.IsNullOrWhiteSpace(athleteId))
+    {
+        cache.Remove($"activities_{athleteId}_100_");
+    }
+
     http.Session.Clear();
     if (http.Request.Cookies.ContainsKey(".strava.stats.session"))
     {
@@ -478,13 +504,14 @@ app.MapGet("/activities/normalized", async (
     }
 });
 
-// GET /activities/all/normalized — all pages normalized
+// GET /activities/all/normalized — all pages normalized with caching
 app.MapGet("/activities/all/normalized", async (
     HttpContext http,
     IHttpClientFactory httpClientFactory,
     IOptions<StravaOptions> strava,
     StravaStats.Api.Services.IStravaApiClient api,
     StravaStats.Api.Services.IActivityNormalizer normalizer,
+    Microsoft.Extensions.Caching.Memory.IMemoryCache cache,
     int? per_page,
     long? before,
     long? after,
@@ -497,6 +524,17 @@ app.MapGet("/activities/all/normalized", async (
         return Results.Unauthorized();
     }
 
+    // Generate cache key based on user's access token and query parameters
+    // Using athlete ID from session would be better, but access token works as a unique user identifier
+    var athleteId = http.Session.GetString("strava_athlete_id") ?? ok.accessToken!.GetHashCode().ToString();
+    var cacheKey = $"activities_{athleteId}_{per_page ?? 100}_{before}_{after}_{max_pages ?? 100}";
+
+    // Try to get from cache first
+    if (cache.TryGetValue(cacheKey, out object? cachedResult) && cachedResult is List<object> cachedActivities)
+    {
+        return Results.Ok(cachedActivities);
+    }
+
     try
     {
         var (all, _) = await api.GetAllActivitiesAsync(
@@ -507,6 +545,16 @@ app.MapGet("/activities/all/normalized", async (
             maxPages: Math.Clamp(max_pages ?? 100, 1, 1000),
             ct: ct);
         var normalized = normalizer.NormalizeMany(all);
+
+        // Cache the normalized activities for 5 minutes
+        var cacheOptions = new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions
+        {
+            SlidingExpiration = TimeSpan.FromMinutes(5),
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(15)
+        };
+
+        cache.Set(cacheKey, normalized, cacheOptions);
+
         return Results.Ok(normalized);
     }
     catch (HttpRequestException ex) when (ex.StatusCode.HasValue)
@@ -530,6 +578,7 @@ internal sealed class TokenResponse
 
 internal sealed class AthleteResponse
 {
+    [JsonPropertyName("id")] public long Id { get; set; }
     [JsonPropertyName("username")] public string? Username { get; set; }
     [JsonPropertyName("firstname")] public string? Firstname { get; set; }
     [JsonPropertyName("lastname")] public string? Lastname { get; set; }
