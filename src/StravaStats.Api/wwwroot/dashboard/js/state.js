@@ -68,15 +68,15 @@ function applyFilter() {
 
     if (type === 'last7') {
       afterDate = new Date(now);
-      afterDate.setDate(afterDate.getDate() - 7);
+      afterDate.setDate(afterDate.getDate() - 6);
       afterDate.setHours(0, 0, 0, 0);
     } else if (type === 'last30') {
       afterDate = new Date(now);
-      afterDate.setDate(afterDate.getDate() - 30);
+      afterDate.setDate(afterDate.getDate() - 29);
       afterDate.setHours(0, 0, 0, 0);
     } else if (type === 'last90') {
       afterDate = new Date(now);
-      afterDate.setDate(afterDate.getDate() - 90);
+      afterDate.setDate(afterDate.getDate() - 89);
       afterDate.setHours(0, 0, 0, 0);
     } else if (type === 'last6months') {
       afterDate = new Date(now);

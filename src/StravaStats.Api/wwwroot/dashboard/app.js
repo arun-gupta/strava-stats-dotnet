@@ -25,7 +25,16 @@ const hmAllBtn = document.getElementById('hmAllBtn');
 const hmRunBtn = document.getElementById('hmRunBtn');
 const heatmapEl = document.getElementById('heatmap');
 const currentStreakEl = document.getElementById('currentStreak');
-const longestStreakEl = document.getElementById('longestStreak');
+const showGapDetailsBtn = document.getElementById('showGapDetailsBtn');
+const gapDetails = document.getElementById('gapDetails');
+const gapList = document.getElementById('gapList');
+
+// Workout statistics elements
+const workoutDaysEl = document.getElementById('workoutDays');
+const missedDaysEl = document.getElementById('missedDays');
+const daysSinceLastEl = document.getElementById('daysSinceLast');
+const longestGapEl = document.getElementById('longestGap');
+const totalGapDaysEl = document.getElementById('totalGapDays');
 
 // Chart instances
 let activityCountChart = null;
@@ -265,6 +274,33 @@ if (hmAllBtn && hmRunBtn) {
       btn.classList.add('active');
       setHeatmapMode(mode);
     });
+  });
+}
+
+// Show Gap Details button
+if (showGapDetailsBtn) {
+  showGapDetailsBtn.addEventListener('click', () => {
+    if (gapDetails.classList.contains('hidden')) {
+      // Calculate and show gaps
+      const gaps = calculateGaps(currentDayValues);
+
+      if (gaps.length === 0) {
+        gapList.innerHTML = '<p>No gaps found! You have been consistently active.</p>';
+      } else {
+        gapList.innerHTML = gaps.map(gap => `
+          <article style="margin-bottom: 0.5rem; padding: 0.75rem; border: 1px solid var(--pico-muted-border-color); border-radius: 4px;">
+            <div><strong>${gap.start.toLocaleDateString([], { dateStyle: 'medium' })} - ${gap.end.toLocaleDateString([], { dateStyle: 'medium' })}</strong></div>
+            <div style="color: var(--pico-muted-color); font-size: 0.875rem;">${gap.duration} day${gap.duration === 1 ? '' : 's'} without activity</div>
+          </article>
+        `).join('');
+      }
+
+      gapDetails.classList.remove('hidden');
+      showGapDetailsBtn.textContent = 'Hide Gap Details';
+    } else {
+      gapDetails.classList.add('hidden');
+      showGapDetailsBtn.textContent = 'Show Gap Details';
+    }
   });
 }
 
@@ -613,6 +649,14 @@ function renderRunningStats(activities) {
   }
 }
 
+// Helper to format date as YYYY-MM-DD in local timezone
+function formatDateKey(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 // Transform activities to heatmap data structure
 // Returns { "YYYY-MM-DD": value } for easy lookup by date
 function transformToHeatmapData(activities, mode = 'all') {
@@ -666,40 +710,56 @@ function getDateDomain() {
     start = new Date(dateRange.customStart);
     end = dateRange.customEnd ? new Date(dateRange.customEnd) : endCandidate;
   } else {
-    // mirror filter logic
+    // mirror filter logic from state.js
     let afterDate;
-    const now = Date.now();
-    if (dateRange.type === 'last7') afterDate = new Date(now - 7*24*60*60*1000);
-    else if (dateRange.type === 'last30') afterDate = new Date(now - 30*24*60*60*1000);
-    else if (dateRange.type === 'last90') afterDate = new Date(now - 90*24*60*60*1000);
-    else if (dateRange.type === 'last6months') { const d = new Date(); d.setMonth(d.getMonth()-6); afterDate = d; }
-    else if (dateRange.type === 'ytd') afterDate = new Date(new Date().getFullYear(),0,1);
-    else afterDate = null;
+    const now = new Date();
+    if (dateRange.type === 'last7') {
+      afterDate = new Date(now);
+      afterDate.setDate(afterDate.getDate() - 6);
+      afterDate.setHours(0, 0, 0, 0);
+    } else if (dateRange.type === 'last30') {
+      afterDate = new Date(now);
+      afterDate.setDate(afterDate.getDate() - 29);
+      afterDate.setHours(0, 0, 0, 0);
+    } else if (dateRange.type === 'last90') {
+      afterDate = new Date(now);
+      afterDate.setDate(afterDate.getDate() - 89);
+      afterDate.setHours(0, 0, 0, 0);
+    } else if (dateRange.type === 'last6months') {
+      afterDate = new Date(now);
+      afterDate.setMonth(afterDate.getMonth() - 6);
+      afterDate.setHours(0, 0, 0, 0);
+    } else if (dateRange.type === 'ytd') {
+      afterDate = new Date(now.getFullYear(), 0, 1);
+    } else {
+      afterDate = null;
+    }
 
     if (!afterDate) return null;
     start = new Date(afterDate.getFullYear(), afterDate.getMonth(), afterDate.getDate());
     end = endCandidate;
   }
 
-  // Align to week boundaries (weeks as columns, Sunday first)
-  const startDay = start.getDay();
-  const alignedStart = new Date(start);
-  alignedStart.setDate(alignedStart.getDate() - startDay);
-  const endDay = end.getDay();
-  const alignedEnd = new Date(end);
-  alignedEnd.setDate(alignedEnd.getDate() + (6 - endDay));
-
-  return { start: alignedStart, end: alignedEnd };
+  return { start, end };
 }
 
-function quantizeLevel(value, maxValue) {
+function quantizeLevel(value, mode) {
   if (!value || value <= 0) return 0;
-  if (!maxValue || maxValue <= 0) return 1;
-  const ratio = value / maxValue;
-  if (ratio >= 0.75) return 4;
-  if (ratio >= 0.50) return 3;
-  if (ratio >= 0.25) return 2;
-  return 1;
+
+  if (mode === 'running') {
+    // Distance-based for running (in meters)
+    const km = value / 1000;
+    if (km >= 15) return 3; // 15km+
+    if (km >= 10) return 2; // 10-15km
+    if (km >= 5) return 1;  // 5-10km
+    return 1; // Any running
+  } else {
+    // Time-based for all activities (in seconds)
+    const hours = value / 3600;
+    if (hours >= 2) return 3;   // 2h+
+    if (hours >= 1) return 2;   // 1-2h
+    return 1;                   // < 1h
+  }
 }
 
 function formatDayTitle(date, metrics, mode) {
@@ -743,6 +803,60 @@ function calculateStreaks(dayValues, endDate) {
   return { current, longest };
 }
 
+function calculateGaps(dayValues) {
+  // dayValues: array of {date: Date, active: boolean}, sorted asc
+  const gaps = [];
+  let gapStart = null;
+
+  for (let i = 0; i < dayValues.length; i++) {
+    const { date, active } = dayValues[i];
+    if (!active) {
+      if (gapStart === null) {
+        gapStart = date;
+      }
+    } else {
+      if (gapStart !== null) {
+        const gapEnd = new Date(date);
+        gapEnd.setDate(gapEnd.getDate() - 1); // End is the day before activity resumed
+        const duration = Math.floor((gapEnd - gapStart) / (1000 * 60 * 60 * 24)) + 1;
+        gaps.push({ start: gapStart, end: gapEnd, duration });
+        gapStart = null;
+      }
+    }
+  }
+
+  // If we ended in a gap, close it
+  if (gapStart !== null && dayValues.length > 0) {
+    const gapEnd = dayValues[dayValues.length - 1].date;
+    const duration = Math.floor((gapEnd - gapStart) / (1000 * 60 * 60 * 24)) + 1;
+    gaps.push({ start: gapStart, end: gapEnd, duration });
+  }
+
+  return gaps;
+}
+
+// Store days for gap calculation
+let currentDayValues = [];
+
+function updateLegendLabels(mode) {
+  const label0 = document.getElementById('legendLabel0');
+  const label1 = document.getElementById('legendLabel1');
+  const label2 = document.getElementById('legendLabel2');
+  const label3 = document.getElementById('legendLabel3');
+
+  if (mode === 'running') {
+    if (label0) label0.textContent = 'No Activity';
+    if (label1) label1.textContent = '< 5km';
+    if (label2) label2.textContent = '10-15km';
+    if (label3) label3.textContent = '15km+';
+  } else {
+    if (label0) label0.textContent = 'No Activity';
+    if (label1) label1.textContent = '< 1h';
+    if (label2) label2.textContent = '1-2h';
+    if (label3) label3.textContent = '2h+';
+  }
+}
+
 function renderHeatmap(activities) {
   if (!heatmapEl) return;
   const { heatmapMode } = getState();
@@ -756,7 +870,7 @@ function renderHeatmap(activities) {
   const days = [];
   let maxValue = 0;
   for (let d = new Date(domain.start); d <= domain.end; d.setDate(d.getDate()+1)) {
-    const key = d.toISOString().split('T')[0];
+    const key = formatDateKey(d);
     const metrics = map[key];
     let value = 0;
     if (metrics) {
@@ -772,12 +886,15 @@ function renderHeatmap(activities) {
     weeks.push(days.slice(i, i+7));
   }
 
+  // Update legend labels based on mode
+  updateLegendLabels(heatmapMode);
+
   weeks.forEach(week => {
     const col = document.createElement('div');
     col.className = 'week';
     week.forEach(({ date, value, metrics }) => {
       const cell = document.createElement('div');
-      const level = quantizeLevel(value, maxValue);
+      const level = quantizeLevel(value, heatmapMode);
       cell.className = `day level-${level}`;
       cell.title = formatDayTitle(date, metrics, heatmapMode);
       cell.setAttribute('aria-label', cell.title);
@@ -786,11 +903,41 @@ function renderHeatmap(activities) {
     heatmapEl.appendChild(col);
   });
 
-  // Streaks
+  // Calculate and display workout statistics
   const dayValues = days.map(x => ({ date: x.date, active: x.value > 0 }));
+  currentDayValues = dayValues; // Store for gap calculation
+
+  const workoutDays = dayValues.filter(d => d.active).length;
+  const missedDays = dayValues.length - workoutDays;
+
   const { longest, current } = calculateStreaks(dayValues, domain.end);
-  if (currentStreakEl) currentStreakEl.textContent = `${current} day${current===1?'':'s'}`;
-  if (longestStreakEl) longestStreakEl.textContent = `${longest} day${longest===1?'':'s'}`;
+  if (currentStreakEl) currentStreakEl.textContent = `${current}`;
+
+  // Days since last activity
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let daysSinceLast = 0;
+  for (let i = dayValues.length - 1; i >= 0; i--) {
+    const { date, active } = dayValues[i];
+    if (active) break;
+    if (date <= today) daysSinceLast++;
+  }
+
+  // Calculate gaps
+  const gaps = calculateGaps(dayValues);
+  const longestGap = gaps.length > 0 ? Math.max(...gaps.map(g => g.duration)) : 0;
+  const totalGapDays = gaps.reduce((sum, g) => sum + g.duration, 0);
+
+  // Update UI
+  if (workoutDaysEl) workoutDaysEl.textContent = String(workoutDays);
+  if (missedDaysEl) missedDaysEl.textContent = String(missedDays);
+  if (daysSinceLastEl) daysSinceLastEl.textContent = String(daysSinceLast);
+  if (longestGapEl) longestGapEl.textContent = String(longestGap);
+  if (totalGapDaysEl) totalGapDaysEl.textContent = String(totalGapDays);
+
+  // Hide gap details when heatmap rerenders
+  gapDetails.classList.add('hidden');
+  showGapDetailsBtn.textContent = 'Show Gap Details';
 }
 
 // Update UI when active tab changes

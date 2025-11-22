@@ -112,29 +112,59 @@
             </div>
 
             <div id="heatmapLegend" class="heatmap-legend" aria-hidden="true">
-              <span>Less</span>
-              <span class="legend-box level-0"></span>
-              <span class="legend-box level-1"></span>
-              <span class="legend-box level-2"></span>
-              <span class="legend-box level-3"></span>
-              <span class="legend-box level-4"></span>
-              <span>More</span>
+              <span class="legend-item">
+                <span class="legend-box level-0"></span>
+                <span class="legend-label" id="legendLabel0">No Activity</span>
+              </span>
+              <span class="legend-item">
+                <span class="legend-box level-1"></span>
+                <span class="legend-label" id="legendLabel1">&lt; 1h</span>
+              </span>
+              <span class="legend-item">
+                <span class="legend-box level-2"></span>
+                <span class="legend-label" id="legendLabel2">1-2h</span>
+              </span>
+              <span class="legend-item">
+                <span class="legend-box level-3"></span>
+                <span class="legend-label" id="legendLabel3">2h+</span>
+              </span>
             </div>
 
             <div id="heatmap" class="heatmap" role="img" aria-label="Activity calendar heatmap"></div>
           </section>
 
           <section class="card">
-            <h4>Streaks</h4>
-            <div class="grid">
-              <article>
+            <h4>Workout Statistics</h4>
+            <div class="workout-stats-grid">
+              <article class="workout-stat">
+                <header>Workout Days</header>
+                <strong id="workoutDays">—</strong>
+              </article>
+              <article class="workout-stat">
+                <header>Missed Days</header>
+                <strong id="missedDays">—</strong>
+              </article>
+              <article class="workout-stat">
                 <header>Current Streak</header>
-                <strong id="currentStreak">0 days</strong>
+                <strong id="currentStreak">—</strong>
               </article>
-              <article>
-                <header>Longest Streak</header>
-                <strong id="longestStreak">0 days</strong>
+              <article class="workout-stat">
+                <header>Days Since Last</header>
+                <strong id="daysSinceLast">—</strong>
               </article>
+              <article class="workout-stat">
+                <header>Longest Gap</header>
+                <strong id="longestGap">—</strong>
+              </article>
+              <article class="workout-stat">
+                <header>Total Gap Days</header>
+                <strong id="totalGapDays">—</strong>
+              </article>
+            </div>
+            <button id="showGapDetailsBtn" class="secondary outline" style="margin-top: 1rem;">Show Gap Details</button>
+            <div id="gapDetails" class="hidden" style="margin-top: 1rem;">
+              <h5>Gap Periods</h5>
+              <div id="gapList"></div>
             </div>
           </section>
         </div>

@@ -240,15 +240,52 @@
 .heatmap .day:hover { outline: 1px solid var(--pico-muted-border-color); }
 
 /* Color levels (GitHub-like) using brand hue */
-.heatmap-legend { display: flex; align-items: center; gap: 6px; margin: .5rem 0 1rem; font-size: .85rem; color: var(--pico-muted-color); }
+.heatmap-legend { display: flex; align-items: center; gap: 1rem; margin: .5rem 0 1rem; font-size: .85rem; color: var(--pico-muted-color); flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 0.375rem; }
 .legend-box { display: inline-block; width: 12px; height: 12px; border-radius: 2px; background: #ebedf0; }
+.legend-label { font-size: 0.8rem; color: var(--pico-muted-color); }
 .legend-box.level-0 { background: #ebedf0; }
 .legend-box.level-1 { background: #fde2d6; }
 .legend-box.level-2 { background: #fbbda1; }
-.legend-box.level-3 { background: #f9936f; }
-.legend-box.level-4 { background: #f96332; }
+.legend-box.level-3 { background: #f96332; }
 .day.level-0 { background: #ebedf0; }
 .day.level-1 { background: #fde2d6; }
 .day.level-2 { background: #fbbda1; }
-.day.level-3 { background: #f9936f; }
-.day.level-4 { background: #f96332; }
+.day.level-3 { background: #f96332; }
+
+/* Workout Statistics Grid */
+.workout-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.workout-stat {
+  padding: 1rem;
+  background: transparent;
+  border-radius: 8px;
+  border: 1px solid rgba(128, 128, 128, 0.15);
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.workout-stat:hover {
+  border-color: var(--pico-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.workout-stat header {
+  font-size: 0.75rem;
+  color: var(--pico-muted-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.workout-stat strong {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--pico-color);
+  display: block;
+}

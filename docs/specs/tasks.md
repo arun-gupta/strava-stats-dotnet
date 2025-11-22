@@ -167,8 +167,25 @@ This document tracks the step-by-step technical tasks required to build the Stra
 - [x] **4.2 Build Calendar Heatmap Component**
   - _Plan Item:_ Heatmap Tab with Mode Toggle
   - _Req ID:_ [Req 5]
-  - **Details:** Render a GitHub-style calendar grid. Add single "🔥 Heatmap" tab to dashboard with mode toggle/buttons to switch between "All Activities" and "Running Only" views. Calculate and display "Current Streak" and "Longest Streak" metrics based on consecutive days in the filtered dataset. For "All Activities" mode, intensity is measured by total time spent per day.
-  - Completed on 2025-11-22: Added "🔥 Heatmap" tab with segmented toggle for modes (All Activities vs Running Only). Implemented calendar heatmap grid (weeks as columns, days as rows) with 5-level color scale based on activity density (All = time/day, Running = distance/day). Integrated with global date range filter and reactive store; rerenders on filter, tab, or mode changes. Added streak metrics section computing Current and Longest streaks across the selected range. Accessible tooltips and ARIA labels included. Styled legend and cells in site.css.
+  - **Details:** Render a GitHub-style calendar grid. Add single "🔥 Heatmap" tab to dashboard with mode toggle/buttons to switch between "All Activities" and "Running Only" views. Display legend showing intensity scale (Less to More) within the Heatmap tab. Calculate and display "Current Streak" and "Longest Streak" metrics based on consecutive days in the filtered dataset. For "All Activities" mode, intensity is measured by total time spent per day.
+  - Completed on 2025-11-22: Added "🔥 Heatmap" tab with segmented toggle for modes (All Activities vs Running Only). Implemented calendar heatmap grid (weeks as columns, days as rows) with 5-level color scale based on activity density (All = time/day, Running = distance/day). Integrated with global date range filter and reactive store; rerenders on filter, tab, or mode changes. Added streak metrics section computing Current and Longest streaks across the selected range. Accessible tooltips and ARIA labels included. Styled legend and cells in site.css. Legend is displayed within the Heatmap tab showing intensity scale from Less to More.
+
+- [x] **4.2.1 Add Gap Details Feature**
+  - _Plan Item:_ Heatmap Gap Analysis
+  - _Req ID:_ [Req 5]
+  - **Details:** Add "Show Gap Details" button to Heatmap tab. When clicked, display a list of all gap periods (consecutive days without activity) in the selected date range, showing the start date, end date, and duration (in days) of each gap. Implement logic to identify gaps from the day values array used in heatmap rendering.
+  - Completed on 2025-11-22: Added "Show Gap Details" button below streaks section. Implemented `calculateGaps()` function that identifies consecutive days without activity. Button toggles visibility of gap list and changes text between "Show Gap Details" and "Hide Gap Details". Gap periods displayed as cards showing date range and duration. Displays friendly message when no gaps found.
+
+- [x] **4.2.2 Add Workout Statistics**
+  - _Plan Item:_ Heatmap Workout Statistics
+  - _Req ID:_ [Req 5]
+  - **Details:** Add comprehensive workout statistics display to Heatmap tab showing: Workout Days (total days with activity), Missed Days (days without activity), Current Streak (consecutive active days ending today), Days Since Last (days since most recent activity), Longest Gap (longest period without activity), and Total Gap Days (sum of all gap days). Display these as a grid of stat cards similar to the overview layout.
+  - Completed on 2025-11-22: Replaced "Streaks" section with "Workout Statistics" section containing 6 stat cards in a responsive grid. Added CSS for `.workout-stats-grid` and `.workout-stat` styles. Implemented calculation logic in `renderHeatmap()` for all 6 statistics. Statistics update dynamically when date range or heatmap mode changes.
+
+- [ ] **4.2.3 Update Heatmap Legend with Time-based Labels**
+  - _Plan Item:_ Heatmap Legend Enhancement
+  - _Req ID:_ [Req 5]
+  - **Details:** Replace generic "Less/More" legend labels with descriptive time-based labels for All Activities mode ("No Activity", "< 1h", "1-2h", "2h+") and distance-based labels for Running Only mode. Update quantization logic to use fixed time/distance thresholds instead of relative percentages.
 
 - [ ] **4.3 Implement Trend Aggregation Logic**
   - _Plan Item:_ Trend Calculation Engine

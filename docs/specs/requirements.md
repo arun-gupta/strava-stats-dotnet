@@ -45,7 +45,9 @@ The Strava Activity Analyzer is a web application designed to authenticate with 
      - WHEN the "Heatmap" tab loads, THEN the system SHALL provide a mode toggle to switch between "All Activities" and "Running Only" views.
      - WHEN "All Activities" mode is selected, THEN the system SHALL colorize days based on the total time spent on all activities per day.
      - WHEN "Running Only" mode is selected, THEN the system SHALL only display running data and colorize days based on distance covered.
-     - WHEN viewing heatmaps, THEN the system SHALL calculate and display the current and longest streak of active days.
+     - WHEN viewing the heatmap, THEN the system SHALL display a legend within the Heatmap tab showing time-based intensity levels: "No Activity", "< 1h", "1-2h", "2h+" for All Activities mode, and distance-based levels for Running Only mode.
+     - WHEN viewing the heatmap, THEN the system SHALL display workout statistics including: Workout Days (total days with activity), Missed Days (days without activity), Current Streak (consecutive active days ending today), Days Since Last (days since most recent activity), Longest Gap (longest period without activity), and Total Gap Days (sum of all gap days).
+     - WHEN the user clicks "Show Gap Details", THEN the system SHALL display a list of all gap periods (consecutive days without activity) in the selected date range, showing the start date, end date, and duration of each gap.
 
 6. **Running Statistics**
    - **User Story**: As a runner, I want to see specific aggregated metrics and personal records so that I can track my running progress.
