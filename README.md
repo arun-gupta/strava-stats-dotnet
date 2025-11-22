@@ -24,22 +24,17 @@ cp .env.example .env
 # SESSION_SECRET=...
 ```
 
-3) Start the API (opens Strava auth by default)
+3) Start the API
 ```bash
 ./start.sh        # first time you may need: chmod +x start.sh
 ```
+
+Tip: `./start.sh` auto-loads `.env`, uses Development, builds, starts the API, and opens the dashboard. You can choose the initial page with `--open=swagger|auth|dashboard` (default: `dashboard`).
 
 After signing in with Strava, you’ll be redirected to your dashboard:
 
 ![Dashboard](docs/images/dashboard.png)
 
-### About the start.sh helper
-On macOS/Linux (or Git Bash on Windows), `start.sh` will:
-- Load variables from `.env` if present.
-- Default `ASPNETCORE_ENVIRONMENT=Development` if not set.
-- Run `dotnet restore`, `dotnet build`, and start the API.
-
-Note: If you see a message about a missing framework like "Microsoft.NETCore.App 8.0.0", ensure the .NET 8 runtime is installed as shown above.
 
 ### Advanced setup and alternatives
 - Windows/Linux install instructions, PATH notes, and using dotnet user-secrets are documented here:
