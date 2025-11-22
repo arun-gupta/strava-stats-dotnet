@@ -107,11 +107,11 @@ This document tracks the step-by-step technical tasks required to build the Stra
     - Graceful empty/unauthorized states
     - File structure created: `css/site.css`, and initial JS module placeholders in `js/` for future state/UI refactors.
 
-- [ ] **3.2 Implement Main Dashboard Grid**
+- [x] **3.2 Implement Main Dashboard Grid**
   - _Plan Item:_ Dashboard Layout
   - _Req ID:_ N/A
   - **Details:** Create the responsive container and grid layout for widgets.
-  - Completed on 2025-11-22: Added `.dashboard-grid` responsive CSS (1/2/3 columns at mobile/tablet/desktop) and wrapped Totals and Recent cards into the grid. Added `.card` padding helper and `.card-scroll` overflow helper. No JS changes required.
+  - Completed on 2025-11-22: Added `.dashboard-grid` single-column responsive layout with proper card styling (background, border, padding). Fixed stat card text wrapping with `white-space: nowrap` on headers and proper spacing. Cards now display cleanly without text breaking awkwardly.
 
 - [ ] **3.3 Create State Management Store**
   - _Plan Item:_ Global State Management

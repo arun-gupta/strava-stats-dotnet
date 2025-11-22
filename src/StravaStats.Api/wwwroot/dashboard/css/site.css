@@ -11,24 +11,31 @@
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.25rem;
-}
-
-@media (min-width: 768px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (min-width: 1200px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
+  gap: 1.5rem;
 }
 
 /* Card helpers */
-.card { padding: 0.5rem 0.75rem; }
-.card header { margin-bottom: 0.25rem; }
+.card {
+  padding: 1.5rem;
+  background: var(--pico-card-background-color);
+  border-radius: var(--pico-border-radius);
+  border: 1px solid var(--pico-card-border-color);
+}
+.card h4 { margin-bottom: 1rem; }
+.card article {
+  padding: 0.75rem;
+  text-align: center;
+  margin-bottom: 0;
+}
+.card article header {
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+}
+.card article strong {
+  font-size: 1.5rem;
+  display: block;
+}
 
 /* Tables overflow safe inside cards */
 .card-scroll { overflow: auto; }
