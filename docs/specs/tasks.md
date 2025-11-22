@@ -205,8 +205,8 @@ This document tracks the step-by-step technical tasks required to build the Stra
 - [x] **4.3 Build Trends Tab**
   - _Plan Item:_ Trends Tab with Mode Toggle
   - _Req ID:_ [Req 8]
-  - **Details:** Add single "📈 Trends" tab to dashboard with mode toggle between "All Activities" and "Running Only". Display line charts for distance and pace over time with aggregation options and smoothing.
-  - Completed on 2025-11-22: Implemented complete trends functionality with aggregation logic (4.3.1) and visualization (4.3.2).
+  - **Details:** Add single "📈 Trends" tab to dashboard displaying line charts for distance and pace over time with aggregation options and smoothing. Trends are running-specific only since pace data is only relevant for running activities.
+  - Completed on 2025-11-22: Implemented complete trends functionality with aggregation logic (4.3.1) and visualization (4.3.2). Updated on 2025-11-22: Removed mode toggle since trends are running-specific only.
 
   - [x] **4.3.1 Implement Trend Aggregation Logic**
     - **Details:** Create function to group filtered data by Day, Week, or Month for both "All Activities" and "Running Only" modes. Calculate distance totals and average pace for each time bucket. Implement moving average smoothing (e.g., 7-day rolling avg) to reduce noise in daily data.
@@ -215,11 +215,12 @@ This document tracks the step-by-step technical tasks required to build the Stra
       - `movingAverage(series, field, window)` computes trailing moving average for any numeric field (default 7). Exposed via `window.Trends` for use by charts in 4.3.2.
 
   - [x] **4.3.2 Build Trend Line Charts**
-    - **Details:** Render line charts for distance and pace over time using Chart.js. Add mode toggle between "All Activities" and "Running Only". Implement aggregation selector (Day/Week/Month) with dropdown or segmented control. Display dual-axis chart or separate charts for distance and pace trends.
-    - Completed on 2025-11-22: Added "📈 Trends" tab with mode toggle (All Activities/Running Only) and granularity selector (Daily/Weekly/Monthly). Implemented two separate line charts:
-      - **Distance Over Time**: Shows distance trends in user's preferred units (mi/km) with orange styling. Applies 7-day moving average smoothing for daily granularity to reduce noise.
-      - **Pace Over Time**: Shows average pace trends (min/mi or min/km) with blue styling and inverted y-axis (faster pace at top). Only displays when running data is available. Applies 7-day moving average smoothing for daily data.
-      - Both charts are responsive, integrate with global date range filter and unit system, and automatically re-render when mode, granularity, date range, or unit system changes. Charts use existing `groupActivitiesForTrends()` and `movingAverage()` functions from task 4.3.1.
+    - **Details:** Render line charts for distance and pace over time using Chart.js. Implement aggregation selector (Day/Week/Month/Year) with segmented control. Display separate charts for distance and pace trends. Trends are running-specific only since pace data is only relevant for running activities.
+    - Completed on 2025-11-22: Added "📈 Trends" tab with granularity selector (Daily/Weekly/Monthly/Yearly). Implemented two separate line charts:
+      - **Distance Over Time**: Shows running distance trends in user's preferred units (mi/km) with orange styling. Applies 7-day moving average smoothing for daily granularity to reduce noise.
+      - **Pace Over Time**: Shows average running pace trends (min/mi or min/km) with blue styling and inverted y-axis (faster pace at top). Only displays when running data is available. Applies 7-day moving average smoothing for daily data.
+      - Both charts are responsive, integrate with global date range filter and unit system, and automatically re-render when granularity, date range, or unit system changes. Charts use existing `groupActivitiesForTrends()` and `movingAverage()` functions from task 4.3.1.
+    - Updated on 2025-11-22: Removed mode toggle since trends are running-specific only. Simplified to show only granularity selector and "Running Trends" title.
 
 ## Phase 5: User Experience & Quality Assurance
 

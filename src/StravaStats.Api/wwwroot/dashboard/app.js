@@ -278,26 +278,7 @@ if (hmAllBtn && hmRunBtn) {
   });
 }
 
-// Trend mode toggle
-const trendAllBtn = document.getElementById('trendAllBtn');
-const trendRunBtn = document.getElementById('trendRunBtn');
-if (trendAllBtn && trendRunBtn) {
-  [trendAllBtn, trendRunBtn].forEach(btn => {
-    btn.addEventListener('click', () => {
-      const mode = btn.dataset.mode;
-      [trendAllBtn, trendRunBtn].forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      trendMode = mode;
-
-      // Re-render trend charts with new mode
-      if (dataLoaded) {
-        const { filteredActivities } = getState();
-        renderDistanceTrendChart(filteredActivities);
-        renderPaceTrendChart(filteredActivities);
-      }
-    });
-  });
-}
+// Trend mode toggle removed - trends are running-only
 
 // Trend granularity buttons
 const trendGranularityBtns = document.querySelectorAll('[data-granularity]');
@@ -1197,8 +1178,7 @@ function renderHeatmap(activities) {
 let distanceTrendChart = null;
 let paceTrendChart = null;
 
-// Trend state (mode and granularity)
-let trendMode = 'all';
+// Trend state (granularity only - trends are always running-only)
 let trendGranularity = 'week';
 
 // Render distance trend line chart
@@ -1213,8 +1193,8 @@ function renderDistanceTrendChart(activities) {
 
   const { unitSystem } = getState();
 
-  // Group activities by granularity
-  const buckets = groupActivitiesForTrends(activities, { mode: trendMode, granularity: trendGranularity });
+  // Group activities by granularity (running-only)
+  const buckets = groupActivitiesForTrends(activities, { mode: 'running', granularity: trendGranularity });
 
   if (buckets.length === 0) {
     if (distanceTrendChart) {
@@ -1337,8 +1317,8 @@ function renderPaceTrendChart(activities) {
 
   const { unitSystem } = getState();
 
-  // Group activities by granularity
-  const buckets = groupActivitiesForTrends(activities, { mode: trendMode, granularity: trendGranularity });
+  // Group activities by granularity (running-only)
+  const buckets = groupActivitiesForTrends(activities, { mode: 'running', granularity: trendGranularity });
 
   // Filter buckets that have pace data (avg_pace_s_per_km not null)
   const paceData = buckets.filter(b => b.avg_pace_s_per_km != null && b.avg_pace_s_per_km > 0);
