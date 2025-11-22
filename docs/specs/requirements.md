@@ -43,7 +43,7 @@ The Strava Activity Analyzer is a web application designed to authenticate with 
    - **User Story**: As a user, I want to visualize my training consistency on a calendar grid so that I can spot streaks and gaps.
    - **Acceptance Criteria**:
      - WHEN the "Heatmap" tab loads, THEN the system SHALL provide a mode toggle to switch between "All Activities" and "Running Only" views.
-     - WHEN "All Activities" mode is selected, THEN the system SHALL colorize days based on the intensity (count or time) of all activities.
+     - WHEN "All Activities" mode is selected, THEN the system SHALL colorize days based on the total time spent on all activities per day.
      - WHEN "Running Only" mode is selected, THEN the system SHALL only display running data and colorize days based on distance covered.
      - WHEN viewing heatmaps, THEN the system SHALL calculate and display the current and longest streak of active days.
 

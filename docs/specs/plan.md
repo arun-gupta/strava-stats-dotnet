@@ -42,7 +42,7 @@ This document outlines the development phases for the Strava Activity Analyzer, 
 | Priority | Task Description | Requirement ID |
 | :--- | :--- | :--- |
 | **Medium** | **Heatmap Component Logic**: Develop the algorithm to map daily activity intensity to a calendar grid. | [Req 5] |
-| **Medium** | **Heatmap Tab with Mode Toggle**: Render single heatmap tab with toggle between "All Activities" (intensity by count/time) and "Running Only" (intensity by distance). Include streak calculation (current/longest streak). | [Req 5] |
+| **Medium** | **Heatmap Tab with Mode Toggle**: Render single heatmap tab with toggle between "All Activities" (intensity by total time per day) and "Running Only" (intensity by distance). Include streak calculation (current/longest streak). | [Req 5] |
 | **Low** | **Trend Calculation Engine**: Implement logic to aggregate data by day/week/month for trend lines. | [Req 7] |
 | **Low** | **Trends Tab with Mode Toggle**: Render single trends tab with toggle between "All Activities" and "Running Only". Display line charts for distance and pace over time with smoothing (moving average) and aggregation options. | [Req 7] |
 
