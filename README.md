@@ -38,7 +38,7 @@ After signing in with Strava, you’ll be redirected to your dashboard:
 
 ### Advanced setup and alternatives
 - Windows/Linux install instructions, PATH notes, and using dotnet user-secrets are documented here:
-  - docs/setup.md
+  - [docs/setup.md](docs/setup.md)
 
 <!-- Configuration (secrets) section removed for a leaner README. See docs/setup.md#configure-secrets for full details. -->
 
