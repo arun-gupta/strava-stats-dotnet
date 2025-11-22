@@ -23,6 +23,10 @@ const customEnd = document.getElementById('customEnd');
 const tabBtns = document.querySelectorAll('.tab-btn');
 const tabPanels = document.querySelectorAll('.tab-panel');
 
+// Chart instances
+let activityCountChart = null;
+let timeDistChart = null;
+
 // Simple helpers
 const fmtDate = (iso) => new Date(iso).toLocaleDateString();
 const fmtTime = (secs) => {
@@ -298,6 +302,146 @@ tabBtns.forEach(btn => {
   });
 });
 
+// Generate chart colors
+function generateColors(count) {
+  const colors = [
+    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+    '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF9F40'
+  ];
+  return colors.slice(0, count);
+}
+
+// Render Activity Count Chart (Donut)
+function renderActivityCountChart(activities) {
+  const ctx = document.getElementById('activityCountChart');
+  if (!ctx) return;
+
+  // Group by sport_type
+  const counts = {};
+  activities.forEach(a => {
+    const type = a.sport_type || 'Unknown';
+    counts[type] = (counts[type] || 0) + 1;
+  });
+
+  const labels = Object.keys(counts);
+  const data = Object.values(counts);
+  const colors = generateColors(labels.length);
+
+  // Destroy existing chart
+  if (activityCountChart) {
+    activityCountChart.destroy();
+  }
+
+  activityCountChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Activities',
+        data: data,
+        backgroundColor: colors,
+        borderWidth: 2,
+        borderColor: '#1e293b'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            color: '#cbd5e1',
+            font: { size: 12 },
+            padding: 15
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.parsed;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = ((value / total) * 100).toFixed(1);
+              return `${label}: ${value} (${percentage}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// Render Time Distribution Chart (Donut)
+function renderTimeDistChart(activities) {
+  const ctx = document.getElementById('timeDistChart');
+  if (!ctx) return;
+
+  // Group by sport_type, sum moving_time_s
+  const times = {};
+  activities.forEach(a => {
+    const type = a.sport_type || 'Unknown';
+    times[type] = (times[type] || 0) + (a.moving_time_s || 0);
+  });
+
+  const labels = Object.keys(times);
+  const dataInSeconds = Object.values(times);
+  const data = dataInSeconds.map(secs => secs / 3600); // Convert to hours for chart values
+  const colors = generateColors(labels.length);
+
+  // Helper to format seconds to HH:MM
+  const formatTime = (secs) => {
+    const hours = Math.floor(secs / 3600);
+    const minutes = Math.floor((secs % 3600) / 60);
+    return `${hours}h ${minutes}m`;
+  };
+
+  // Destroy existing chart
+  if (timeDistChart) {
+    timeDistChart.destroy();
+  }
+
+  timeDistChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Time',
+        data: data,
+        backgroundColor: colors,
+        borderWidth: 2,
+        borderColor: '#1e293b'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            color: '#cbd5e1',
+            font: { size: 12 },
+            padding: 15
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const label = context.label || '';
+              const index = context.dataIndex;
+              const seconds = dataInSeconds[index];
+              const total = data.reduce((a, b) => a + b, 0);
+              const percentage = ((context.parsed / total) * 100).toFixed(1);
+              return `${label}: ${formatTime(seconds)} (${percentage}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
 // Update UI when active tab changes
 function updateActiveTab() {
   const { activeTab } = getState();
@@ -331,9 +475,15 @@ subscribe((state) => {
     renderRecent(state.filteredActivities.slice(0, 20));
     renderTotals(state.filteredActivities);
     updateTotalsTitle();
+    renderActivityCountChart(state.filteredActivities);
+    renderTimeDistChart(state.filteredActivities);
   }
 });
 
 loadData().then(() => {
   dataLoaded = true;
+  // Initial render of charts
+  const { filteredActivities } = getState();
+  renderActivityCountChart(filteredActivities);
+  renderTimeDistChart(filteredActivities);
 });

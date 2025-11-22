@@ -6,6 +6,7 @@
     <title>Strava Stats — Dashboard</title>
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2.0.6/css/pico.min.css">
     <link rel="stylesheet" href="/dashboard/css/site.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
       header.container { margin-top: 1rem; }
       table { font-size: .95rem; }
@@ -47,6 +48,8 @@
       <!-- Tab Navigation -->
       <nav class="tab-nav">
         <button class="tab-btn active" data-tab="overview">📊 Overview</button>
+        <button class="tab-btn" data-tab="activity-count">📈 Activity Count</button>
+        <button class="tab-btn" data-tab="time-dist">⏱️ Time Distribution</button>
       </nav>
 
       <!-- Tab Panels -->
@@ -102,6 +105,28 @@
           </div>
         </div>
         <!-- End Overview Tab -->
+
+        <!-- Activity Count Tab -->
+        <div id="tab-activity-count" class="tab-panel">
+          <section class="card">
+            <h4>Number of Activities by Type</h4>
+            <div class="chart-container">
+              <canvas id="activityCountChart"></canvas>
+            </div>
+          </section>
+        </div>
+        <!-- End Activity Count Tab -->
+
+        <!-- Time Distribution Tab -->
+        <div id="tab-time-dist" class="tab-panel">
+          <section class="card">
+            <h4>Time Distribution by Type</h4>
+            <div class="chart-container">
+              <canvas id="timeDistChart"></canvas>
+            </div>
+          </section>
+        </div>
+        <!-- End Time Distribution Tab -->
       </div>
       <!-- End Tab Content -->
 

@@ -131,20 +131,26 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Convert dashboard from grid layout to tabbed interface. Create tab infrastructure with initial "Overview" tab (containing current Totals and Recent Activities sections). Implement tab switching logic, state management for active tab, and styling with active state. Ensure tabs are responsive on mobile. The date range filter should remain global and apply to all tabs.
   - Completed on 2025-11-22: Created tabbed interface foundation with "Overview" tab containing existing Totals and Recent Activities. Added tab navigation bar in `index.html` with emoji icon. Styled tabs in `site.css` with active state (bottom border highlight), hover effects, and mobile-responsive horizontal scroll. Added `activeTab` to state.js with `setActiveTab()` function. Implemented tab switching logic in `app.js` that updates button states and panel visibility via subscriber pattern. Date range filter remains global and applies to all tabs.
 
-- [ ] **3.5 Implement Activity Distribution Charts**
+- [x] **3.5 Implement Activity Distribution Charts**
   - _Plan Item:_ Activity Distribution Charts
   - _Req ID:_ [Req 4]
   - **Details:** Integrate a chart library (e.g., Chart.js, Recharts). Create Pie/Donut charts for "Count by Type" and "Time by Type". Add "Activity Count" and "Time Distribution" tabs to dashboard.
+  - Completed on 2025-11-22: Integrated Chart.js (v4.4.0) via CDN. Added two new tabs: "📈 Activity Count" and "⏱️ Time Distribution". Implemented donut charts that group activities by `sport_type`:
+    - **Activity Count Chart**: Shows number of activities per type with count and percentage in tooltips
+    - **Time Distribution Chart**: Shows total time per type with HH:MM format (e.g., "12h 34m") and percentage in tooltips
+    - Both charts use color-coded legends positioned on the right, are responsive (400px mobile, 500px desktop), and automatically update when date range filter changes via subscriber pattern
+    - Added `generateColors()` helper with 10 distinct colors for consistent styling
 
-- [ ] **3.6 Implement Running Stats Widget**
-  - _Plan Item:_ Running Statistics Component
+- [ ] **3.6 Implement Running Stats Tab**
+  - _Plan Item:_ Running Statistics Component & Distance Histogram
   - _Req ID:_ [Req 6]
-  - **Details:** Create component to compute and display: Total Runs, 10K+ Runs, Total Distance, Avg Pace. Calculate PRs (Fastest 10k, Longest Run) from the filtered list. Add "Running Stats" tab to dashboard.
+  - **Details:** Add "Running Stats" tab to dashboard combining distance histogram and key statistics.
 
-- [ ] **3.7 Implement Distance Histogram**
-  - _Plan Item:_ Distance Histogram
-  - _Req ID:_ [Req 6]
-  - **Details:** Create logic to bin runs by distance (0-1mi, 1-2mi, etc.). Render a bar chart using these bins. This can be added to the "Running Stats" tab.
+  - [ ] **3.6a Implement Distance Histogram**
+    - **Details:** Create logic to bin runs by distance (0-1mi, 1-2mi, 2-3mi, etc.). Render a bar chart using these bins at the top of the Running Stats tab. Filter activities to only include running types (Run, TrailRun, VirtualRun).
+
+  - [ ] **3.6b Implement Running Statistics Summary**
+    - **Details:** Below the histogram, create component to compute and display: Total Runs, 10K+ Runs, Total Distance, Avg Pace. Calculate PRs (Fastest 10k, Longest Run) from the filtered list of running activities.
 
 ## Phase 4: Advanced Visualization & Trends
 
