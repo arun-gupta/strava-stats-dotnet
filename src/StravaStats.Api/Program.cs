@@ -63,6 +63,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Serve static files from wwwroot (for the minimal dashboard UI)
+app.UseStaticFiles();
+
 app.UseSession();
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
@@ -239,6 +242,9 @@ app.MapGet("/welcome", (HttpContext http) =>
         "</html>\n";
     return Results.Content(content, "text/html");
 });
+
+// Simple route to the static dashboard UI
+app.MapGet("/dashboard", () => Results.Redirect("/dashboard/index.html"));
 
 // Task 1.7: Logout — clear session and remove session cookie
 app.MapGet("/auth/logout", (HttpContext http) =>

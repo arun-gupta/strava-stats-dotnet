@@ -100,11 +100,13 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - _Plan Item:_ Dashboard Layout
   - _Req ID:_ N/A
   - **Details:** Scaffold the UI application (HTML/CSS/JS or SPA framework). Configure build pipeline if needed.
+  - Started on 2025-11-22: Added minimal static dashboard under `wwwroot/dashboard` with Pico.css.
 
 - [ ] **3.2 Implement Main Dashboard Grid**
   - _Plan Item:_ Dashboard Layout
   - _Req ID:_ N/A
   - **Details:** Create the responsive container and grid layout for widgets.
+  - Started on 2025-11-22: Implemented lightweight grid/cards in `index.html` for Totals and Recent Activities.
 
 - [ ] **3.3 Create State Management Store**
   - _Plan Item:_ Global State Management

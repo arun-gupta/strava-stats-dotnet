@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Strava Stats — Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2.0.6/css/pico.min.css">
+    <style>
+      :root { --brand: #f96332; }
+      header.container { margin-top: 1rem; }
+      .brand { color: var(--brand); font-weight: 600; }
+      .muted { color: #6b7280; }
+      .chip { display: inline-block; padding: .25rem .5rem; background: #f3f4f6; border-radius: 999px; font-size: .85rem; }
+      .right { text-align: right; }
+      table { font-size: .95rem; }
+      .distance { white-space: nowrap; }
+      .hidden { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <header class="container">
+      <nav>
+        <ul>
+          <li><span class="brand">Strava Stats</span></li>
+        </ul>
+        <ul id="authArea">
+          <li class="muted">Checking session…</li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section id="totalsCard">
+        <h4>Last 30 Days</h4>
+        <div id="totalsLoading">Loading totals…</div>
+        <div id="totals" class="hidden">
+          <div class="grid">
+            <article>
+              <header>Total Activities</header>
+              <strong id="totCount">—</strong>
+            </article>
+            <article>
+              <header>Total Distance</header>
+              <strong id="totDistance">—</strong>
+            </article>
+            <article>
+              <header>Total Moving Time</header>
+              <strong id="totTime">—</strong>
+            </article>
+            <article>
+              <header>Avg per Activity</header>
+              <strong id="avgPer">—</strong>
+            </article>
+          </div>
+        </div>
+        <div id="totalsEmpty" class="hidden">No activities in the last 30 days.</div>
+      </section>
+
+      <section>
+        <h4>Recent Activities</h4>
+        <div id="recentLoading">Loading recent activities…</div>
+        <div class="overflow-auto">
+          <table id="recentTable" class="hidden">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="right">Distance</th>
+                <th class="right">Moving Time</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div id="recentEmpty" class="hidden">No recent activities.</div>
+      </section>
+      <footer class="muted" style="margin-top:2rem">Built quickly with vanilla JS. Data from your Strava account.</footer>
+    </main>
+
+    <script type="module" src="/dashboard/app.js"></script>
+  </body>
+  </html>
