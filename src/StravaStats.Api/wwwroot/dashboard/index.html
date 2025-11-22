@@ -51,6 +51,7 @@
         <button class="tab-btn active" data-tab="overview">📊 Overview</button>
         <button class="tab-btn" data-tab="activity-count">📈 Activity Count</button>
         <button class="tab-btn" data-tab="time-dist">⏱️ Time Distribution</button>
+        <button class="tab-btn" data-tab="heatmap">🔥 Heatmap</button>
         <button class="tab-btn" data-tab="running-stats">🏃 Running Stats</button>
       </nav>
 
@@ -129,6 +130,46 @@
           </section>
         </div>
         <!-- End Time Distribution Tab -->
+
+        <!-- Heatmap Tab -->
+        <div id="tab-heatmap" class="tab-panel">
+          <section class="card">
+            <div class="flex-between">
+              <h4 style="margin:0">Activity Calendar</h4>
+              <div class="segmented">
+                <button id="hmAllBtn" class="seg-btn active" data-mode="all">All Activities</button>
+                <button id="hmRunBtn" class="seg-btn" data-mode="running">Running Only</button>
+              </div>
+            </div>
+
+            <div id="heatmapLegend" class="heatmap-legend" aria-hidden="true">
+              <span>Less</span>
+              <span class="legend-box level-0"></span>
+              <span class="legend-box level-1"></span>
+              <span class="legend-box level-2"></span>
+              <span class="legend-box level-3"></span>
+              <span class="legend-box level-4"></span>
+              <span>More</span>
+            </div>
+
+            <div id="heatmap" class="heatmap" role="img" aria-label="Activity calendar heatmap"></div>
+          </section>
+
+          <section class="card">
+            <h4>Streaks</h4>
+            <div class="grid">
+              <article>
+                <header>Current Streak</header>
+                <strong id="currentStreak">0 days</strong>
+              </article>
+              <article>
+                <header>Longest Streak</header>
+                <strong id="longestStreak">0 days</strong>
+              </article>
+            </div>
+          </section>
+        </div>
+        <!-- End Heatmap Tab -->
 
         <!-- Running Stats Tab -->
         <div id="tab-running-stats" class="tab-panel">

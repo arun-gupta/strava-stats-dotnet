@@ -163,10 +163,11 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Write a function to transform a list of activities into a map of `{ "YYYY-MM-DD": value }` for both "All Activities" (intensity by count or time) and "Running Only" (intensity by distance) modes.
   - Completed on 2025-11-22: Added `transformToHeatmapData(activities, mode)` function in app.js. Function accepts activities array and mode ('all' or 'running') and returns a map where each date key (YYYY-MM-DD) contains aggregated metrics: count (number of activities), time (total moving time in seconds), and distance (total distance in meters). Supports filtering to running types (Run, TrailRun, VirtualRun) when mode is 'running'. Extracts dates from start_local timestamps for proper timezone handling.
 
-- [ ] **4.2 Build Calendar Heatmap Component**
+- [x] **4.2 Build Calendar Heatmap Component**
   - _Plan Item:_ Heatmap Tab with Mode Toggle
   - _Req ID:_ [Req 5]
   - **Details:** Render a GitHub-style calendar grid. Add single "🔥 Heatmap" tab to dashboard with mode toggle/buttons to switch between "All Activities" and "Running Only" views. Calculate and display "Current Streak" and "Longest Streak" metrics based on consecutive days in the filtered dataset.
+  - Completed on 2025-11-22: Added "🔥 Heatmap" tab with segmented toggle for modes (All Activities vs Running Only). Implemented calendar heatmap grid (weeks as columns, days as rows) with 5-level color scale based on activity density (All = count/day, Running = distance/day). Integrated with global date range filter and reactive store; rerenders on filter, tab, or mode changes. Added streak metrics section computing Current and Longest streaks across the selected range. Accessible tooltips and ARIA labels included. Styled legend and cells in site.css.
 
 - [ ] **4.3 Implement Trend Aggregation Logic**
   - _Plan Item:_ Trend Calculation Engine

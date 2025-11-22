@@ -1,4 +1,4 @@
-import { getState, setUser, setAllActivities, setDateRange, setActiveTab, initializeUnitSystem, subscribe } from './js/state.js';
+import { getState, setUser, setAllActivities, setDateRange, setActiveTab, initializeUnitSystem, subscribe, setHeatmapMode } from './js/state.js';
 
 const authArea = document.getElementById('authArea');
 const recentLoading = document.getElementById('recentLoading');
@@ -22,6 +22,13 @@ const customEnd = document.getElementById('customEnd');
 
 const tabBtns = document.querySelectorAll('.tab-btn');
 const tabPanels = document.querySelectorAll('.tab-panel');
+
+// Heatmap elements
+const hmAllBtn = document.getElementById('hmAllBtn');
+const hmRunBtn = document.getElementById('hmRunBtn');
+const heatmapEl = document.getElementById('heatmap');
+const currentStreakEl = document.getElementById('currentStreak');
+const longestStreakEl = document.getElementById('longestStreak');
 
 // Chart instances
 let activityCountChart = null;
@@ -302,6 +309,18 @@ tabBtns.forEach(btn => {
     setActiveTab(tabName);
   });
 });
+
+// Heatmap mode toggle
+if (hmAllBtn && hmRunBtn) {
+  [hmAllBtn, hmRunBtn].forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.mode;
+      [hmAllBtn, hmRunBtn].forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      setHeatmapMode(mode);
+    });
+  });
+}
 
 // Generate chart colors
 function generateColors(count) {
@@ -683,6 +702,146 @@ function transformToHeatmapData(activities, mode = 'all') {
   return heatmapData;
 }
 
+// Build date range domain for heatmap grid
+function getDateDomain() {
+  const { dateRange, filteredActivities } = getState();
+  let start, end;
+
+  const today = new Date();
+  const endCandidate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+  if (dateRange.type === 'all') {
+    if (filteredActivities.length === 0) return null;
+    const dates = filteredActivities.map(a => new Date(a.start_local));
+    dates.sort((a,b) => a - b);
+    start = new Date(dates[0].getFullYear(), dates[0].getMonth(), dates[0].getDate());
+    end = new Date(dates[dates.length - 1].getFullYear(), dates[dates.length - 1].getMonth(), dates[dates.length - 1].getDate());
+  } else if (dateRange.type === 'custom' && dateRange.customStart) {
+    start = new Date(dateRange.customStart);
+    end = dateRange.customEnd ? new Date(dateRange.customEnd) : endCandidate;
+  } else {
+    // mirror filter logic
+    let afterDate;
+    const now = Date.now();
+    if (dateRange.type === 'last7') afterDate = new Date(now - 7*24*60*60*1000);
+    else if (dateRange.type === 'last30') afterDate = new Date(now - 30*24*60*60*1000);
+    else if (dateRange.type === 'last90') afterDate = new Date(now - 90*24*60*60*1000);
+    else if (dateRange.type === 'last6months') { const d = new Date(); d.setMonth(d.getMonth()-6); afterDate = d; }
+    else if (dateRange.type === 'ytd') afterDate = new Date(new Date().getFullYear(),0,1);
+    else afterDate = null;
+
+    if (!afterDate) return null;
+    start = new Date(afterDate.getFullYear(), afterDate.getMonth(), afterDate.getDate());
+    end = endCandidate;
+  }
+
+  // Align to week boundaries (weeks as columns, Sunday first)
+  const startDay = start.getDay();
+  const alignedStart = new Date(start);
+  alignedStart.setDate(alignedStart.getDate() - startDay);
+  const endDay = end.getDay();
+  const alignedEnd = new Date(end);
+  alignedEnd.setDate(alignedEnd.getDate() + (6 - endDay));
+
+  return { start: alignedStart, end: alignedEnd };
+}
+
+function quantizeLevel(value, maxValue) {
+  if (!maxValue || maxValue <= 0 || !value) return 0;
+  const ratio = value / maxValue;
+  if (ratio >= 0.80) return 4;
+  if (ratio >= 0.60) return 3;
+  if (ratio >= 0.35) return 2;
+  return 1;
+}
+
+function formatDayTitle(date, metrics, mode) {
+  const d = date.toLocaleDateString([], { dateStyle: 'medium' });
+  if (!metrics) return `${d}: No activity`;
+  if (mode === 'running') {
+    const km = (metrics.distance / 1000).toFixed(2);
+    return `${d}: ${km} km run`;
+  }
+  return `${d}: ${metrics.count} activity${metrics.count===1?'':'ies'}`;
+}
+
+function calculateStreaks(dayValues, endDate) {
+  // dayValues: array of {date: Date, active: boolean}, sorted asc
+  let longest = 0, current = 0;
+  let streak = 0;
+  const today = new Date();
+  const clampEnd = endDate > today ? new Date(today.getFullYear(), today.getMonth(), today.getDate()) : endDate;
+
+  for (let i = 0; i < dayValues.length; i++) {
+    const { active } = dayValues[i];
+    if (active) {
+      streak += 1;
+      longest = Math.max(longest, streak);
+    } else {
+      streak = 0;
+    }
+  }
+
+  // Compute current streak ending at clampEnd
+  current = 0;
+  for (let i = dayValues.length - 1; i >= 0; i--) {
+    const { date, active } = dayValues[i];
+    if (date > clampEnd) continue;
+    if (active) current += 1; else break;
+  }
+  return { current, longest };
+}
+
+function renderHeatmap(activities) {
+  if (!heatmapEl) return;
+  const { heatmapMode } = getState();
+  const domain = getDateDomain();
+  heatmapEl.innerHTML = '';
+  if (!domain) return;
+
+  const map = transformToHeatmapData(activities, heatmapMode);
+
+  // Build values per day over full domain and compute max
+  const days = [];
+  let maxValue = 0;
+  for (let d = new Date(domain.start); d <= domain.end; d.setDate(d.getDate()+1)) {
+    const key = d.toISOString().split('T')[0];
+    const metrics = map[key];
+    let value = 0;
+    if (metrics) {
+      value = (heatmapMode === 'running') ? metrics.distance : metrics.count;
+    }
+    maxValue = Math.max(maxValue, value);
+    days.push({ date: new Date(d), value, metrics });
+  }
+
+  // Create week columns (7 rows)
+  const weeks = [];
+  for (let i = 0; i < days.length; i += 7) {
+    weeks.push(days.slice(i, i+7));
+  }
+
+  weeks.forEach(week => {
+    const col = document.createElement('div');
+    col.className = 'week';
+    week.forEach(({ date, value, metrics }) => {
+      const cell = document.createElement('div');
+      const level = quantizeLevel(value, maxValue);
+      cell.className = `day level-${level}`;
+      cell.title = formatDayTitle(date, metrics, heatmapMode);
+      cell.setAttribute('aria-label', cell.title);
+      col.appendChild(cell);
+    });
+    heatmapEl.appendChild(col);
+  });
+
+  // Streaks
+  const dayValues = days.map(x => ({ date: x.date, active: x.value > 0 }));
+  const { longest, current } = calculateStreaks(dayValues, domain.end);
+  if (currentStreakEl) currentStreakEl.textContent = `${current} day${current===1?'':'s'}`;
+  if (longestStreakEl) longestStreakEl.textContent = `${longest} day${longest===1?'':'s'}`;
+}
+
 // Update UI when active tab changes
 function updateActiveTab() {
   const { activeTab } = getState();
@@ -720,6 +879,7 @@ subscribe((state) => {
     renderTimeDistChart(state.filteredActivities);
     renderDistanceHistogram(state.filteredActivities);
     renderRunningStats(state.filteredActivities);
+    renderHeatmap(state.filteredActivities);
   }
 });
 
@@ -731,4 +891,5 @@ loadData().then(() => {
   renderTimeDistChart(filteredActivities);
   renderDistanceHistogram(filteredActivities);
   renderRunningStats(filteredActivities);
+  renderHeatmap(filteredActivities);
 });

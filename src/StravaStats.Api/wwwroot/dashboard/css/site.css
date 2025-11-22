@@ -159,3 +159,28 @@
     height: 500px;
   }
 }
+
+/* Heatmap */
+.flex-between { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.segmented { display: inline-flex; border: 1px solid var(--pico-muted-border-color); border-radius: 8px; overflow: hidden; }
+.seg-btn { margin: 0; padding: .4rem .8rem; border: 0; background: transparent; cursor: pointer; font-size: .9rem; color: var(--pico-muted-color); }
+.seg-btn.active { background: var(--pico-primary-background); color: var(--pico-primary-inverse); }
+
+.heatmap { display: flex; gap: 4px; overflow-x: auto; padding: .5rem 0; }
+.heatmap .week { display: flex; flex-direction: column; gap: 4px; }
+.heatmap .day { width: 12px; height: 12px; border-radius: 2px; background: var(--heatmap-empty, #ebedf0); }
+.heatmap .day:hover { outline: 1px solid var(--pico-muted-border-color); }
+
+/* Color levels (GitHub-like) using brand hue */
+.heatmap-legend { display: flex; align-items: center; gap: 6px; margin: .5rem 0 1rem; font-size: .85rem; color: var(--pico-muted-color); }
+.legend-box { display: inline-block; width: 12px; height: 12px; border-radius: 2px; background: #ebedf0; }
+.legend-box.level-0 { background: #ebedf0; }
+.legend-box.level-1 { background: #fde2d6; }
+.legend-box.level-2 { background: #fbbda1; }
+.legend-box.level-3 { background: #f9936f; }
+.legend-box.level-4 { background: #f96332; }
+.day.level-0 { background: #ebedf0; }
+.day.level-1 { background: #fde2d6; }
+.day.level-2 { background: #fbbda1; }
+.day.level-3 { background: #f9936f; }
+.day.level-4 { background: #f96332; }

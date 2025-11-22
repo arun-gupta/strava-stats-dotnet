@@ -6,7 +6,8 @@ const state = {
   filteredActivities: [],
   dateRange: { type: 'last30', customStart: null, customEnd: null }, // type: 'all' | 'ytd' | 'last30' | 'custom'
   unitSystem: 'imperial', // 'metric' | 'imperial'
-  activeTab: 'overview', // 'overview' | 'activity-count' | 'time-dist' | etc.
+  activeTab: 'overview', // 'overview' | 'activity-count' | 'time-dist' | 'heatmap' | etc.
+  heatmapMode: 'all', // 'all' | 'running'
 };
 
 const subscribers = [];
@@ -103,6 +104,14 @@ function applyFilter() {
 export function setActiveTab(tabName) {
   state.activeTab = tabName;
   notify();
+}
+
+// Set heatmap mode
+export function setHeatmapMode(mode) {
+  if (mode === 'all' || mode === 'running') {
+    state.heatmapMode = mode;
+    notify();
+  }
 }
 
 // Initialize unit system from browser locale
