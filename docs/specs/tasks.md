@@ -96,11 +96,16 @@ This document tracks the step-by-step technical tasks required to build the Stra
 
 ## Phase 3: Dashboard Framework & Basic Widgets
 
-- [ ] **3.1 Setup Frontend Project Structure**
+- [x] **3.1 Setup Frontend Project Structure**
   - _Plan Item:_ Dashboard Layout
   - _Req ID:_ N/A
   - **Details:** Scaffold the UI application (HTML/CSS/JS or SPA framework). Configure build pipeline if needed.
-  - Started on 2025-11-22: Added minimal static dashboard under `wwwroot/dashboard` with Pico.css.
+  - Completed on 2025-11-22: Static dashboard scaffold under `src/StravaStats.Api/wwwroot/dashboard` with Pico.css and project CSS. Entry `index.html` served at `/dashboard/` loading `app.js`. Basic features:
+    - Auth status with links to `/auth/login` and `/auth/logout`
+    - Recent Activities table (first page via `/activities/normalized`)
+    - Last 30 days totals (via `/activities/all/normalized`)
+    - Graceful empty/unauthorized states
+    - File structure created: `css/site.css`, and initial JS module placeholders in `js/` for future state/UI refactors.
 
 - [ ] **3.2 Implement Main Dashboard Grid**
   - _Plan Item:_ Dashboard Layout

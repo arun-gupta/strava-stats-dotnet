@@ -1,0 +1,8 @@
+/* Project-specific tweaks for the dashboard */
+:root { --brand: #f96332; }
+.brand { color: var(--brand); font-weight: 600; }
+.muted { color: #6b7280; }
+.chip { display: inline-block; padding: .25rem .5rem; background: #f3f4f6; border-radius: 999px; font-size: .85rem; }
+.right { text-align: right; }
+.hidden { display: none !important; }
+.distance { white-space: nowrap; }
