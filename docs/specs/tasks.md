@@ -274,7 +274,34 @@ This document tracks the step-by-step technical tasks required to build the Stra
     - **Automatic Persistence**: Preferences are saved automatically whenever changed via `setUnitSystem()` or `setDateRange()` functions
     - Users' filter and unit preferences now persist across browser sessions and page reloads
 
-- [ ] **5.5 Conduct Security Audit**
+- [x] **5.5 Conduct Security Audit**
   - _Plan Item:_ Security Review
   - _Req ID:_ [Req 1], [Req 2]
   - **Details:** Verify no secrets are committed. Test that logging out invalidates the token. Verify tokens are not accessible via client-side JS (if using HttpOnly cookies).
+  - Completed on 2025-11-22: Conducted comprehensive security audit with the following findings:
+    - **✅ Secrets Management**:
+      - No secrets or credentials are committed to git repository
+      - `.gitignore` properly excludes `.env`, `.env*`, and `secrets.json` files
+      - Verified `.env` file is not tracked in git history
+      - All secrets are loaded from environment variables or user secrets
+      - Configuration properly maps environment variables: `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `SESSION_SECRET`
+    - **✅ Session & Cookie Security**:
+      - Session cookies are configured with `HttpOnly = true` (Program.cs:44), preventing client-side JavaScript access
+      - Cookies use `SameSite = Lax` for CSRF protection while allowing OAuth redirects
+      - Cookie security policy is `SameAsRequest` (works with HTTP in dev, requires HTTPS in prod)
+      - Session data is stored server-side; only session ID is sent to client
+      - No tokens or sensitive data are accessible via client-side JavaScript
+    - **✅ Token Management**:
+      - Access tokens and refresh tokens are stored in server-side session storage
+      - Tokens are never exposed to client-side JavaScript
+      - No token references found in client-side code (verified via grep)
+    - **✅ Logout & Token Invalidation**:
+      - Logout endpoint (`/auth/logout`) properly clears session with `Session.Clear()`
+      - Session cookie is explicitly deleted on logout
+      - Both GET and POST logout methods implemented for flexibility
+      - Users are redirected to welcome page after logout
+      - Token invalidation is immediate (server-side session cleared)
+    - **⚠️ Security Headers** (Optional Enhancement):
+      - No HSTS, Content-Security-Policy, or X-Frame-Options headers currently configured
+      - Not critical for development but recommended for production deployment
+      - Consider adding security headers middleware for production
