@@ -90,6 +90,7 @@
         <div id="tab-overview" class="tab-panel active">
           <section class="card">
             <h4>Activity Count Distribution</h4>
+            <div id="activityCountEmpty" class="hidden">No activities in the selected date range.</div>
             <div class="chart-container">
               <div id="activityCountLoading" class="loading">
                 <div class="spinner"></div>
@@ -105,6 +106,7 @@
         <div id="tab-time-dist" class="tab-panel">
           <section class="card">
             <h4>Duration by Type</h4>
+            <div id="timeDistEmpty" class="hidden">No activities in the selected date range.</div>
             <div class="chart-container">
               <div id="timeDistLoading" class="loading">
                 <div class="spinner"></div>
@@ -202,6 +204,7 @@
 
           <section class="card">
             <h4>Distance Over Time</h4>
+            <div id="distanceTrendEmpty" class="hidden">No running activities in the selected date range.</div>
             <div class="chart-container">
               <div id="distanceTrendLoading" class="loading">
                 <div class="spinner"></div>
@@ -213,7 +216,7 @@
 
           <section class="card">
             <h4>Pace Over Time</h4>
-            <div id="paceTrendEmpty" class="hidden">Pace data only available for running activities.</div>
+            <div id="paceTrendEmpty" class="hidden">No running activities in the selected date range.</div>
             <div class="chart-container">
               <div id="paceTrendLoading" class="loading">
                 <div class="spinner"></div>
@@ -263,6 +266,7 @@
 
           <section class="card">
             <h4>Distance Distribution</h4>
+            <div id="distanceHistogramEmpty" class="hidden">No running activities in the selected date range.</div>
             <div class="chart-container">
               <div id="distanceHistogramLoading" class="loading">
                 <div class="spinner"></div>

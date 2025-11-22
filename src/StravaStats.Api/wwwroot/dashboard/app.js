@@ -340,11 +340,24 @@ function generateColors(count) {
 function renderActivityCountChart(activities) {
   const ctx = document.getElementById('activityCountChart');
   const loadingEl = document.getElementById('activityCountLoading');
+  const emptyEl = document.getElementById('activityCountEmpty');
   if (!ctx) return;
 
   // Show loading state
   if (loadingEl) loadingEl.style.display = 'flex';
   ctx.style.display = 'none';
+  if (emptyEl) emptyEl.classList.add('hidden');
+
+  // Check for empty data
+  if (!activities || activities.length === 0) {
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (emptyEl) emptyEl.classList.remove('hidden');
+    if (activityCountChart) {
+      activityCountChart.destroy();
+      activityCountChart = null;
+    }
+    return;
+  }
 
   // Group by sport_type
   const counts = {};
@@ -422,11 +435,24 @@ function renderActivityCountChart(activities) {
 function renderTimeDistChart(activities) {
   const ctx = document.getElementById('timeDistChart');
   const loadingEl = document.getElementById('timeDistLoading');
+  const emptyEl = document.getElementById('timeDistEmpty');
   if (!ctx) return;
 
   // Show loading state
   if (loadingEl) loadingEl.style.display = 'flex';
   ctx.style.display = 'none';
+  if (emptyEl) emptyEl.classList.add('hidden');
+
+  // Check for empty data
+  if (!activities || activities.length === 0) {
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (emptyEl) emptyEl.classList.remove('hidden');
+    if (timeDistChart) {
+      timeDistChart.destroy();
+      timeDistChart = null;
+    }
+    return;
+  }
 
   // Group by sport_type, sum moving_time_s
   const times = {};
@@ -515,15 +541,28 @@ function renderTimeDistChart(activities) {
 function renderDistanceHistogram(activities) {
   const ctx = document.getElementById('distanceHistogramChart');
   const loadingEl = document.getElementById('distanceHistogramLoading');
+  const emptyEl = document.getElementById('distanceHistogramEmpty');
   if (!ctx) return;
 
   // Show loading state
   if (loadingEl) loadingEl.style.display = 'flex';
   ctx.style.display = 'none';
+  if (emptyEl) emptyEl.classList.add('hidden');
 
   // Filter to running activities only
   const runningTypes = ['Run', 'TrailRun', 'VirtualRun'];
   const runs = activities.filter(a => runningTypes.includes(a.sport_type));
+
+  // Check for empty data
+  if (!runs || runs.length === 0) {
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (emptyEl) emptyEl.classList.remove('hidden');
+    if (distanceHistogramChart) {
+      distanceHistogramChart.destroy();
+      distanceHistogramChart = null;
+    }
+    return;
+  }
 
   // Get unit system
   const { unitSystem } = getState();
@@ -1185,11 +1224,13 @@ let trendGranularity = 'week';
 function renderDistanceTrendChart(activities) {
   const ctx = document.getElementById('distanceTrendChart');
   const loadingEl = document.getElementById('distanceTrendLoading');
+  const emptyEl = document.getElementById('distanceTrendEmpty');
   if (!ctx) return;
 
   // Show loading state
   if (loadingEl) loadingEl.style.display = 'flex';
   ctx.style.display = 'none';
+  if (emptyEl) emptyEl.classList.add('hidden');
 
   const { unitSystem } = getState();
 
@@ -1202,6 +1243,7 @@ function renderDistanceTrendChart(activities) {
       distanceTrendChart = null;
     }
     if (loadingEl) loadingEl.style.display = 'none';
+    if (emptyEl) emptyEl.classList.remove('hidden');
     return;
   }
 

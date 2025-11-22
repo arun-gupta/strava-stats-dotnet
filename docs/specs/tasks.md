@@ -230,10 +230,18 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Show visual feedback while data is being fetched or re-calculated.
   - Completed on 2025-11-22: Added loading spinner animations to all chart components (Activity Count, Time Distribution, Distance Histogram, Distance Trend, Pace Trend). Created CSS styles for `.loading`, `.spinner` with rotation animation, and `.loading-text`. Each chart rendering function now shows a loading spinner before rendering and hides it after the chart is displayed. Initial data fetch already shows "Loading activities..." message in totals section.
 
-- [ ] **5.2 Handle "No Data" States**
+- [x] **5.2 Handle "No Data" States**
   - _Plan Item:_ Empty States
   - _Req ID:_ [Req 10]
   - **Details:** Ensure widgets display a friendly message if the date filter results in zero activities.
+  - Completed on 2025-11-22: Added empty state handling to all charts and tabs:
+    - **Overview Tab**: Shows "No activities in the selected date range" when activity count chart has no data
+    - **Duration Tab**: Shows "No activities in the selected date range" when time distribution chart has no data
+    - **Trends Tab**: Shows "No running activities in the selected date range" for both distance and pace charts when no running data exists
+    - **Running Stats Tab**: Shows "No running activities in the selected date range" for both running summary cards and distance histogram when no running data exists
+    - **Dashboard Summary**: Already had empty state handling with dynamic messages based on date range type
+    - Added CSS styling for consistent empty state appearance (padding, centering, muted color)
+    - All chart functions now check for empty data, destroy existing charts, hide loading spinner, and show empty message before attempting to render
 
 - [ ] **5.3 Implement Global Error Boundary/Toast**
   - _Plan Item:_ Error Handling UI

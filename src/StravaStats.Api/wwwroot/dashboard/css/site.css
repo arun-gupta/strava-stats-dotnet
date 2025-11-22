@@ -357,3 +357,17 @@
   font-size: 0.9rem;
   margin-top: 0.5rem;
 }
+
+/* Empty States */
+#activityCountEmpty,
+#timeDistEmpty,
+#distanceTrendEmpty,
+#distanceHistogramEmpty,
+#paceTrendEmpty,
+#runningStatsEmpty,
+#summaryEmpty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--pico-muted-color);
+  font-size: 0.95rem;
+}
