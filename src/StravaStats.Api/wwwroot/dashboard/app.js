@@ -5,6 +5,79 @@ Chart.register(ChartDataLabels);
 
 const authArea = document.getElementById('authArea');
 
+// Toast notification system
+const toastContainer = document.getElementById('toastContainer');
+let toastIdCounter = 0;
+
+function showToast({ type = 'info', title, message, duration = 5000 }) {
+  const toastId = `toast-${toastIdCounter++}`;
+
+  const icons = {
+    error: '❌',
+    warning: '⚠️',
+    info: 'ℹ️',
+    success: '✅'
+  };
+
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.id = toastId;
+  toast.setAttribute('role', 'alert');
+
+  toast.innerHTML = `
+    <div class="toast-icon">${icons[type] || icons.info}</div>
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      ${message ? `<div class="toast-message">${message}</div>` : ''}
+    </div>
+    <button class="toast-close" aria-label="Close notification">×</button>
+  `;
+
+  const closeBtn = toast.querySelector('.toast-close');
+  closeBtn.addEventListener('click', () => removeToast(toastId));
+
+  toastContainer.appendChild(toast);
+
+  if (duration > 0) {
+    setTimeout(() => removeToast(toastId), duration);
+  }
+
+  return toastId;
+}
+
+function removeToast(toastId) {
+  const toast = document.getElementById(toastId);
+  if (!toast) return;
+
+  toast.classList.add('toast-removing');
+  setTimeout(() => {
+    if (toast.parentNode) {
+      toast.parentNode.removeChild(toast);
+    }
+  }, 300); // Match animation duration
+}
+
+// Global error handler for uncaught errors
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('Unhandled promise rejection:', event.reason);
+  showToast({
+    type: 'error',
+    title: 'Unexpected Error',
+    message: 'An unexpected error occurred. Please try refreshing the page.',
+    duration: 7000
+  });
+});
+
+window.addEventListener('error', (event) => {
+  console.error('Uncaught error:', event.error);
+  showToast({
+    type: 'error',
+    title: 'Unexpected Error',
+    message: 'An unexpected error occurred. Please try refreshing the page.',
+    duration: 7000
+  });
+});
+
 // Dashboard Summary elements
 const summaryLoading = document.getElementById('summaryLoading');
 const summary = document.getElementById('summary');
@@ -68,9 +141,67 @@ function setAuthUI(isSignedIn, name) {
 }
 
 async function fetchJson(url) {
-  const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
-  if (!resp.ok) throw new Error(`${resp.status}`);
-  return await resp.json();
+  try {
+    const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+
+    if (!resp.ok) {
+      // Handle specific HTTP error codes
+      if (resp.status === 401) {
+        showToast({
+          type: 'error',
+          title: 'Authentication Required',
+          message: 'Your session has expired. Please sign in again.',
+          duration: 7000
+        });
+        setTimeout(() => {
+          window.location.href = '/auth/login';
+        }, 2000);
+      } else if (resp.status === 500) {
+        showToast({
+          type: 'error',
+          title: 'Server Error',
+          message: 'The server encountered an error. Please try again later.',
+          duration: 7000
+        });
+      } else if (resp.status === 429) {
+        showToast({
+          type: 'warning',
+          title: 'Too Many Requests',
+          message: 'Please wait a moment before trying again.',
+          duration: 7000
+        });
+      } else if (resp.status >= 400 && resp.status < 500) {
+        showToast({
+          type: 'error',
+          title: 'Request Failed',
+          message: `Error ${resp.status}: Unable to complete request.`,
+          duration: 5000
+        });
+      } else {
+        showToast({
+          type: 'error',
+          title: 'Network Error',
+          message: 'Unable to connect to the server. Please check your connection.',
+          duration: 5000
+        });
+      }
+
+      throw new Error(`HTTP ${resp.status}`);
+    }
+
+    return await resp.json();
+  } catch (error) {
+    // Network errors (offline, DNS failure, etc.)
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      showToast({
+        type: 'error',
+        title: 'Connection Error',
+        message: 'Unable to reach the server. Please check your internet connection.',
+        duration: 7000
+      });
+    }
+    throw error;
+  }
 }
 
 async function loadAuth() {
@@ -156,8 +287,19 @@ async function loadData() {
   } catch (e) {
     console.error('Failed to load activities:', e);
     summaryLoading.classList.add('hidden');
-    summaryEmpty.textContent = 'Failed to load totals.';
+    summaryEmpty.textContent = 'Failed to load activities. Please try refreshing the page.';
     summaryEmpty.classList.remove('hidden');
+
+    // Toast is already shown by fetchJson, so we don't need to show another one
+    // unless this is a non-fetch error
+    if (!(e.message && e.message.startsWith('HTTP'))) {
+      showToast({
+        type: 'error',
+        title: 'Failed to Load Activities',
+        message: 'An unexpected error occurred while loading your activities.',
+        duration: 7000
+      });
+    }
   }
 }
 

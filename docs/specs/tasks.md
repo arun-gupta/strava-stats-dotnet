@@ -243,10 +243,22 @@ This document tracks the step-by-step technical tasks required to build the Stra
     - Added CSS styling for consistent empty state appearance (padding, centering, muted color)
     - All chart functions now check for empty data, destroy existing charts, hide loading spinner, and show empty message before attempting to render
 
-- [ ] **5.3 Implement Global Error Boundary/Toast**
+- [x] **5.3 Implement Global Error Boundary/Toast**
   - _Plan Item:_ Error Handling UI
   - _Req ID:_ [Req 10]
   - **Details:** Catch API errors (401, 500) and display a user-friendly notification or error page.
+  - Completed on 2025-11-22: Implemented comprehensive toast notification system for user-friendly error handling:
+    - **Toast Notification Component**: Created reusable toast system with 4 types (error, warning, info, success) with distinct styling (red, orange, blue, green borders)
+    - **CSS Styling**: Added toast container (fixed top-right), slide-in/out animations, close button, responsive design for mobile
+    - **Global Error Boundary**: Added window event listeners for `unhandledrejection` and `error` to catch uncaught errors and promise rejections
+    - **API Error Handling**: Enhanced `fetchJson()` to show appropriate toasts for:
+      - 401 Unauthorized: Shows "Authentication Required" toast and redirects to login after 2 seconds
+      - 500 Server Error: Shows "Server Error" toast with retry suggestion
+      - 429 Too Many Requests: Shows "Too Many Requests" warning toast
+      - 4xx Client Errors: Shows generic "Request Failed" error toast
+      - Network errors: Shows "Connection Error" toast for offline/DNS failures
+    - **Activity Load Error Handling**: Updated `loadData()` to show user-friendly error message in dashboard summary and avoid duplicate toasts
+    - All toasts include icon, title, message, close button, and auto-dismiss after 5-7 seconds
 
 - [ ] **5.4 Persist User Preferences**
   - _Plan Item:_ Persist User Settings
