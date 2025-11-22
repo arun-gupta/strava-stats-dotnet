@@ -33,7 +33,7 @@ This document outlines the development phases for the Strava Activity Analyzer, 
 | **High** | **Global State Management**: Set up state for `Activities`, `DateRange`, and `UnitPreference`. | [Req 8], [Req 9] |
 | **High** | **Date Filter Controls**: Implement UI for selecting presets (30 days, YTD, etc.) and custom date ranges. | [Req 8] |
 | **High** | **Running Statistics Component**: Implement the logic and UI to calculate totals (count, distance) and find PRs (fastest 10k, etc.). | [Req 6] |
-| **Medium** | **Activity Distribution Charts**: Implement Pie/Donut charts for "Activity Count" and "Time Distribution". | [Req 4] |
+| **Medium** | **Activity Distribution Charts**: Implement Pie/Donut charts for "Activity Count" and "Time Distribution" with data labels displayed on chart slices for segments > 5%. | [Req 4] |
 | **Medium** | **Distance Histogram**: Implement the bar chart showing the distribution of run distances (1-mile bins). | [Req 6] |
 
 ## Phase 4: Advanced Visualization & Trends

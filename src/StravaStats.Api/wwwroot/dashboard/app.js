@@ -367,6 +367,18 @@ function renderActivityCountChart(activities) {
               return `${label}: ${value} (${percentage}%)`;
             }
           }
+        },
+        datalabels: {
+          color: '#fff',
+          font: {
+            weight: 'bold',
+            size: 14
+          },
+          formatter: (value, context) => {
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const percentage = ((value / total) * 100).toFixed(0);
+            return percentage > 5 ? value : ''; // Only show label if slice is > 5%
+          }
         }
       }
     }
@@ -436,6 +448,20 @@ function renderTimeDistChart(activities) {
               const percentage = ((context.parsed / total) * 100).toFixed(1);
               return `${label}: ${formatTime(seconds)} (${percentage}%)`;
             }
+          }
+        },
+        datalabels: {
+          color: '#fff',
+          font: {
+            weight: 'bold',
+            size: 14
+          },
+          formatter: (value, context) => {
+            const index = context.dataIndex;
+            const seconds = dataInSeconds[index];
+            const total = data.reduce((a, b) => a + b, 0);
+            const percentage = ((value / total) * 100).toFixed(0);
+            return percentage > 5 ? formatTime(seconds) : ''; // Only show label if slice is > 5%
           }
         }
       }

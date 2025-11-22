@@ -134,12 +134,13 @@ This document tracks the step-by-step technical tasks required to build the Stra
 - [x] **3.5 Implement Activity Distribution Charts**
   - _Plan Item:_ Activity Distribution Charts
   - _Req ID:_ [Req 4]
-  - **Details:** Integrate a chart library (e.g., Chart.js, Recharts). Create Pie/Donut charts for "Count by Type" and "Time by Type". Add "Activity Count" and "Time Distribution" tabs to dashboard.
-  - Completed on 2025-11-22: Integrated Chart.js (v4.4.0) via CDN. Added two new tabs: "📈 Activity Count" and "⏱️ Time Distribution". Implemented donut charts that group activities by `sport_type`:
-    - **Activity Count Chart**: Shows number of activities per type with count and percentage in tooltips
-    - **Time Distribution Chart**: Shows total time per type with HH:MM format (e.g., "12h 34m") and percentage in tooltips
+  - **Details:** Integrate a chart library (e.g., Chart.js, Recharts). Create Pie/Donut charts for "Count by Type" and "Time by Type". Add "Activity Count" and "Time Distribution" tabs to dashboard. Display data labels on chart slices for segments representing more than 5% of the total.
+  - Completed on 2025-11-22: Integrated Chart.js (v4.4.0) and chartjs-plugin-datalabels (v2.2.0) via CDN. Added two new tabs: "📈 Activity Count" and "⏱️ Time Distribution". Implemented donut charts that group activities by `sport_type`:
+    - **Activity Count Chart**: Shows number of activities per type with count and percentage in tooltips, plus count values displayed directly on slices > 5%
+    - **Time Distribution Chart**: Shows total time per type with HH:MM format (e.g., "12h 34m") and percentage in tooltips, plus time values displayed directly on slices > 5%
     - Both charts use color-coded legends positioned on the right, are responsive (400px mobile, 500px desktop), and automatically update when date range filter changes via subscriber pattern
     - Added `generateColors()` helper with 10 distinct colors for consistent styling
+    - Data labels use white bold text (14px) and only show for segments > 5% to avoid clutter on small slices
 
 - [x] **3.6 Implement Running Stats Tab**
   - _Plan Item:_ Running Statistics Component & Distance Histogram
