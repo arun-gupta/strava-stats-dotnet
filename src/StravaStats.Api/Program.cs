@@ -53,6 +53,7 @@ builder.Services.AddHttpClient("strava", c =>
     c.BaseAddress = new Uri("https://www.strava.com/api/v3/");
 });
 builder.Services.AddTransient<StravaStats.Api.Services.IStravaApiClient, StravaStats.Api.Services.StravaApiClient>();
+builder.Services.AddTransient<StravaStats.Api.Services.IActivityNormalizer, StravaStats.Api.Services.ActivityNormalizer>();
 
 var app = builder.Build();
 
@@ -413,6 +414,79 @@ app.MapGet("/activities/all", async (
             maxPages: Math.Clamp(max_pages ?? 100, 1, 1000),
             ct: ct);
         return Results.Ok(all);
+    }
+    catch (HttpRequestException ex) when (ex.StatusCode.HasValue)
+    {
+        return Results.Problem(title: "Strava API call failed", detail: ex.Message, statusCode: (int)ex.StatusCode!.Value);
+    }
+});
+
+// Task 2.5: normalized variants using ActivityNormalizer
+// GET /activities/normalized — single page normalized
+app.MapGet("/activities/normalized", async (
+    HttpContext http,
+    IHttpClientFactory httpClientFactory,
+    IOptions<StravaOptions> strava,
+    StravaStats.Api.Services.IStravaApiClient api,
+    StravaStats.Api.Services.IActivityNormalizer normalizer,
+    int? page,
+    int? per_page,
+    long? before,
+    long? after) =>
+{
+    var ok = await EnsureAccessTokenAsync(http, httpClientFactory, strava);
+    if (!ok.ok)
+    {
+        return Results.Unauthorized();
+    }
+
+    try
+    {
+        var (activities, _) = await api.GetActivitiesAsync(
+            ok.accessToken!,
+            page ?? 1,
+            per_page ?? 30,
+            before,
+            after);
+        var normalized = normalizer.NormalizeMany(activities);
+        return Results.Ok(normalized);
+    }
+    catch (HttpRequestException ex) when (ex.StatusCode.HasValue)
+    {
+        return Results.Problem(title: "Strava API call failed", detail: ex.Message, statusCode: (int)ex.StatusCode!.Value);
+    }
+});
+
+// GET /activities/all/normalized — all pages normalized
+app.MapGet("/activities/all/normalized", async (
+    HttpContext http,
+    IHttpClientFactory httpClientFactory,
+    IOptions<StravaOptions> strava,
+    StravaStats.Api.Services.IStravaApiClient api,
+    StravaStats.Api.Services.IActivityNormalizer normalizer,
+    int? per_page,
+    long? before,
+    long? after,
+    int? max_pages,
+    CancellationToken ct) =>
+{
+    var ok = await EnsureAccessTokenAsync(http, httpClientFactory, strava);
+    if (!ok.ok)
+    {
+        return Results.Unauthorized();
+    }
+
+    try
+    {
+        var (all, _) = await api.GetAllActivitiesAsync(
+            ok.accessToken!,
+            perPage: per_page ?? 100,
+            before: before,
+            after: after,
+            maxPages: Math.Clamp(max_pages ?? 100, 1, 1000),
+            ct: ct);
+        var normalized = normalizer.NormalizeMany(all);
+        return Results.Ok(normalized);
     }
     catch (HttpRequestException ex) when (ex.StatusCode.HasValue)
     {
