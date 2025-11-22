@@ -23,8 +23,9 @@
       </nav>
     </header>
 
-    <main class="container">
-      <section id="totalsCard">
+    <main class="container" role="main">
+      <div class="dashboard-grid">
+      <section id="totalsCard" class="card">
         <h4>Last 30 Days</h4>
         <div id="totalsLoading">Loading totals…</div>
         <div id="totals" class="hidden">
@@ -50,10 +51,10 @@
         <div id="totalsEmpty" class="hidden">No activities in the last 30 days.</div>
       </section>
 
-      <section>
+      <section class="card">
         <h4>Recent Activities</h4>
         <div id="recentLoading">Loading recent activities…</div>
-        <div class="overflow-auto">
+        <div class="overflow-auto card-scroll">
           <table id="recentTable" class="hidden">
             <thead>
               <tr>
@@ -69,6 +70,7 @@
         </div>
         <div id="recentEmpty" class="hidden">No recent activities.</div>
       </section>
+      </div>
       <footer class="muted" style="margin-top:2rem">Built quickly with vanilla JS. Data from your Strava account.</footer>
     </main>
 

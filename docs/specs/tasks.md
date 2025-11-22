@@ -111,7 +111,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - _Plan Item:_ Dashboard Layout
   - _Req ID:_ N/A
   - **Details:** Create the responsive container and grid layout for widgets.
-  - Started on 2025-11-22: Implemented lightweight grid/cards in `index.html` for Totals and Recent Activities.
+  - Completed on 2025-11-22: Added `.dashboard-grid` responsive CSS (1/2/3 columns at mobile/tablet/desktop) and wrapped Totals and Recent cards into the grid. Added `.card` padding helper and `.card-scroll` overflow helper. No JS changes required.
 
 - [ ] **3.3 Create State Management Store**
   - _Plan Item:_ Global State Management

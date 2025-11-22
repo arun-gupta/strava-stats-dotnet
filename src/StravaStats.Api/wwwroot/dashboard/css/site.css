@@ -6,3 +6,29 @@
 .right { text-align: right; }
 .hidden { display: none !important; }
 .distance { white-space: nowrap; }
+
+/* 3.2: Responsive dashboard grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1200px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+/* Card helpers */
+.card { padding: 0.5rem 0.75rem; }
+.card header { margin-bottom: 0.25rem; }
+
+/* Tables overflow safe inside cards */
+.card-scroll { overflow: auto; }
