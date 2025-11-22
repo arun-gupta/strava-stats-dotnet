@@ -42,10 +42,8 @@ After signing in with Strava, you’ll be redirected to your dashboard:
 
 ## Configuration (secrets)
 
-Keep the README simple: use one of the following, and see docs for full instructions.
-
-- Quick local setup: copy `.env.example` to `.env`, fill in your Strava app creds and a session secret, then run `./start.sh` (it auto-loads `.env`).
-- Alternative methods (dotnet user-secrets, environment variables for CI/containers), supported keys, and security notes are documented in `docs/setup.md`.
+- Quick local: copy `.env.example` → `.env`, set your Strava client ID/secret and a session secret, then run `./start.sh` (it auto-loads `.env`).
+- Full details (user-secrets, env vars for CI/containers, supported keys, security notes): see `docs/setup.md#configure-secrets`.
 
 ## Repo structure
 
