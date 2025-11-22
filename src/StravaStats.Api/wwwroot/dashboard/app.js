@@ -708,7 +708,11 @@ function formatDayTitle(date, metrics, mode) {
     const km = (metrics.distance / 1000).toFixed(2);
     return `${d}: ${km} km run`;
   }
-  return `${d}: ${metrics.count} activity${metrics.count===1?'':'ies'}`;
+  // Format time for All Activities mode
+  const hours = Math.floor(metrics.time / 3600);
+  const minutes = Math.floor((metrics.time % 3600) / 60);
+  const timeStr = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+  return `${d}: ${timeStr} active`;
 }
 
 function calculateStreaks(dayValues, endDate) {
