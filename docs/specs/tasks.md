@@ -165,7 +165,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
 - [ ] **4.2 Build Calendar Heatmap Component**
   - _Plan Item:_ Workout & Running Heatmaps
   - _Req ID:_ [Req 5]
-  - **Details:** Render a GitHub-style calendar grid. Support two modes: "All Activities" (intensity = frequency) and "Running" (intensity = distance). Add "Workout Heatmap" and "Running Heatmap" tabs to dashboard.
+  - **Details:** Render a GitHub-style calendar grid. Support two modes: "All Activities" (intensity = frequency) and "Running" (intensity = distance). Add single "Heatmap" tab to dashboard with toggle/buttons to switch between the two modes.
 
 - [ ] **4.3 Calculate Streak Metrics**
   - _Plan Item:_ Workout & Running Heatmaps
