@@ -5,12 +5,13 @@ Chart.register(ChartDataLabels);
 
 const authArea = document.getElementById('authArea');
 
-const totalsLoading = document.getElementById('totalsLoading');
-const totals = document.getElementById('totals');
-const totalsEmpty = document.getElementById('totalsEmpty');
-const totalsTitle = document.getElementById('totalsTitle');
-const totCount = document.getElementById('totCount');
-const totTime = document.getElementById('totTime');
+// Dashboard Summary elements
+const summaryLoading = document.getElementById('summaryLoading');
+const summary = document.getElementById('summary');
+const summaryEmpty = document.getElementById('summaryEmpty');
+const summaryDateRange = document.getElementById('summaryDateRange');
+const summaryTotalActivities = document.getElementById('summaryTotalActivities');
+const summaryTotalTime = document.getElementById('summaryTotalTime');
 
 const dateRangeBtns = document.querySelectorAll('.date-range-btn');
 const customDateInputs = document.getElementById('customDateInputs');
@@ -94,7 +95,7 @@ async function loadAuth() {
 }
 
 function renderTotals(list) {
-  totalsLoading.classList.add('hidden');
+  summaryLoading.classList.add('hidden');
   if (!list || list.length === 0) {
     // Update empty message based on current date range
     const { dateRange } = getState();
@@ -107,20 +108,20 @@ function renderTotals(list) {
       all: 'No activities found.',
       custom: 'No activities in the selected date range.'
     };
-    totalsEmpty.textContent = emptyMessages[dateRange.type] || 'No activities found.';
-    totalsEmpty.classList.remove('hidden');
-    totals.classList.add('hidden');
+    summaryEmpty.textContent = emptyMessages[dateRange.type] || 'No activities found.';
+    summaryEmpty.classList.remove('hidden');
+    summary.classList.add('hidden');
     return;
   }
 
-  totalsEmpty.classList.add('hidden');
+  summaryEmpty.classList.add('hidden');
 
   const count = list.length;
   const totalTime = list.reduce((s, a) => s + (a.moving_time_s || 0), 0);
 
-  totCount.textContent = String(count);
-  totTime.textContent = fmtTime(totalTime);
-  totals.classList.remove('hidden');
+  summaryTotalActivities.textContent = String(count);
+  summaryTotalTime.textContent = fmtTime(totalTime);
+  summary.classList.remove('hidden');
 }
 
 async function loadData() {
@@ -130,9 +131,9 @@ async function loadData() {
   const signedIn = await loadAuth();
   if (!signedIn) {
     // Hide loaders and prompt sign-in in empty states
-    totalsLoading.classList.add('hidden');
-    totalsEmpty.textContent = 'Please sign in to see your activities.';
-    totalsEmpty.classList.remove('hidden');
+    summaryLoading.classList.add('hidden');
+    summaryEmpty.textContent = 'Please sign in to see your activities.';
+    summaryEmpty.classList.remove('hidden');
     return;
   }
 
@@ -154,13 +155,13 @@ async function loadData() {
     updateTotalsTitle();
   } catch (e) {
     console.error('Failed to load activities:', e);
-    totalsLoading.classList.add('hidden');
-    totalsEmpty.textContent = 'Failed to load totals.';
-    totalsEmpty.classList.remove('hidden');
+    summaryLoading.classList.add('hidden');
+    summaryEmpty.textContent = 'Failed to load totals.';
+    summaryEmpty.classList.remove('hidden');
   }
 }
 
-// Update totals title based on date range
+// Update dashboard summary date range based on date range
 function updateTotalsTitle() {
   const { dateRange } = getState();
   const titles = {
@@ -199,10 +200,10 @@ function updateTotalsTitle() {
 
   if (startDate) {
     const formatDate = (d) => d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
-    title += ` (${formatDate(startDate)} - ${formatDate(endDate)})`;
+    title = `${formatDate(startDate)} - ${formatDate(endDate)}`;
   }
 
-  totalsTitle.textContent = title;
+  summaryDateRange.textContent = title;
 }
 
 // Update active button state
@@ -357,7 +358,12 @@ function generateColors(count) {
 // Render Activity Count Chart (Donut)
 function renderActivityCountChart(activities) {
   const ctx = document.getElementById('activityCountChart');
+  const loadingEl = document.getElementById('activityCountLoading');
   if (!ctx) return;
+
+  // Show loading state
+  if (loadingEl) loadingEl.style.display = 'flex';
+  ctx.style.display = 'none';
 
   // Group by sport_type
   const counts = {};
@@ -425,12 +431,21 @@ function renderActivityCountChart(activities) {
       }
     }
   });
+
+  // Hide loading, show chart
+  if (loadingEl) loadingEl.style.display = 'none';
+  ctx.style.display = 'block';
 }
 
 // Render Time Distribution Chart (Donut)
 function renderTimeDistChart(activities) {
   const ctx = document.getElementById('timeDistChart');
+  const loadingEl = document.getElementById('timeDistLoading');
   if (!ctx) return;
+
+  // Show loading state
+  if (loadingEl) loadingEl.style.display = 'flex';
+  ctx.style.display = 'none';
 
   // Group by sport_type, sum moving_time_s
   const times = {};
@@ -509,12 +524,21 @@ function renderTimeDistChart(activities) {
       }
     }
   });
+
+  // Hide loading, show chart
+  if (loadingEl) loadingEl.style.display = 'none';
+  ctx.style.display = 'block';
 }
 
 // Render Distance Histogram (Bar Chart for Running Activities)
 function renderDistanceHistogram(activities) {
   const ctx = document.getElementById('distanceHistogramChart');
+  const loadingEl = document.getElementById('distanceHistogramLoading');
   if (!ctx) return;
+
+  // Show loading state
+  if (loadingEl) loadingEl.style.display = 'flex';
+  ctx.style.display = 'none';
 
   // Filter to running activities only
   const runningTypes = ['Run', 'TrailRun', 'VirtualRun'];
@@ -608,6 +632,10 @@ function renderDistanceHistogram(activities) {
       }
     }
   });
+
+  // Hide loading, show chart
+  if (loadingEl) loadingEl.style.display = 'none';
+  ctx.style.display = 'block';
 }
 
 // Render Running Statistics Summary
@@ -1176,7 +1204,12 @@ let trendGranularity = 'week';
 // Render distance trend line chart
 function renderDistanceTrendChart(activities) {
   const ctx = document.getElementById('distanceTrendChart');
+  const loadingEl = document.getElementById('distanceTrendLoading');
   if (!ctx) return;
+
+  // Show loading state
+  if (loadingEl) loadingEl.style.display = 'flex';
+  ctx.style.display = 'none';
 
   const { unitSystem } = getState();
 
@@ -1188,6 +1221,7 @@ function renderDistanceTrendChart(activities) {
       distanceTrendChart.destroy();
       distanceTrendChart = null;
     }
+    if (loadingEl) loadingEl.style.display = 'none';
     return;
   }
 
@@ -1283,13 +1317,23 @@ function renderDistanceTrendChart(activities) {
       }
     }
   });
+
+  // Hide loading, show chart
+  if (loadingEl) loadingEl.style.display = 'none';
+  ctx.style.display = 'block';
 }
 
 // Render pace trend line chart
 function renderPaceTrendChart(activities) {
   const ctx = document.getElementById('paceTrendChart');
+  const loadingEl = document.getElementById('paceTrendLoading');
   const emptyEl = document.getElementById('paceTrendEmpty');
   if (!ctx || !emptyEl) return;
+
+  // Show loading state
+  if (loadingEl) loadingEl.style.display = 'flex';
+  ctx.style.display = 'none';
+  emptyEl.classList.add('hidden');
 
   const { unitSystem } = getState();
 
@@ -1304,13 +1348,11 @@ function renderPaceTrendChart(activities) {
       paceTrendChart.destroy();
       paceTrendChart = null;
     }
+    if (loadingEl) loadingEl.style.display = 'none';
     emptyEl.classList.remove('hidden');
     ctx.style.display = 'none';
     return;
   }
-
-  emptyEl.classList.add('hidden');
-  ctx.style.display = 'block';
 
   const labels = paceData.map(b => b.label);
 
@@ -1409,6 +1451,11 @@ function renderPaceTrendChart(activities) {
       }
     }
   });
+
+  // Hide loading, show chart
+  if (loadingEl) loadingEl.style.display = 'none';
+  emptyEl.classList.add('hidden');
+  ctx.style.display = 'block';
 }
 
 // Update UI when active tab changes

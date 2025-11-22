@@ -113,11 +113,12 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Create the responsive container and grid layout for widgets.
   - Completed on 2025-11-22: Added `.dashboard-grid` single-column responsive layout with proper card styling (background, border, padding). Fixed stat card text wrapping with `white-space: nowrap` on headers and proper spacing. Cards now display cleanly without text breaking awkwardly.
 
-- [x] **3.2.5 Implement Dashboard Navigation**
-  - _Plan Item:_ Dashboard Navigation
+- [x] **3.2.5 Implement Dashboard Summary and Navigation**
+  - _Plan Item:_ Dashboard Summary
   - _Req ID:_ [Req 4]
-  - **Details:** Make "Strava Stats" branding in the header clickable to navigate back to the dashboard home page.
+  - **Details:** Make "Strava Stats" branding in the header clickable to navigate back to the dashboard home page. Add dashboard-wide summary section above tabs showing Date Range (start to end dates), Total Activities, and Total Moving Time. Reorder tabs to: Overview, Duration, Heatmap, Trends, Running Stats.
   - Completed on 2025-11-22: Converted "Strava Stats" branding from `<span>` to `<a>` link pointing to `/dashboard/`. Added `text-decoration: none` to maintain visual appearance while enabling clickable navigation to dashboard home.
+  - Updated on 2025-11-22: Added dashboard summary section above tabs with three stat cards (Date Range, Total Activities, Total Moving Time). Moved stats from Overview tab to dashboard summary so they're visible across all tabs. Updated Overview tab to show only Activity Count Distribution chart. Swapped tab order: Trends now appears before Running Stats. Updated JavaScript to use new `summary*` element IDs and `summaryDateRange` for formatted date ranges showing actual start and end dates instead of preset names.
 
 - [x] **3.3 Create State Management Store**
   - _Plan Item:_ Global State Management
@@ -222,10 +223,11 @@ This document tracks the step-by-step technical tasks required to build the Stra
 
 ## Phase 5: User Experience & Quality Assurance
 
-- [ ] **5.1 Add Loading Skeletons/Spinners**
+- [x] **5.1 Add Loading Skeletons/Spinners**
   - _Plan Item:_ Performance Optimization
-  - _Req ID:_ [Req 11]
+  - _Req ID:_ [Req 12]
   - **Details:** Show visual feedback while data is being fetched or re-calculated.
+  - Completed on 2025-11-22: Added loading spinner animations to all chart components (Activity Count, Time Distribution, Distance Histogram, Distance Trend, Pace Trend). Created CSS styles for `.loading`, `.spinner` with rotation animation, and `.loading-text`. Each chart rendering function now shows a loading spinner before rendering and hides it after the chart is displayed. Initial data fetch already shows "Loading activities..." message in totals section.
 
 - [ ] **5.2 Handle "No Data" States**
   - _Plan Item:_ Empty States

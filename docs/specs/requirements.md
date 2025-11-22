@@ -33,14 +33,16 @@ The Strava Activity Analyzer is a web application designed to authenticate with 
 ### Dashboard & Visualization
 
 4. **Dashboard Navigation**
-   - **User Story**: As a user, I want intuitive navigation so that I can easily return to the main dashboard view.
+   - **User Story**: As a user, I want intuitive navigation so that I can easily return to the main dashboard view and see key metrics at a glance.
    - **Acceptance Criteria**:
      - WHEN the user clicks on "Strava Stats" branding in the top-left header, THEN the system SHALL navigate to the dashboard home page.
+     - WHEN viewing the dashboard, THEN the system SHALL display a summary section above the tabs showing: Date Range (with start and end dates), Total Activities count, and Total Moving Time.
+     - WHEN viewing the dashboard, THEN the system SHALL display tabs in the following order: Overview, Duration, Heatmap, Trends, Running Stats.
 
 5. **Activity Distribution Widgets**
    - **User Story**: As a user, I want to see a breakdown of my sport types by count and duration so that I can understand my training focus.
    - **Acceptance Criteria**:
-     - WHEN the "Overview" tab loads, THEN the system SHALL display totals (Total Activities, Total Moving Time) and an Activity Count Distribution pie/donut chart showing the number of activities per type (Run, Ride, Swim, etc.).
+     - WHEN the "Overview" tab loads, THEN the system SHALL display an Activity Count Distribution pie/donut chart showing the number of activities per type (Run, Ride, Swim, etc.).
      - WHEN the "Time Distribution" tab loads, THEN the system SHALL display a chart showing total moving time aggregated by activity type.
      - WHEN viewing distribution charts, THEN the system SHALL display data labels directly on the chart slices showing count values or time values for segments representing more than 5% of the total.
 

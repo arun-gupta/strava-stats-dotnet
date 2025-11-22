@@ -30,11 +30,11 @@ This document outlines the development phases for the Strava Activity Analyzer, 
 | Priority | Task Description | Requirement ID |
 | :--- | :--- | :--- |
 | **High** | **Dashboard Layout**: Create the main responsive grid layout for the dashboard. | N/A |
-| **High** | **Dashboard Navigation**: Make "Strava Stats" branding in header clickable to navigate back to dashboard home page. | [Req 4] |
+| **High** | **Dashboard Summary**: Add dashboard-wide summary section above tabs showing Date Range (start to end dates), Total Activities, and Total Moving Time. Make "Strava Stats" branding clickable. Display tabs in order: Overview, Duration, Heatmap, Trends, Running Stats. | [Req 4] |
 | **High** | **Global State Management**: Set up state for `Activities`, `DateRange`, and `UnitPreference`. | [Req 9], [Req 10] |
 | **High** | **Date Filter Controls**: Implement UI for selecting presets (7 days, 30 days, YTD, etc.) and custom date ranges. Default to "Last 7 Days" on initial load. | [Req 9] |
 | **High** | **Running Statistics Component**: Implement the logic and UI to calculate totals (count, distance) and find PRs (fastest 10k, etc.). Display summary statistics before the distance histogram for better information hierarchy. | [Req 7] |
-| **Medium** | **Overview Tab**: Implement totals summary (Total Activities, Total Moving Time) and Activity Count Distribution pie chart with data labels on slices > 5%. | [Req 5] |
+| **Medium** | **Overview Tab**: Implement Activity Count Distribution pie chart with data labels on slices > 5%. | [Req 5] |
 | **Medium** | **Time Distribution Tab**: Implement Time Distribution pie chart with data labels on slices > 5%. | [Req 5] |
 | **Medium** | **Distance Histogram**: Implement the bar chart showing the distribution of run distances (1-mile bins). | [Req 7] |
 
