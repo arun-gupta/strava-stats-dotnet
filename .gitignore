@@ -43,3 +43,6 @@ secrets.json
 
 # Ensure any committed .idea files are removed
 *.iml
+
+# JetBrains run configurations runtime files
+.run/*.pid
