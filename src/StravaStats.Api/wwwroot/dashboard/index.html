@@ -50,6 +50,7 @@
         <button class="tab-btn active" data-tab="overview">📊 Overview</button>
         <button class="tab-btn" data-tab="activity-count">📈 Activity Count</button>
         <button class="tab-btn" data-tab="time-dist">⏱️ Time Distribution</button>
+        <button class="tab-btn" data-tab="running-stats">🏃 Running Stats</button>
       </nav>
 
       <!-- Tab Panels -->
@@ -127,6 +128,17 @@
           </section>
         </div>
         <!-- End Time Distribution Tab -->
+
+        <!-- Running Stats Tab -->
+        <div id="tab-running-stats" class="tab-panel">
+          <section class="card">
+            <h4>Distance Distribution</h4>
+            <div class="chart-container">
+              <canvas id="distanceHistogramChart"></canvas>
+            </div>
+          </section>
+        </div>
+        <!-- End Running Stats Tab -->
       </div>
       <!-- End Tab Content -->
 

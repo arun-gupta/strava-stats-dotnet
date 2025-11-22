@@ -26,6 +26,7 @@ const tabPanels = document.querySelectorAll('.tab-panel');
 // Chart instances
 let activityCountChart = null;
 let timeDistChart = null;
+let distanceHistogramChart = null;
 
 // Simple helpers
 const fmtDate = (iso) => new Date(iso).toLocaleDateString();
@@ -442,6 +443,105 @@ function renderTimeDistChart(activities) {
   });
 }
 
+// Render Distance Histogram (Bar Chart for Running Activities)
+function renderDistanceHistogram(activities) {
+  const ctx = document.getElementById('distanceHistogramChart');
+  if (!ctx) return;
+
+  // Filter to running activities only
+  const runningTypes = ['Run', 'TrailRun', 'VirtualRun'];
+  const runs = activities.filter(a => runningTypes.includes(a.sport_type));
+
+  // Get unit system
+  const { unitSystem } = getState();
+  const useMiles = unitSystem === 'imperial';
+  const distLabel = useMiles ? 'mi' : 'km';
+
+  // Convert distances and create bins
+  const distances = runs.map(a => {
+    const meters = a.distance_m || 0;
+    return useMiles ? metersToMiles(meters) : metersToKm(meters);
+  });
+
+  // Define bin ranges (in miles or km depending on unit)
+  const binSize = useMiles ? 1 : 2; // 1 mile or 2 km bins
+  const maxDistance = Math.max(...distances, 0);
+  const numBins = Math.ceil(maxDistance / binSize);
+
+  // Create bin labels and counts
+  const bins = Array(numBins).fill(0);
+  const binLabels = [];
+
+  for (let i = 0; i < numBins; i++) {
+    const start = i * binSize;
+    const end = (i + 1) * binSize;
+    binLabels.push(`${start.toFixed(0)}-${end.toFixed(0)} ${distLabel}`);
+  }
+
+  // Count activities in each bin
+  distances.forEach(dist => {
+    const binIndex = Math.min(Math.floor(dist / binSize), numBins - 1);
+    if (binIndex >= 0) bins[binIndex]++;
+  });
+
+  // Destroy existing chart
+  if (distanceHistogramChart) {
+    distanceHistogramChart.destroy();
+  }
+
+  distanceHistogramChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: binLabels,
+      datasets: [{
+        label: 'Number of Runs',
+        data: bins,
+        backgroundColor: '#36A2EB',
+        borderColor: '#1e293b',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1,
+            color: '#cbd5e1'
+          },
+          grid: {
+            color: '#334155'
+          }
+        },
+        x: {
+          ticks: {
+            color: '#cbd5e1',
+            maxRotation: 45,
+            minRotation: 45
+          },
+          grid: {
+            color: '#334155'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `Runs: ${context.parsed.y}`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
 // Update UI when active tab changes
 function updateActiveTab() {
   const { activeTab } = getState();
@@ -477,6 +577,7 @@ subscribe((state) => {
     updateTotalsTitle();
     renderActivityCountChart(state.filteredActivities);
     renderTimeDistChart(state.filteredActivities);
+    renderDistanceHistogram(state.filteredActivities);
   }
 });
 
@@ -486,4 +587,5 @@ loadData().then(() => {
   const { filteredActivities } = getState();
   renderActivityCountChart(filteredActivities);
   renderTimeDistChart(filteredActivities);
+  renderDistanceHistogram(filteredActivities);
 });
