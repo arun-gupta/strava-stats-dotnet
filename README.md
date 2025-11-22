@@ -29,8 +29,6 @@ cp .env.example .env
 ./start.sh        # first time you may need: chmod +x start.sh
 ```
 
-Tip: `./start.sh` auto-loads `.env`, uses Development, builds, starts the API, and opens the dashboard. You can choose the initial page with `--open=swagger|auth|dashboard` (default: `dashboard`).
-
 After signing in with Strava, you’ll be redirected to your dashboard:
 
 ![Dashboard](docs/images/dashboard.png)
