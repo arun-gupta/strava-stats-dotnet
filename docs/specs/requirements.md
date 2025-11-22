@@ -35,8 +35,8 @@ The Strava Activity Analyzer is a web application designed to authenticate with 
 4. **Activity Distribution Widgets**
    - **User Story**: As a user, I want to see a breakdown of my sport types by count and duration so that I can understand my training focus.
    - **Acceptance Criteria**:
-     - WHEN the "Activity Count Distribution" widget loads, THEN the system SHALL display a pie/donut chart showing the number of activities per type (Run, Ride, Swim, etc.).
-     - WHEN the "Time Distribution" widget loads, THEN the system SHALL display a chart showing total moving time aggregated by activity type.
+     - WHEN the "Overview" tab loads, THEN the system SHALL display totals (Total Activities, Total Moving Time) and an Activity Count Distribution pie/donut chart showing the number of activities per type (Run, Ride, Swim, etc.).
+     - WHEN the "Time Distribution" tab loads, THEN the system SHALL display a chart showing total moving time aggregated by activity type.
      - WHEN viewing distribution charts, THEN the system SHALL display data labels directly on the chart slices showing count values or time values for segments representing more than 5% of the total.
 
 5. **Training Heatmaps**
