@@ -56,7 +56,7 @@ Current highlights:
   - Graceful empty/unauthorized states
 
 ## Roadmap
-See `docs/specs/tasks.md` and `docs/specs/plan.md`.
+See [docs/specs/tasks.md](docs/specs/tasks.md) and [docs/specs/plan.md](docs/specs/plan.md).
 
 
 ### Git hooks (auto add Co‑authored‑by: Junie)
