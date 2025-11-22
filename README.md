@@ -12,12 +12,16 @@ Current highlights:
 - **Smart Data Fetching**: Typed Strava API client with pagination and respectful rate-limit backoff
 - **Activity Normalization**: DST-aware local time conversion, consistent unit handling
 - **Interactive Dashboard** at `/dashboard`:
-  - Tabbed interface (Overview and more coming soon)
+  - **Overview Tab**: Activity summaries with totals, distance, moving time, averages, and recent activities table
+  - **Activity Count Tab**: Donut chart showing distribution of activities by sport type with data labels
+  - **Time Distribution Tab**: Donut chart showing total time per sport type (HH:MM format) with data labels
+  - **Running Stats Tab**:
+    - Distance histogram with dynamic binning (1-mile or 2-km bins based on unit system)
+    - Running summary cards: Total Runs, 10K+ Runs, Total Distance, Avg Pace, Fastest 10K, Longest Run
   - Flexible date range filtering (Last 7/30/90 days, 6 months, YTD, All Time, Custom)
-  - Activity summaries with totals, distance, moving time, and averages
-  - Recent activities table with sortable data
-  - Imperial/Metric unit system support
+  - Imperial/Metric unit system support with automatic conversion
   - Responsive design for mobile and desktop
+  - Real-time reactive updates when filters or units change
 
 ![Dashboard](docs/images/dashboard.png)
 
