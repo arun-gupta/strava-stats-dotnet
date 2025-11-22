@@ -1,10 +1,6 @@
 import { getState, setUser, setAllActivities, setDateRange, setActiveTab, initializeUnitSystem, subscribe, setHeatmapMode } from './js/state.js';
 
 const authArea = document.getElementById('authArea');
-const recentLoading = document.getElementById('recentLoading');
-const recentTable = document.getElementById('recentTable');
-const recentTbody = recentTable.querySelector('tbody');
-const recentEmpty = document.getElementById('recentEmpty');
 
 const totalsLoading = document.getElementById('totalsLoading');
 const totals = document.getElementById('totals');
@@ -87,40 +83,6 @@ async function loadAuth() {
   }
 }
 
-function renderRecent(list) {
-  recentLoading.classList.add('hidden');
-  if (!list || list.length === 0) {
-    recentEmpty.classList.remove('hidden');
-    recentTable.classList.add('hidden');
-    return;
-  }
-
-  recentEmpty.classList.add('hidden');
-  recentTable.classList.remove('hidden');
-  recentTbody.innerHTML = '';
-
-  const { unitSystem } = getState();
-  const useMiles = unitSystem === 'imperial';
-  const distLabel = useMiles ? 'mi' : 'km';
-
-  for (const a of list) {
-    const tr = document.createElement('tr');
-    const date = new Date(a.start_local).toLocaleString([], { dateStyle: 'medium' });
-
-    const dist = useMiles ? metersToMiles(a.distance_m) : metersToKm(a.distance_m);
-    const distStr = `${dist.toFixed(2)} ${distLabel}`;
-
-    tr.innerHTML = `
-      <td>${date}</td>
-      <td>${a.name ?? ''}</td>
-      <td><span class="chip">${a.sport_type ?? ''}</span></td>
-      <td class="right distance">${distStr}</td>
-      <td class="right">${fmtTime(a.moving_time_s)}</td>
-    `;
-    recentTbody.appendChild(tr);
-  }
-}
-
 function renderTotals(list) {
   totalsLoading.classList.add('hidden');
   if (!list || list.length === 0) {
@@ -166,11 +128,8 @@ async function loadData() {
   const signedIn = await loadAuth();
   if (!signedIn) {
     // Hide loaders and prompt sign-in in empty states
-    recentLoading.classList.add('hidden');
     totalsLoading.classList.add('hidden');
-    recentEmpty.textContent = 'Please sign in to see your recent activities.';
-    totalsEmpty.textContent = 'Please sign in to see totals.';
-    recentEmpty.classList.remove('hidden');
+    totalsEmpty.textContent = 'Please sign in to see your activities.';
     totalsEmpty.classList.remove('hidden');
     return;
   }
@@ -186,9 +145,6 @@ async function loadData() {
     const { filteredActivities } = getState();
     console.log('Filtered activities:', filteredActivities.length);
 
-    // Render recent (first 20 from filtered)
-    renderRecent(filteredActivities.slice(0, 20));
-
     // Render totals (all filtered)
     renderTotals(filteredActivities);
 
@@ -196,11 +152,8 @@ async function loadData() {
     updateTotalsTitle();
   } catch (e) {
     console.error('Failed to load activities:', e);
-    recentLoading.classList.add('hidden');
     totalsLoading.classList.add('hidden');
-    recentEmpty.textContent = 'Failed to load activities.';
     totalsEmpty.textContent = 'Failed to load totals.';
-    recentEmpty.classList.remove('hidden');
     totalsEmpty.classList.remove('hidden');
   }
 }
@@ -872,7 +825,6 @@ subscribe((state) => {
   updateActiveTab();
 
   if (dataLoaded) {
-    renderRecent(state.filteredActivities.slice(0, 20));
     renderTotals(state.filteredActivities);
     updateTotalsTitle();
     renderActivityCountChart(state.filteredActivities);
