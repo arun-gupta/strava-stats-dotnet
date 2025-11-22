@@ -7,9 +7,7 @@ const totals = document.getElementById('totals');
 const totalsEmpty = document.getElementById('totalsEmpty');
 const totalsTitle = document.getElementById('totalsTitle');
 const totCount = document.getElementById('totCount');
-const totDistance = document.getElementById('totDistance');
 const totTime = document.getElementById('totTime');
-const avgPer = document.getElementById('avgPer');
 
 const dateRangeBtns = document.querySelectorAll('.date-range-btn');
 const customDateInputs = document.getElementById('customDateInputs');
@@ -105,19 +103,11 @@ function renderTotals(list) {
 
   totalsEmpty.classList.add('hidden');
 
-  const { unitSystem } = getState();
-  const useMiles = unitSystem === 'imperial';
-  const distLabel = useMiles ? 'mi' : 'km';
-
   const count = list.length;
-  const totalMeters = list.reduce((s, a) => s + (a.distance_m || 0), 0);
   const totalTime = list.reduce((s, a) => s + (a.moving_time_s || 0), 0);
-  const totalDist = useMiles ? metersToMiles(totalMeters) : metersToKm(totalMeters);
-  const avgDist = totalDist / count;
+
   totCount.textContent = String(count);
-  totDistance.textContent = `${totalDist.toFixed(1)} ${distLabel}`;
   totTime.textContent = fmtTime(totalTime);
-  avgPer.textContent = `${avgDist.toFixed(2)} ${distLabel}`;
   totals.classList.remove('hidden');
 }
 
