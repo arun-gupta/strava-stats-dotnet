@@ -30,22 +30,23 @@ This document outlines the development phases for the Strava Activity Analyzer, 
 | Priority | Task Description | Requirement ID |
 | :--- | :--- | :--- |
 | **High** | **Dashboard Layout**: Create the main responsive grid layout for the dashboard. | N/A |
-| **High** | **Global State Management**: Set up state for `Activities`, `DateRange`, and `UnitPreference`. | [Req 8], [Req 9] |
-| **High** | **Date Filter Controls**: Implement UI for selecting presets (7 days, 30 days, YTD, etc.) and custom date ranges. Default to "Last 7 Days" on initial load. | [Req 8] |
-| **High** | **Running Statistics Component**: Implement the logic and UI to calculate totals (count, distance) and find PRs (fastest 10k, etc.). | [Req 6] |
-| **Medium** | **Overview Tab**: Implement totals summary (Total Activities, Total Moving Time) and Activity Count Distribution pie chart with data labels on slices > 5%. | [Req 4] |
-| **Medium** | **Time Distribution Tab**: Implement Time Distribution pie chart with data labels on slices > 5%. | [Req 4] |
-| **Medium** | **Distance Histogram**: Implement the bar chart showing the distribution of run distances (1-mile bins). | [Req 6] |
+| **High** | **Dashboard Navigation**: Make "Strava Stats" branding in header clickable to navigate back to dashboard home page. | [Req 4] |
+| **High** | **Global State Management**: Set up state for `Activities`, `DateRange`, and `UnitPreference`. | [Req 9], [Req 10] |
+| **High** | **Date Filter Controls**: Implement UI for selecting presets (7 days, 30 days, YTD, etc.) and custom date ranges. Default to "Last 7 Days" on initial load. | [Req 9] |
+| **High** | **Running Statistics Component**: Implement the logic and UI to calculate totals (count, distance) and find PRs (fastest 10k, etc.). Display summary statistics before the distance histogram for better information hierarchy. | [Req 7] |
+| **Medium** | **Overview Tab**: Implement totals summary (Total Activities, Total Moving Time) and Activity Count Distribution pie chart with data labels on slices > 5%. | [Req 5] |
+| **Medium** | **Time Distribution Tab**: Implement Time Distribution pie chart with data labels on slices > 5%. | [Req 5] |
+| **Medium** | **Distance Histogram**: Implement the bar chart showing the distribution of run distances (1-mile bins). | [Req 7] |
 
 ## Phase 4: Advanced Visualization & Trends
 **Goal:** Implement complex visualizations including heatmaps and time-series trends.
 
 | Priority | Task Description | Requirement ID |
 | :--- | :--- | :--- |
-| **Medium** | **Heatmap Component Logic**: Develop the algorithm to map daily activity intensity to a calendar grid. | [Req 5] |
-| **Medium** | **Heatmap Tab with Mode Toggle**: Render single heatmap tab with toggle between "All Activities" (intensity by total time per day) and "Running Only" (intensity by distance). Display calendar in horizontal layout (days as rows, weeks as columns) to utilize available screen width. Display legend showing intensity scale within the tab. Display workout statistics (Workout Days, Missed Days, Current Streak, Days Since Last, Longest Gap, Total Gap Days). Include gap analysis feature showing detailed list of gap periods. | [Req 5] |
-| **Low** | **Trend Calculation Engine**: Implement logic to aggregate data by day/week/month for trend lines. | [Req 7] |
-| **Low** | **Trends Tab with Mode Toggle**: Render single trends tab with toggle between "All Activities" and "Running Only". Display line charts for distance and pace over time with smoothing (moving average) and aggregation options. | [Req 7] |
+| **Medium** | **Heatmap Component Logic**: Develop the algorithm to map daily activity intensity to a calendar grid. | [Req 6] |
+| **Medium** | **Heatmap Tab with Mode Toggle**: Render single heatmap tab with toggle between "All Activities" (intensity by total time per day) and "Running Only" (intensity by distance). Display calendar in horizontal layout (days as rows, weeks as columns) to utilize available screen width. Display legend showing intensity scale within the tab. Display workout statistics (Workout Days, Missed Days, Current Streak, Days Since Last, Longest Gap, Total Gap Days). Include gap analysis feature showing detailed list of gap periods. | [Req 6] |
+| **Low** | **Trend Calculation Engine**: Implement logic to aggregate data by day/week/month for trend lines. | [Req 8] |
+| **Low** | **Trends Tab with Mode Toggle**: Render single trends tab with toggle between "All Activities" and "Running Only". Display line charts for distance and pace over time with smoothing (moving average) and aggregation options. | [Req 8] |
 
 ## Phase 5: User Experience & Quality Assurance
 **Goal:** Polish the application, handle edge cases, and ensure performance.

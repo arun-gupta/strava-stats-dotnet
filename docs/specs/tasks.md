@@ -113,27 +113,33 @@ This document tracks the step-by-step technical tasks required to build the Stra
   - **Details:** Create the responsive container and grid layout for widgets.
   - Completed on 2025-11-22: Added `.dashboard-grid` single-column responsive layout with proper card styling (background, border, padding). Fixed stat card text wrapping with `white-space: nowrap` on headers and proper spacing. Cards now display cleanly without text breaking awkwardly.
 
+- [x] **3.2.5 Implement Dashboard Navigation**
+  - _Plan Item:_ Dashboard Navigation
+  - _Req ID:_ [Req 4]
+  - **Details:** Make "Strava Stats" branding in the header clickable to navigate back to the dashboard home page.
+  - Completed on 2025-11-22: Converted "Strava Stats" branding from `<span>` to `<a>` link pointing to `/dashboard/`. Added `text-decoration: none` to maintain visual appearance while enabling clickable navigation to dashboard home.
+
 - [x] **3.3 Create State Management Store**
   - _Plan Item:_ Global State Management
-  - _Req ID:_ [Req 8], [Req 9]
+  - _Req ID:_ [Req 9], [Req 10]
   - **Details:** Set up a store (Context API, Redux, Pinia, or simple state) to hold `allActivities`, `filteredActivities`, `dateRange`, and `unitSystem`.
   - Completed on 2025-11-22: Enhanced `js/state.js` with subscriber pattern and centralized state management. Store holds `user`, `allActivities`, `filteredActivities`, `dateRange` (with type and custom dates), and `unitSystem` (imperial/metric). Includes `subscribe()`, `getState()`, `setUser()`, `setAllActivities()`, `setDateRange()`, `setUnitSystem()`, and `initializeUnitSystem()` functions. Automatic filtering logic applies date ranges (last30/ytd/all/custom). Refactored `app.js` to use the store with reactive re-rendering on state changes.
 
 - [x] **3.4 Build Date Range Picker Component**
   - _Plan Item:_ Date Filter Controls
-  - _Req ID:_ [Req 8]
+  - _Req ID:_ [Req 9]
   - **Details:** Create UI for date range presets (Last 7 Days, Last 30 Days, YTD, All Time) and Custom Start/End inputs. Wire up logic to filter the `allActivities` list into `filteredActivities`. Default to "Last 7 Days" on initial load.
   - Completed on 2025-11-22: Added date range picker UI in `index.html` with buttons for Last 7 Days, Last 30 Days, Last 90 Days, Last 6 Months, Year to Date, All Time, and Custom Range with custom date inputs. Styled in `site.css` with flexbox layout. Implemented event handlers in `app.js` that call `setDateRange()` from state store. Custom date inputs show/hide based on selection. Totals title updates dynamically to reflect current date range. Filtering logic in `state.js` automatically applies to `filteredActivities` and triggers re-render via subscriber pattern. Defaults to "Last 7 Days" on initial load.
 
 - [x] **3.4.5 Implement Tabbed Dashboard Layout (Foundation)**
   - _Plan Item:_ Dashboard Layout Enhancement
-  - _Req ID:_ [Req 4], [Req 5], [Req 6], [Req 7]
+  - _Req ID:_ [Req 8], [Req 8], [Req 8], [Req 8]
   - **Details:** Convert dashboard from grid layout to tabbed interface. Create tab infrastructure with initial "Overview" tab (containing current Totals and Recent Activities sections). Implement tab switching logic, state management for active tab, and styling with active state. Ensure tabs are responsive on mobile. The date range filter should remain global and apply to all tabs.
   - Completed on 2025-11-22: Created tabbed interface foundation with "Overview" tab containing existing Totals and Recent Activities. Added tab navigation bar in `index.html` with emoji icon. Styled tabs in `site.css` with active state (bottom border highlight), hover effects, and mobile-responsive horizontal scroll. Added `activeTab` to state.js with `setActiveTab()` function. Implemented tab switching logic in `app.js` that updates button states and panel visibility via subscriber pattern. Date range filter remains global and applies to all tabs.
 
 - [x] **3.5 Implement Overview and Distribution Charts**
   - _Plan Item:_ Overview Tab and Distribution Charts
-  - _Req ID:_ [Req 4]
+  - _Req ID:_ [Req 8]
   - **Details:** Integrate a chart library (e.g., Chart.js, Recharts). Create Overview tab with totals summary and Activity Count pie chart. Create separate Time Distribution tab. Display data labels on chart slices for segments representing more than 5% of the total.
   - Completed on 2025-11-22: Integrated Chart.js (v4.4.0) and chartjs-plugin-datalabels (v2.2.0) via CDN. Implemented donut charts that group activities by `sport_type`:
     - **Overview Tab**: Shows totals summary (Total Activities, Total Moving Time) and Activity Count Distribution chart with count values displayed directly on slices > 5%
@@ -145,58 +151,59 @@ This document tracks the step-by-step technical tasks required to build the Stra
 
 - [x] **3.6 Implement Running Stats Tab**
   - _Plan Item:_ Running Statistics Component & Distance Histogram
-  - _Req ID:_ [Req 6]
-  - **Details:** Add "Running Stats" tab to dashboard combining distance histogram and key statistics.
+  - _Req ID:_ [Req 8]
+  - **Details:** Add "Running Stats" tab to dashboard combining distance histogram and key statistics. Display summary statistics first, followed by the histogram for better information hierarchy.
 
   - [x] **3.6a Implement Distance Histogram**
-    - **Details:** Create logic to bin runs by distance (0-1mi, 1-2mi, 2-3mi, etc.). Render a bar chart using these bins at the top of the Running Stats tab. Filter activities to only include running types (Run, TrailRun, VirtualRun).
+    - **Details:** Create logic to bin runs by distance (0-1mi, 1-2mi, 2-3mi, etc.). Render a bar chart using these bins. Filter activities to only include running types (Run, TrailRun, VirtualRun).
     - Completed on 2025-11-22: Added "🏃 Running Stats" tab with distance histogram bar chart. Filters activities to running types only (Run, TrailRun, VirtualRun). Bins distances dynamically based on unit system: 1-mile bins for imperial, 2-km bins for metric. Chart displays number of runs in each distance range with rotated labels (45°) for readability. Automatically updates when date range or unit system changes via subscriber pattern.
 
   - [x] **3.6b Implement Running Statistics Summary**
-    - **Details:** Below the histogram, create component to compute and display: Total Runs, 10K+ Runs, Total Distance, Avg Pace. Calculate PRs (Fastest 10k, Longest Run) from the filtered list of running activities.
-    - Completed on 2025-11-22: Added Running Summary section below distance histogram with six statistics cards: Total Runs (count of running activities), 10K+ Runs (runs >= 10km), Total Distance (sum with unit conversion), Avg Pace (formatted as MM:SS min/mi or min/km), Fastest 10K (best time for runs >= 10km), and Longest Run (maximum distance). Implemented `renderRunningStats()` function that filters to running types, calculates all metrics with proper unit system support, handles empty states, and integrates with subscriber pattern for reactive updates.
+    - **Details:** Create component to compute and display: Total Runs, 10K+ Runs, Total Distance, Avg Pace. Calculate PRs (Fastest 10k, Longest Run) from the filtered list of running activities.
+    - Completed on 2025-11-22: Added Running Summary section with six statistics cards: Total Runs (count of running activities), 10K+ Runs (runs >= 10km), Total Distance (sum with unit conversion), Avg Pace (formatted as MM:SS min/mi or min/km), Fastest 10K (best time for runs >= 10km), and Longest Run (maximum distance). Implemented `renderRunningStats()` function that filters to running types, calculates all metrics with proper unit system support, handles empty states, and integrates with subscriber pattern for reactive updates.
+    - Updated on 2025-11-22: Reordered Running Stats tab to display summary statistics first, followed by the distance histogram for better information hierarchy and user experience.
 
 ## Phase 4: Advanced Visualization & Trends
 
 - [x] **4.1 Implement Heatmap Data Transformation**
   - _Plan Item:_ Heatmap Component Logic
-  - _Req ID:_ [Req 5]
+  - _Req ID:_ [Req 8]
   - **Details:** Write a function to transform a list of activities into a map of `{ "YYYY-MM-DD": value }` for both "All Activities" (intensity by total time per day) and "Running Only" (intensity by distance) modes.
   - Completed on 2025-11-22: Added `transformToHeatmapData(activities, mode)` function in app.js. Function accepts activities array and mode ('all' or 'running') and returns a map where each date key (YYYY-MM-DD) contains aggregated metrics: count (number of activities), time (total moving time in seconds), and distance (total distance in meters). Supports filtering to running types (Run, TrailRun, VirtualRun) when mode is 'running'. Extracts dates from start_local timestamps for proper timezone handling.
 
 - [x] **4.2 Build Calendar Heatmap Component**
   - _Plan Item:_ Heatmap Tab with Mode Toggle
-  - _Req ID:_ [Req 5]
+  - _Req ID:_ [Req 8]
   - **Details:** Render a GitHub-style calendar grid. Add single "🔥 Heatmap" tab to dashboard with mode toggle/buttons to switch between "All Activities" and "Running Only" views. Display legend showing intensity scale (Less to More) within the Heatmap tab. Calculate and display "Current Streak" and "Longest Streak" metrics based on consecutive days in the filtered dataset. For "All Activities" mode, intensity is measured by total time spent per day.
   - Completed on 2025-11-22: Added "🔥 Heatmap" tab with segmented toggle for modes (All Activities vs Running Only). Implemented calendar heatmap grid (weeks as columns, days as rows) with 5-level color scale based on activity density (All = time/day, Running = distance/day). Integrated with global date range filter and reactive store; rerenders on filter, tab, or mode changes. Added streak metrics section computing Current and Longest streaks across the selected range. Accessible tooltips and ARIA labels included. Styled legend and cells in site.css. Legend is displayed within the Heatmap tab showing intensity scale from Less to More.
 
 - [x] **4.2.1 Add Gap Details Feature**
   - _Plan Item:_ Heatmap Gap Analysis
-  - _Req ID:_ [Req 5]
+  - _Req ID:_ [Req 8]
   - **Details:** Add "Show Gap Details" button to Heatmap tab. When clicked, display a list of all gap periods (consecutive days without activity) in the selected date range, showing the start date, end date, and duration (in days) of each gap. Implement logic to identify gaps from the day values array used in heatmap rendering.
   - Completed on 2025-11-22: Added "Show Gap Details" button below streaks section. Implemented `calculateGaps()` function that identifies consecutive days without activity. Button toggles visibility of gap list and changes text between "Show Gap Details" and "Hide Gap Details". Gap periods displayed as cards showing date range and duration. Displays friendly message when no gaps found.
 
 - [x] **4.2.2 Add Workout Statistics**
   - _Plan Item:_ Heatmap Workout Statistics
-  - _Req ID:_ [Req 5]
+  - _Req ID:_ [Req 8]
   - **Details:** Add comprehensive workout statistics display to Heatmap tab showing: Workout Days (total days with activity), Missed Days (days without activity), Current Streak (consecutive active days ending today), Days Since Last (days since most recent activity), Longest Gap (longest period without activity), and Total Gap Days (sum of all gap days). Display these as a grid of stat cards similar to the overview layout.
   - Completed on 2025-11-22: Replaced "Streaks" section with "Workout Statistics" section containing 6 stat cards in a responsive grid. Added CSS for `.workout-stats-grid` and `.workout-stat` styles. Implemented calculation logic in `renderHeatmap()` for all 6 statistics. Statistics update dynamically when date range or heatmap mode changes.
 
 - [x] **4.2.3 Update Heatmap Legend with Time-based Labels**
   - _Plan Item:_ Heatmap Legend Enhancement
-  - _Req ID:_ [Req 5]
+  - _Req ID:_ [Req 8]
   - **Details:** Replace generic "Less/More" legend labels with descriptive time-based labels for All Activities mode ("No Activity", "< 1h", "1-2h", "2h+") and distance-based labels for Running Only mode. Update quantization logic to use fixed time/distance thresholds instead of relative percentages.
   - Completed on 2025-11-22: Replaced generic "Less/More" legend with descriptive time-based labels. Restructured legend HTML with 4 levels (reduced from 5) using `.legend-item` containers. Implemented `updateLegendLabels()` function to dynamically update labels based on mode (All Activities: "No Activity", "< 1h", "1-2h", "2h+" | Running: "No Activity", "< 5km", "10-15km", "15km+"). Updated `quantizeLevel()` to use fixed thresholds instead of relative percentages. Updated CSS with `.legend-item`, `.legend-label` styles and reduced color levels to 4.
 
 - [x] **4.2.4 Implement Horizontal Heatmap Layout**
   - _Plan Item:_ Heatmap Layout Enhancement
-  - _Req ID:_ [Req 5]
+  - _Req ID:_ [Req 8]
   - **Details:** Change heatmap layout from vertical (weeks as columns, days as rows) to horizontal (days as rows, weeks as columns) to better utilize available screen width. Update rendering logic to build rows for each day of the week (Sunday through Saturday) with week columns flowing horizontally. Add day-of-week labels on the left side. Update CSS to support horizontal scrolling and responsive layout.
   - Completed on 2025-11-22: Changed heatmap from vertical to horizontal layout. Implemented 7 rows (one per day of week: Sun-Sat) with weeks flowing horizontally as columns. Added day-of-week labels on the left side (32px wide, right-aligned). Updated `renderHeatmap()` to group days by day of week and render as `.heatmap-row` elements. Updated CSS: changed `.heatmap` to column flex direction, added `.heatmap-row` and `.day-label` styles, increased day cell size from 12px to 14px, reduced gaps to 3px, added `flex-shrink: 0` to prevent squishing. Layout now better utilizes available screen width with horizontal scrolling support.
 
 - [x] **4.3 Build Trends Tab**
   - _Plan Item:_ Trends Tab with Mode Toggle
-  - _Req ID:_ [Req 7]
+  - _Req ID:_ [Req 8]
   - **Details:** Add single "📈 Trends" tab to dashboard with mode toggle between "All Activities" and "Running Only". Display line charts for distance and pace over time with aggregation options and smoothing.
   - Completed on 2025-11-22: Implemented complete trends functionality with aggregation logic (4.3.1) and visualization (4.3.2).
 

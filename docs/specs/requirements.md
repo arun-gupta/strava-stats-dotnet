@@ -32,14 +32,19 @@ The Strava Activity Analyzer is a web application designed to authenticate with 
 
 ### Dashboard & Visualization
 
-4. **Activity Distribution Widgets**
+4. **Dashboard Navigation**
+   - **User Story**: As a user, I want intuitive navigation so that I can easily return to the main dashboard view.
+   - **Acceptance Criteria**:
+     - WHEN the user clicks on "Strava Stats" branding in the top-left header, THEN the system SHALL navigate to the dashboard home page.
+
+5. **Activity Distribution Widgets**
    - **User Story**: As a user, I want to see a breakdown of my sport types by count and duration so that I can understand my training focus.
    - **Acceptance Criteria**:
      - WHEN the "Overview" tab loads, THEN the system SHALL display totals (Total Activities, Total Moving Time) and an Activity Count Distribution pie/donut chart showing the number of activities per type (Run, Ride, Swim, etc.).
      - WHEN the "Time Distribution" tab loads, THEN the system SHALL display a chart showing total moving time aggregated by activity type.
      - WHEN viewing distribution charts, THEN the system SHALL display data labels directly on the chart slices showing count values or time values for segments representing more than 5% of the total.
 
-5. **Training Heatmaps**
+6. **Training Heatmaps**
    - **User Story**: As a user, I want to visualize my training consistency on a calendar grid so that I can spot streaks and gaps.
    - **Acceptance Criteria**:
      - WHEN the "Heatmap" tab loads, THEN the system SHALL provide a mode toggle to switch between "All Activities" and "Running Only" views.
@@ -50,14 +55,15 @@ The Strava Activity Analyzer is a web application designed to authenticate with 
      - WHEN viewing the heatmap, THEN the system SHALL display workout statistics including: Workout Days (total days with activity), Missed Days (days without activity), Current Streak (consecutive active days ending today), Days Since Last (days since most recent activity), Longest Gap (longest period without activity), and Total Gap Days (sum of all gap days).
      - WHEN the user clicks "Show Gap Details", THEN the system SHALL display a list of all gap periods (consecutive days without activity) in the selected date range, showing the start date, end date, and duration of each gap.
 
-6. **Running Statistics**
+7. **Running Statistics**
    - **User Story**: As a runner, I want to see specific aggregated metrics and personal records so that I can track my running progress.
    - **Acceptance Criteria**:
+     - WHEN viewing the "Running Stats" tab, THEN the system SHALL display the running summary statistics first, followed by the distance distribution histogram.
      - WHEN rendering "Running Stats", THEN the system SHALL display total runs, count of runs over 10K, total distance, and average pace.
      - WHEN calculating Personal Records (PRs), THEN the system SHALL identify the fastest mile, fastest 10K, longest run, and most elevation gain from the fetched activities.
      - WHEN rendering the distance distribution, THEN the system SHALL display a histogram of run distances in 1-mile (or 1-km) bins.
 
-7. **Trend Analysis**
+8. **Trend Analysis**
    - **User Story**: As a user, I want to see how my mileage and pace have changed over time so that I can identify training trends.
    - **Acceptance Criteria**:
      - WHEN the "Trends" tab loads, THEN the system SHALL provide a mode toggle to switch between "All Activities" and "Running Only" views.
@@ -67,7 +73,7 @@ The Strava Activity Analyzer is a web application designed to authenticate with 
 
 ### User Controls & Configuration
 
-8. **Date Filtering**
+9. **Date Filtering**
    - **User Story**: As a user, I want to filter my dashboard by specific dates so that I can analyze a specific training block or year.
    - **Acceptance Criteria**:
      - WHEN the dashboard loads, THEN the system SHALL default to showing the last 7 days of activity data.
@@ -75,7 +81,7 @@ The Strava Activity Analyzer is a web application designed to authenticate with 
      - WHEN the user selects a custom range, THEN the system SHALL allow picking specific start and end dates.
      - WHEN a filter is applied, THEN the system SHALL persist the selection in the URL or session so that a page refresh maintains the context.
 
-9. **Unit Preferences**
+10. **Unit Preferences**
    - **User Story**: As a user, I want to toggle between metric and imperial units so that the data is presented in a format I understand.
    - **Acceptance Criteria**:
      - WHEN the dashboard loads, THEN the system SHALL default to imperial units (miles, min/mile).
@@ -84,13 +90,13 @@ The Strava Activity Analyzer is a web application designed to authenticate with 
 
 ### System Quality & User Experience
 
-10. **Error Handling & Empty States**
+11. **Error Handling & Empty States**
     - **User Story**: As a user, I want clear feedback when no data is available or an error occurs so that I know how to proceed.
     - **Acceptance Criteria**:
       - WHEN a selected date range contains no activities, THEN the system SHALL display a friendly "No activities found" message instead of broken charts.
       - WHEN an API error or network failure occurs, THEN the system SHALL display a descriptive error message with a retry option.
 
-11. **Performance**
+12. **Performance**
     - **User Story**: As a user, I want the dashboard to load quickly so that I have a smooth experience.
     - **Acceptance Criteria**:
       - WHEN the dashboard loads with a typical dataset (<5,000 activities), THEN the initial render SHALL complete within 2 seconds.
