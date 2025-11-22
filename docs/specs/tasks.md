@@ -260,10 +260,19 @@ This document tracks the step-by-step technical tasks required to build the Stra
     - **Activity Load Error Handling**: Updated `loadData()` to show user-friendly error message in dashboard summary and avoid duplicate toasts
     - All toasts include icon, title, message, close button, and auto-dismiss after 5-7 seconds
 
-- [ ] **5.4 Persist User Preferences**
+- [x] **5.4 Persist User Preferences**
   - _Plan Item:_ Persist User Settings
   - _Req ID:_ [Req 8], [Req 9]
   - **Details:** Save the selected Unit System and Date Range to `localStorage` or URL query parameters so they persist on reload.
+  - Completed on 2025-11-22: Implemented localStorage persistence for user preferences:
+    - **Unit System Persistence**: Unit system preference (imperial/metric) is automatically saved to localStorage when changed and restored on page load
+    - **Date Range Persistence**: Date range selection (last7/last30/last90/last6months/ytd/all/custom) is saved to localStorage including custom date values
+    - **Storage Keys**: Used prefixed keys (`strava_dashboard_unit_system`, `strava_dashboard_date_range`) to avoid conflicts
+    - **Error Handling**: Added try-catch blocks around localStorage operations with console warnings for quota exceeded or disabled localStorage
+    - **State Initialization**: State module now loads saved preferences during initialization (before any components render)
+    - **UI Restoration**: Active date range button and custom date inputs are automatically restored to match saved preferences on page load
+    - **Automatic Persistence**: Preferences are saved automatically whenever changed via `setUnitSystem()` or `setDateRange()` functions
+    - Users' filter and unit preferences now persist across browser sessions and page reloads
 
 - [ ] **5.5 Conduct Security Audit**
   - _Plan Item:_ Security Review

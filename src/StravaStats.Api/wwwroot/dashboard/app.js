@@ -256,8 +256,23 @@ function renderTotals(list) {
 }
 
 async function loadData() {
-  // Initialize unit system from browser locale
+  // Initialize unit system from localStorage
   initializeUnitSystem();
+
+  // Restore saved date range button state
+  const { dateRange } = getState();
+  updateActiveButton(dateRange.type);
+
+  // Restore custom date inputs if needed
+  if (dateRange.type === 'custom') {
+    customDateInputs.classList.remove('hidden');
+    if (dateRange.customStart) {
+      customStart.value = dateRange.customStart;
+    }
+    if (dateRange.customEnd) {
+      customEnd.value = dateRange.customEnd;
+    }
+  }
 
   const signedIn = await loadAuth();
   if (!signedIn) {

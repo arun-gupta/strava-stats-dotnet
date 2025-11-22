@@ -1,11 +1,40 @@
 // Global state store for dashboard with subscriber pattern
+// Preferences are persisted to localStorage
+
+// Helper functions for localStorage
+const STORAGE_KEYS = {
+  UNIT_SYSTEM: 'strava_dashboard_unit_system',
+  DATE_RANGE: 'strava_dashboard_date_range'
+};
+
+function loadFromStorage(key, defaultValue) {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : defaultValue;
+  } catch (e) {
+    console.warn(`Failed to load ${key} from localStorage:`, e);
+    return defaultValue;
+  }
+}
+
+function saveToStorage(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {
+    console.warn(`Failed to save ${key} to localStorage:`, e);
+  }
+}
+
+// Load preferences from localStorage or use defaults
+const savedUnitSystem = loadFromStorage(STORAGE_KEYS.UNIT_SYSTEM, 'imperial');
+const savedDateRange = loadFromStorage(STORAGE_KEYS.DATE_RANGE, { type: 'last7', customStart: null, customEnd: null });
 
 const state = {
   user: null,
   allActivities: [],
   filteredActivities: [],
-  dateRange: { type: 'last7', customStart: null, customEnd: null }, // type: 'all' | 'ytd' | 'last7' | 'last30' | 'custom'
-  unitSystem: 'imperial', // 'metric' | 'imperial'
+  dateRange: savedDateRange,
+  unitSystem: savedUnitSystem,
   activeTab: 'overview', // 'overview' | 'activity-count' | 'time-dist' | 'heatmap' | etc.
   heatmapMode: 'all', // 'all' | 'running'
 };
@@ -45,6 +74,7 @@ export function setAllActivities(list) {
 // Set date range and reapply filter
 export function setDateRange(type, customStart = null, customEnd = null) {
   state.dateRange = { type, customStart, customEnd };
+  saveToStorage(STORAGE_KEYS.DATE_RANGE, state.dateRange);
   applyFilter();
 }
 
@@ -52,6 +82,7 @@ export function setDateRange(type, customStart = null, customEnd = null) {
 export function setUnitSystem(system) {
   if (system === 'metric' || system === 'imperial') {
     state.unitSystem = system;
+    saveToStorage(STORAGE_KEYS.UNIT_SYSTEM, system);
     notify();
   }
 }
@@ -122,8 +153,9 @@ export function setHeatmapMode(mode) {
   }
 }
 
-// Initialize unit system (defaults to imperial)
+// Initialize unit system (loads from localStorage or defaults to imperial)
 export function initializeUnitSystem() {
-  // Default to imperial units (miles, min/mile)
-  state.unitSystem = 'imperial';
+  // Unit system is already loaded from localStorage during state initialization
+  // This function is kept for compatibility but doesn't need to do anything
+  // since the unit system is now loaded from localStorage on module load
 }
