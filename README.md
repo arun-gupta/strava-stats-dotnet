@@ -12,18 +12,39 @@ Current highlights:
 - **Smart Data Fetching**: Typed Strava API client with pagination and respectful rate-limit backoff
 - **Activity Normalization**: DST-aware local time conversion, consistent unit handling
 - **Interactive Dashboard** at `/dashboard`:
-  - **Overview Tab**: Activity summaries with totals, distance, moving time, averages, and recent activities table
-  - **Activity Count Tab**: Donut chart showing distribution of activities by sport type with data labels
-  - **Time Distribution Tab**: Donut chart showing total time per sport type (HH:MM format) with data labels
+  - **Dashboard Summary**: Date range, total activities, and total moving time visible across all tabs
+  - **Overview Tab**: Activity count distribution donut chart by sport type
+  - **Heatmap Tab**: GitHub-style contribution heatmap with:
+    - Mode toggle (All Activities / Running Only)
+    - Workout statistics: days active, current/longest streak, gaps analysis
+    - Distance-based levels for running mode, time-based for all activities
+  - **Trends Tab**: Running-specific line charts with:
+    - Distance over time with 7-day moving average smoothing
+    - Pace over time with inverted y-axis (faster at top)
+    - Granularity selector (Daily/Weekly/Monthly/Yearly)
   - **Running Stats Tab**:
-    - Distance histogram with dynamic binning (1-mile or 2-km bins based on unit system)
     - Running summary cards: Total Runs, 10K+ Runs, Total Distance, Avg Pace, Fastest 10K, Longest Run
+    - Distance histogram with dynamic binning (1-mile or 2-km bins)
+  - **Duration Tab**: Donut chart showing total time per sport type
   - Flexible date range filtering (Last 7/30/90 days, 6 months, YTD, All Time, Custom)
   - Imperial/Metric unit system support with automatic conversion
+  - Loading spinners for all charts
   - Responsive design for mobile and desktop
   - Real-time reactive updates when filters or units change
 
-![Dashboard](docs/images/dashboard.png)
+### Screenshots
+
+| Activity Overview | Duration by Type | Heatmap - All Activities |
+|:---:|:---:|:---:|
+| [![Overview](docs/images/overview.png)](docs/images/overview.png) | [![Duration](docs/images/duration.png)](docs/images/duration.png) | [![Heatmap All](docs/images/heatmap-activity.png)](docs/images/heatmap-activity.png) |
+
+| Heatmap - Running Only | Running Distance Trends | Running Pace Trends |
+|:---:|:---:|:---:|
+| [![Heatmap Running](docs/images/heatmap-running.png)](docs/images/heatmap-running.png) | [![Distance Trends](docs/images/trends-distance.png)](docs/images/trends-distance.png) | [![Pace Trends](docs/images/trends-pace.png)](docs/images/trends-pace.png) |
+
+| Running Statistics | | |
+|:---:|:---:|:---:|
+| [![Running Stats](docs/images/running-stats.png)](docs/images/running-stats.png) | | |
 
 ## Quickstart
 
