@@ -755,7 +755,7 @@ function renderHeatmap(activities) {
     const metrics = map[key];
     let value = 0;
     if (metrics) {
-      value = (heatmapMode === 'running') ? metrics.distance : metrics.count;
+      value = (heatmapMode === 'running') ? metrics.distance : metrics.time;
     }
     maxValue = Math.max(maxValue, value);
     days.push({ date: new Date(d), value, metrics });

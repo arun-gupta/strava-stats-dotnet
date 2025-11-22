@@ -63,23 +63,30 @@ function applyFilter() {
   if (type === 'all') {
     state.filteredActivities = [...state.allActivities];
   } else {
-    const now = Date.now();
+    const now = new Date();
     let afterDate;
 
     if (type === 'last7') {
-      afterDate = new Date(now - 7 * 24 * 60 * 60 * 1000);
+      afterDate = new Date(now);
+      afterDate.setDate(afterDate.getDate() - 7);
+      afterDate.setHours(0, 0, 0, 0);
     } else if (type === 'last30') {
-      afterDate = new Date(now - 30 * 24 * 60 * 60 * 1000);
+      afterDate = new Date(now);
+      afterDate.setDate(afterDate.getDate() - 30);
+      afterDate.setHours(0, 0, 0, 0);
     } else if (type === 'last90') {
-      afterDate = new Date(now - 90 * 24 * 60 * 60 * 1000);
+      afterDate = new Date(now);
+      afterDate.setDate(afterDate.getDate() - 90);
+      afterDate.setHours(0, 0, 0, 0);
     } else if (type === 'last6months') {
-      const sixMonthsAgo = new Date();
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-      afterDate = sixMonthsAgo;
+      afterDate = new Date(now);
+      afterDate.setMonth(afterDate.getMonth() - 6);
+      afterDate.setHours(0, 0, 0, 0);
     } else if (type === 'ytd') {
-      afterDate = new Date(new Date().getFullYear(), 0, 1); // Jan 1 of current year
+      afterDate = new Date(now.getFullYear(), 0, 1); // Jan 1 of current year
     } else if (type === 'custom' && customStart) {
       afterDate = new Date(customStart);
+      afterDate.setHours(0, 0, 0, 0);
     } else {
       state.filteredActivities = [...state.allActivities];
       notify();
@@ -91,6 +98,7 @@ function applyFilter() {
       if (activityDate < afterDate) return false;
       if (type === 'custom' && customEnd) {
         const beforeDate = new Date(customEnd);
+        beforeDate.setHours(23, 59, 59, 999); // Include entire end day
         if (activityDate > beforeDate) return false;
       }
       return true;
