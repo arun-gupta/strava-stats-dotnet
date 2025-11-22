@@ -137,6 +137,40 @@
               <canvas id="distanceHistogramChart"></canvas>
             </div>
           </section>
+
+          <section class="card">
+            <h4>Running Summary</h4>
+            <div id="runningStatsLoading">Loading running stats…</div>
+            <div id="runningStats" class="hidden">
+              <div class="grid">
+                <article>
+                  <header>Total Runs</header>
+                  <strong id="totalRuns">—</strong>
+                </article>
+                <article>
+                  <header>10K+ Runs</header>
+                  <strong id="runs10kPlus">—</strong>
+                </article>
+                <article>
+                  <header>Total Distance</header>
+                  <strong id="totalRunDistance">—</strong>
+                </article>
+                <article>
+                  <header>Avg Pace</header>
+                  <strong id="avgPace">—</strong>
+                </article>
+                <article>
+                  <header>Fastest 10K</header>
+                  <strong id="fastest10k">—</strong>
+                </article>
+                <article>
+                  <header>Longest Run</header>
+                  <strong id="longestRun">—</strong>
+                </article>
+              </div>
+            </div>
+            <div id="runningStatsEmpty" class="hidden">No running activities in the selected date range.</div>
+          </section>
         </div>
         <!-- End Running Stats Tab -->
       </div>

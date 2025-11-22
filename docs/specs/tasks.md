@@ -141,7 +141,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
     - Both charts use color-coded legends positioned on the right, are responsive (400px mobile, 500px desktop), and automatically update when date range filter changes via subscriber pattern
     - Added `generateColors()` helper with 10 distinct colors for consistent styling
 
-- [ ] **3.6 Implement Running Stats Tab**
+- [x] **3.6 Implement Running Stats Tab**
   - _Plan Item:_ Running Statistics Component & Distance Histogram
   - _Req ID:_ [Req 6]
   - **Details:** Add "Running Stats" tab to dashboard combining distance histogram and key statistics.
@@ -150,8 +150,9 @@ This document tracks the step-by-step technical tasks required to build the Stra
     - **Details:** Create logic to bin runs by distance (0-1mi, 1-2mi, 2-3mi, etc.). Render a bar chart using these bins at the top of the Running Stats tab. Filter activities to only include running types (Run, TrailRun, VirtualRun).
     - Completed on 2025-11-22: Added "🏃 Running Stats" tab with distance histogram bar chart. Filters activities to running types only (Run, TrailRun, VirtualRun). Bins distances dynamically based on unit system: 1-mile bins for imperial, 2-km bins for metric. Chart displays number of runs in each distance range with rotated labels (45°) for readability. Automatically updates when date range or unit system changes via subscriber pattern.
 
-  - [ ] **3.6b Implement Running Statistics Summary**
+  - [x] **3.6b Implement Running Statistics Summary**
     - **Details:** Below the histogram, create component to compute and display: Total Runs, 10K+ Runs, Total Distance, Avg Pace. Calculate PRs (Fastest 10k, Longest Run) from the filtered list of running activities.
+    - Completed on 2025-11-22: Added Running Summary section below distance histogram with six statistics cards: Total Runs (count of running activities), 10K+ Runs (runs >= 10km), Total Distance (sum with unit conversion), Avg Pace (formatted as MM:SS min/mi or min/km), Fastest 10K (best time for runs >= 10km), and Longest Run (maximum distance). Implemented `renderRunningStats()` function that filters to running types, calculates all metrics with proper unit system support, handles empty states, and integrates with subscriber pattern for reactive updates.
 
 ## Phase 4: Advanced Visualization & Trends
 

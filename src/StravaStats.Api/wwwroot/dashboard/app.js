@@ -542,6 +542,86 @@ function renderDistanceHistogram(activities) {
   });
 }
 
+// Render Running Statistics Summary
+function renderRunningStats(activities) {
+  const runningStatsLoading = document.getElementById('runningStatsLoading');
+  const runningStats = document.getElementById('runningStats');
+  const runningStatsEmpty = document.getElementById('runningStatsEmpty');
+
+  // Filter to running activities only
+  const runningTypes = ['Run', 'TrailRun', 'VirtualRun'];
+  const runs = activities.filter(a => runningTypes.includes(a.sport_type));
+
+  runningStatsLoading.classList.add('hidden');
+
+  if (!runs || runs.length === 0) {
+    runningStatsEmpty.classList.remove('hidden');
+    runningStats.classList.add('hidden');
+    return;
+  }
+
+  runningStatsEmpty.classList.add('hidden');
+  runningStats.classList.remove('hidden');
+
+  // Get unit system
+  const { unitSystem } = getState();
+  const useMiles = unitSystem === 'imperial';
+  const distLabel = useMiles ? 'mi' : 'km';
+  const paceLabel = useMiles ? 'min/mi' : 'min/km';
+
+  // Total Runs
+  const totalRuns = runs.length;
+  document.getElementById('totalRuns').textContent = totalRuns;
+
+  // 10K+ Runs (10000 meters = 10 km)
+  const runs10kPlus = runs.filter(a => a.distance_m >= 10000).length;
+  document.getElementById('runs10kPlus').textContent = runs10kPlus;
+
+  // Total Distance
+  const totalMeters = runs.reduce((sum, a) => sum + (a.distance_m || 0), 0);
+  const totalDistance = useMiles ? metersToMiles(totalMeters) : metersToKm(totalMeters);
+  document.getElementById('totalRunDistance').textContent = `${totalDistance.toFixed(1)} ${distLabel}`;
+
+  // Average Pace (total time / total distance)
+  const totalTime = runs.reduce((sum, a) => sum + (a.moving_time_s || 0), 0);
+  const avgPaceMinPerUnit = totalDistance > 0 ? (totalTime / 60) / totalDistance : 0;
+  const avgPaceMin = Math.floor(avgPaceMinPerUnit);
+  const avgPaceSec = Math.floor((avgPaceMinPerUnit - avgPaceMin) * 60);
+  document.getElementById('avgPace').textContent = avgPaceMinPerUnit > 0
+    ? `${avgPaceMin}:${avgPaceSec.toString().padStart(2, '0')} ${paceLabel}`
+    : '—';
+
+  // Fastest 10K (minimum pace for runs >= 10K)
+  const runs10k = runs.filter(a => a.distance_m >= 10000);
+  let fastest10kText = '—';
+  if (runs10k.length > 0) {
+    // Find the run with the best pace (lowest time for >= 10K)
+    const fastest = runs10k.reduce((best, a) => {
+      const dist = useMiles ? metersToMiles(a.distance_m) : metersToKm(a.distance_m);
+      const pace = (a.moving_time_s / 60) / dist;
+      const bestDist = useMiles ? metersToMiles(best.distance_m) : metersToKm(best.distance_m);
+      const bestPace = (best.moving_time_s / 60) / bestDist;
+      return pace < bestPace ? a : best;
+    });
+
+    // Calculate total time for this run
+    const fastestTime = fastest.moving_time_s;
+    const fastestMin = Math.floor(fastestTime / 60);
+    const fastestSec = Math.floor(fastestTime % 60);
+    fastest10kText = `${fastestMin}:${fastestSec.toString().padStart(2, '0')}`;
+  }
+  document.getElementById('fastest10k').textContent = fastest10kText;
+
+  // Longest Run
+  if (runs.length > 0) {
+    const longest = runs.reduce((max, a) => a.distance_m > max.distance_m ? a : max);
+    const longestDist = useMiles ? metersToMiles(longest.distance_m) : metersToKm(longest.distance_m);
+    document.getElementById('longestRun').textContent = `${longestDist.toFixed(2)} ${distLabel}`;
+  } else {
+    document.getElementById('longestRun').textContent = '—';
+  }
+}
+
 // Update UI when active tab changes
 function updateActiveTab() {
   const { activeTab } = getState();
@@ -578,6 +658,7 @@ subscribe((state) => {
     renderActivityCountChart(state.filteredActivities);
     renderTimeDistChart(state.filteredActivities);
     renderDistanceHistogram(state.filteredActivities);
+    renderRunningStats(state.filteredActivities);
   }
 });
 
@@ -588,4 +669,5 @@ loadData().then(() => {
   renderActivityCountChart(filteredActivities);
   renderTimeDistChart(filteredActivities);
   renderDistanceHistogram(filteredActivities);
+  renderRunningStats(filteredActivities);
 });
