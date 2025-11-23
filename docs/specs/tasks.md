@@ -136,13 +136,13 @@ This document tracks the step-by-step technical tasks required to build the Stra
 
 - [x] **3.4.5 Implement Tabbed Dashboard Layout (Foundation)**
   - _Plan Item:_ Dashboard Layout Enhancement
-  - _Req ID:_ [Req 8], [Req 8], [Req 8], [Req 8]
+  - _Req ID:_ [Req 4]
   - **Details:** Convert dashboard from grid layout to tabbed interface. Create tab infrastructure with initial "Overview" tab (containing current Totals and Recent Activities sections). Implement tab switching logic, state management for active tab, and styling with active state. Ensure tabs are responsive on mobile. The date range filter should remain global and apply to all tabs.
   - Completed on 2025-11-22: Created tabbed interface foundation with "Overview" tab containing existing Totals and Recent Activities. Added tab navigation bar in `index.html` with emoji icon. Styled tabs in `site.css` with active state (bottom border highlight), hover effects, and mobile-responsive horizontal scroll. Added `activeTab` to state.js with `setActiveTab()` function. Implemented tab switching logic in `app.js` that updates button states and panel visibility via subscriber pattern. Date range filter remains global and applies to all tabs.
 
 - [x] **3.5 Implement Overview and Distribution Charts**
   - _Plan Item:_ Overview Tab and Distribution Charts
-  - _Req ID:_ [Req 8]
+  - _Req ID:_ [Req 5]
   - **Details:** Integrate a chart library (e.g., Chart.js, Recharts). Create Overview tab with totals summary and Activity Count pie chart. Create separate Time Distribution tab. Display data labels on chart slices for segments representing more than 5% of the total.
   - Completed on 2025-11-22: Integrated Chart.js (v4.4.0) and chartjs-plugin-datalabels (v2.2.0) via CDN. Implemented donut charts that group activities by `sport_type`:
     - **Overview Tab**: Shows totals summary (Total Activities, Total Moving Time) and Activity Count Distribution chart with count values displayed directly on slices > 5%
@@ -154,7 +154,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
 
 - [x] **3.6 Implement Running Stats Tab**
   - _Plan Item:_ Running Statistics Component & Distance Histogram
-  - _Req ID:_ [Req 8]
+  - _Req ID:_ [Req 7]
   - **Details:** Add "Running Stats" tab to dashboard combining distance histogram and key statistics. Display summary statistics first, followed by the histogram for better information hierarchy.
 
   - [x] **3.6a Implement Distance Histogram**
@@ -170,37 +170,37 @@ This document tracks the step-by-step technical tasks required to build the Stra
 
 - [x] **4.1 Implement Heatmap Data Transformation**
   - _Plan Item:_ Heatmap Component Logic
-  - _Req ID:_ [Req 8]
+  - _Req ID:_ [Req 6]
   - **Details:** Write a function to transform a list of activities into a map of `{ "YYYY-MM-DD": value }` for both "All Activities" (intensity by total time per day) and "Running Only" (intensity by distance) modes.
   - Completed on 2025-11-22: Added `transformToHeatmapData(activities, mode)` function in app.js. Function accepts activities array and mode ('all' or 'running') and returns a map where each date key (YYYY-MM-DD) contains aggregated metrics: count (number of activities), time (total moving time in seconds), and distance (total distance in meters). Supports filtering to running types (Run, TrailRun, VirtualRun) when mode is 'running'. Extracts dates from start_local timestamps for proper timezone handling.
 
 - [x] **4.2 Build Calendar Heatmap Component**
   - _Plan Item:_ Heatmap Tab with Mode Toggle
-  - _Req ID:_ [Req 8]
+  - _Req ID:_ [Req 6]
   - **Details:** Render a GitHub-style calendar grid. Add single "🔥 Heatmap" tab to dashboard with mode toggle/buttons to switch between "All Activities" and "Running Only" views. Display legend showing intensity scale (Less to More) within the Heatmap tab. Calculate and display "Current Streak" and "Longest Streak" metrics based on consecutive days in the filtered dataset. For "All Activities" mode, intensity is measured by total time spent per day.
   - Completed on 2025-11-22: Added "🔥 Heatmap" tab with segmented toggle for modes (All Activities vs Running Only). Implemented calendar heatmap grid (weeks as columns, days as rows) with 5-level color scale based on activity density (All = time/day, Running = distance/day). Integrated with global date range filter and reactive store; rerenders on filter, tab, or mode changes. Added streak metrics section computing Current and Longest streaks across the selected range. Accessible tooltips and ARIA labels included. Styled legend and cells in site.css. Legend is displayed within the Heatmap tab showing intensity scale from Less to More.
 
 - [x] **4.2.1 Add Gap Details Feature**
   - _Plan Item:_ Heatmap Gap Analysis
-  - _Req ID:_ [Req 8]
+  - _Req ID:_ [Req 6]
   - **Details:** Add "Show Gap Details" button to Heatmap tab. When clicked, display a list of all gap periods (consecutive days without activity) in the selected date range, showing the start date, end date, and duration (in days) of each gap. Implement logic to identify gaps from the day values array used in heatmap rendering.
   - Completed on 2025-11-22: Added "Show Gap Details" button below streaks section. Implemented `calculateGaps()` function that identifies consecutive days without activity. Button toggles visibility of gap list and changes text between "Show Gap Details" and "Hide Gap Details". Gap periods displayed as cards showing date range and duration. Displays friendly message when no gaps found.
 
 - [x] **4.2.2 Add Workout Statistics**
   - _Plan Item:_ Heatmap Workout Statistics
-  - _Req ID:_ [Req 8]
+  - _Req ID:_ [Req 6]
   - **Details:** Add comprehensive workout statistics display to Heatmap tab showing: Workout Days (total days with activity), Missed Days (days without activity), Current Streak (consecutive active days ending today), Days Since Last (days since most recent activity), Longest Gap (longest period without activity), and Total Gap Days (sum of all gap days). Display these as a grid of stat cards similar to the overview layout.
   - Completed on 2025-11-22: Replaced "Streaks" section with "Workout Statistics" section containing 6 stat cards in a responsive grid. Added CSS for `.workout-stats-grid` and `.workout-stat` styles. Implemented calculation logic in `renderHeatmap()` for all 6 statistics. Statistics update dynamically when date range or heatmap mode changes.
 
 - [x] **4.2.3 Update Heatmap Legend with Time-based Labels**
   - _Plan Item:_ Heatmap Legend Enhancement
-  - _Req ID:_ [Req 8]
+  - _Req ID:_ [Req 6]
   - **Details:** Replace generic "Less/More" legend labels with descriptive time-based labels for All Activities mode ("No Activity", "< 1h", "1-2h", "2h+") and distance-based labels for Running Only mode. Update quantization logic to use fixed time/distance thresholds instead of relative percentages.
   - Completed on 2025-11-22: Replaced generic "Less/More" legend with descriptive time-based labels. Restructured legend HTML with 4 levels (reduced from 5) using `.legend-item` containers. Implemented `updateLegendLabels()` function to dynamically update labels based on mode (All Activities: "No Activity", "< 1h", "1-2h", "2h+" | Running: "No Activity", "< 5km", "10-15km", "15km+"). Updated `quantizeLevel()` to use fixed thresholds instead of relative percentages. Updated CSS with `.legend-item`, `.legend-label` styles and reduced color levels to 4.
 
 - [x] **4.2.4 Implement Horizontal Heatmap Layout**
   - _Plan Item:_ Heatmap Layout Enhancement
-  - _Req ID:_ [Req 8]
+  - _Req ID:_ [Req 6]
   - **Details:** Change heatmap layout from vertical (weeks as columns, days as rows) to horizontal (days as rows, weeks as columns) to better utilize available screen width. Update rendering logic to build rows for each day of the week (Sunday through Saturday) with week columns flowing horizontally. Add day-of-week labels on the left side. Update CSS to support horizontal scrolling and responsive layout.
   - Completed on 2025-11-22: Changed heatmap from vertical to horizontal layout. Implemented 7 rows (one per day of week: Sun-Sat) with weeks flowing horizontally as columns. Added day-of-week labels on the left side (32px wide, right-aligned). Updated `renderHeatmap()` to group days by day of week and render as `.heatmap-row` elements. Updated CSS: changed `.heatmap` to column flex direction, added `.heatmap-row` and `.day-label` styles, increased day cell size from 12px to 14px, reduced gaps to 3px, added `flex-shrink: 0` to prevent squishing. Layout now better utilizes available screen width with horizontal scrolling support.
 
@@ -234,7 +234,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
 
 - [x] **5.2 Handle "No Data" States**
   - _Plan Item:_ Empty States
-  - _Req ID:_ [Req 10]
+  - _Req ID:_ [Req 11]
   - **Details:** Ensure widgets display a friendly message if the date filter results in zero activities.
   - Completed on 2025-11-22: Added empty state handling to all charts and tabs:
     - **Overview Tab**: Shows "No activities in the selected date range" when activity count chart has no data
@@ -247,7 +247,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
 
 - [x] **5.3 Implement Global Error Boundary/Toast**
   - _Plan Item:_ Error Handling UI
-  - _Req ID:_ [Req 10]
+  - _Req ID:_ [Req 11]
   - **Details:** Catch API errors (401, 500) and display a user-friendly notification or error page.
   - Completed on 2025-11-22: Implemented comprehensive toast notification system for user-friendly error handling:
     - **Toast Notification Component**: Created reusable toast system with 4 types (error, warning, info, success) with distinct styling (red, orange, blue, green borders)
@@ -264,7 +264,7 @@ This document tracks the step-by-step technical tasks required to build the Stra
 
 - [x] **5.4 Persist User Preferences**
   - _Plan Item:_ Persist User Settings
-  - _Req ID:_ [Req 8], [Req 9]
+  - _Req ID:_ [Req 9], [Req 10]
   - **Details:** Save the selected Unit System and Date Range to `localStorage` or URL query parameters so they persist on reload.
   - Completed on 2025-11-22: Implemented localStorage persistence for user preferences:
     - **Unit System Persistence**: Unit system preference (imperial/metric) is automatically saved to localStorage when changed and restored on page load
