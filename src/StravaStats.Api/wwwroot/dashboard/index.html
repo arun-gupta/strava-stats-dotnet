@@ -9,20 +9,25 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <style>
+      body { margin: 0; padding: 0; }
       header.container { margin-top: 1rem; }
       table { font-size: .95rem; }
     </style>
   </head>
   <body>
+    <!-- Strava Banner -->
+    <div class="strava-banner">
+      <div class="container" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span style="color: white; font-size: 1.25rem; font-weight: 600;">Strava Activity Analyzer (DotNet)</span>
+        </div>
+        <div id="authArea" style="display: flex; align-items: center; gap: 1rem;">
+          <span class="muted" style="color: rgba(255, 255, 255, 0.7);">Checking session…</span>
+        </div>
+      </div>
+    </div>
+
     <header class="container">
-      <nav>
-        <ul>
-          <li><a href="/dashboard/" class="brand" style="text-decoration: none;">Strava Activity Analyzer</a></li>
-        </ul>
-        <ul id="authArea">
-          <li class="muted">Checking session…</li>
-        </ul>
-      </nav>
     </header>
 
     <main class="container" role="main">
