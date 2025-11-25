@@ -36,11 +36,11 @@ Current highlights:
 
 | Activity Overview | Duration by Type | Heatmap - All Activities |
 |:---:|:---:|:---:|
-| [![Overview](./docs/images/overview.png)](./docs/images/overview.png) | [![Duration](./docs/images/duration.png)](./docs/images/duration.png) | [![Heatmap All](./docs/images/heatmap-all.png)](./docs/images/heatmap-all.png) |
+| [![Overview](./docs/images/overview.png?v=2)](./docs/images/overview.png?v=2) | [![Duration](./docs/images/duration.png?v=2)](./docs/images/duration.png?v=2) | [![Heatmap All](./docs/images/heatmap-all.png?v=2)](./docs/images/heatmap-all.png?v=2) |
 
 | Heatmap - Running Only | Running Trends | Running Statistics |
 |:---:|:---:|:---:|
-| [![Heatmap Running](./docs/images/heatmap-running.png)](./docs/images/heatmap-running.png) | [![Trends](./docs/images/trends.png)](./docs/images/trends.png) | [![Running Stats](./docs/images/running-stats.png)](./docs/images/running-stats.png) |
+| [![Heatmap Running](./docs/images/heatmap-running.png?v=2)](./docs/images/heatmap-running.png?v=2) | [![Trends](./docs/images/trends.png?v=2)](./docs/images/trends.png?v=2) | [![Running Stats](./docs/images/running-stats.png?v=2)](./docs/images/running-stats.png?v=2) |
 
 ## Quickstart
 
